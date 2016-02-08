@@ -45,9 +45,29 @@ for i=1:length(xdesired)
    L5=[L5,length5];
    L6=[L6,length6];
    
-%    [angle11,angle12]=legangle(l1,length1,1,1);
-%    a11=[a11,angle11];
-%    a12=[a12,angle12];
+   [angle11,angle12]=legangle(l1,length1,0.16,1);
+   a11=[a11,angle11];
+   a12=[a12,angle12];
+
+   [angle21,angle22]=legangle(l2,length2,0.16,1);
+   a21=[a21,angle21];
+   a22=[a22,angle22];
+   
+   [angle31,angle32]=legangle(l3,length3,0.16,1);
+   a31=[a31,angle31];
+   a32=[a32,angle32];
+
+   [angle41,angle42]=legangle(l4,length4,0.16,1);
+   a41=[a41,angle41];
+   a42=[a42,angle42];
+   
+   [angle51,angle52]=legangle(l5,length5,0.16,1);
+   a51=[a51,angle51];
+   a52=[a52,angle52];
+
+   [angle61,angle62]=legangle(l6,length6,0.16,1);
+   a61=[a61,angle61];
+   a62=[a62,angle62];
    
 end
 
