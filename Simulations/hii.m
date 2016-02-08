@@ -33,6 +33,8 @@ a52=[];
 a61=[];
 a62=[];
 
+sim('demostration.slx')
+
 for i=1:length(xdesired)
  
    [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6]=traj(xdesired(i),ydesired(i),1+zdesired(i),anglex(i)+axtilt(i),angley(i)+aytilt(i),anglez(i)); 
