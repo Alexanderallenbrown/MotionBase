@@ -72,7 +72,7 @@ for i=1:length(xdesired)
 end
 
 figure(1)
-plot(time(1:101),L1)
+plot(time(1:101),a12)
 
 
 
