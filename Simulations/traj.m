@@ -1,23 +1,41 @@
-function [length1,L1,length2,L2,length3,L3 ,length4,L4 ,length5,L5 ,length6,L6] = traj(x2,y2,z2,ax,ay,az )
+function [length1,L1,length2,L2,length3,L3 ,length4,L4 ,length5,L5 ,length6,L6,Bx,By,Bz,Tx,Ty,Tz] = traj(x2,y2,z2,ax,ay,az )
 
-B1=[-0.402*cos(10/180*pi);0.402*sin(10/180*pi); 0];
+%Define radii of Top and Base (meters)
+r1 = 0.402;
+r2 = 0.265;
+
+%Establish Angles for the points on the hexagon(base) and the triangle(top)
+%The right edge of the triangle is deemed to be 0. The hex begins at +/- 30
+%degrees
+
+hex_angles = [-pi/6:pi/3:9*pi/6];
+tri_angles = [0,2*pi/3,4*pi/3];
+
+%Establish the points of the base
+Bx = r1.*cos(hex_angles);
+By = r1.*sin(hex_angles);
+Bz = zeros(length(hex_angles));
+
+%Establish the points of the top
+Tx = r2.*cos(tri_angles);
+Ty = r2.*sin(tri_angles);
+Tz = zeros(length(tri_angles));
+
+%Initialize the platform location
 P=[x2; y2; z2];
-T1=[0.265*cos(30/180*pi); -0.265*sin(30/180*pi) ;0];
 
-B2=[-0.402*cos(10/180*pi);-0.402*sin(10/180*pi); 0];
-T2=[0.265*cos(30/180*pi); 0.265*sin(30/180*pi) ;0];
+%Initialize variables to work with the rest of Andy's code below
+T1 = [Tx(1);Ty(1);Tz(1)];
+T2 = [Tx(2);Ty(2);Tz(2)];
+T3 = [Tx(3);Ty(3);Tz(3)];
 
-B3=[-0.402*cos(110/180*pi); -0.402*sin(110/180*pi); 0];
-T3=[0; 0.265 ;0];
+B1 = 1.*[Bx(1);By(1);Bz(1)];
+B2 = 1.*[Bx(2);By(2);Bz(2)];
+B3 = 1.*[Bx(3);By(3);Bz(3)];
+B4 = 1.*[Bx(4);By(4);Bz(4)];
+B5 = 1.*[Bx(5);By(5);Bz(5)];
+B6 = 1.*[Bx(6);By(6);Bz(6)];
 
-B4=[-0.402*cos(130/180*pi); -0.402*sin(130/180*pi); 0];
-T4=[-0.265*cos(30/180*pi); 0.265*sin(30/180*pi) ;0];
-
-B5=[0.402*cos(50/180*pi); 0.402*sin(50/180*pi); 0];
-T5=[-0.265*cos(30/180*pi); -0.265*sin(30/180*pi) ;0];
-
-B6=[0.402*cos(70/180*pi); 0.402*sin(70/180*pi); 0];
-T6=[0;-0.265 ;0];
 
 ax=ax/180*pi;
 ay=ay/180*pi;
@@ -31,38 +49,33 @@ T1=Rx*T1;
 T1=Ry*T1;
 T1=Rz*T1;
 
-L1=B1+P+T1;
-
 T2=Rx*T2;
 T2=Ry*T2;
 T2=Rz*T2;
-
-L2=B2+P+T2;
 
 T3=Rx*T3;
 T3=Ry*T3;
 T3=Rz*T3;
 
-L3=B3+P+T3;
+L1=B1+P+T1;
+L2=B2+P+T1;
+L3=B3+P+T2;
+L4=B4+P+T2;
+L5=B5+P+T3;
+L6=B6+P+T3;
 
-T4=Rx*T4;
-T4=Ry*T4;
-T4=Rz*T4;
 
-L4=B4+P+T4;
+% T4=Rx*T4;
+% T4=Ry*T4;
+% T4=Rz*T4;
 
-T5=Rx*T5;
-T5=Ry*T5;
-T5=Rz*T5;
+% T5=Rx*T5;
+% T5=Ry*T5;
+% T5=Rz*T5;
 
-L5=B5+P+T5;
-
-T6=Rx*T6;
-T6=Ry*T6;
-T6=Rz*T6;
-
-L6=B6+P+T6;
-
+% T6=Rx*T6;
+% T6=Ry*T6;
+% T6=Rz*T6;
 
 length1=sqrt(L1(1)^2+L1(2)^2+L1(3)^2);
 length2=sqrt(L2(1)^2+L2(2)^2+L2(3)^2);
