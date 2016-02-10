@@ -1,6 +1,6 @@
-function [F] = forceplatform(m, J, Rpq1, Rpq2, Rpq3, Rpq4, Rpq5,Rpq6, acc, theta)
+function [F] = forceplatform(m, J, Rpq1, Rpq2, Rpq3, Rpq4, Rpq5,Rpq6, r1, r2, r3, acc, theta)
 %inputs:
-%   for point(i) on top platform:
+%   for point r(i) on top platform:
 %                    Rpq(i)=(x,y,z)      vector of the arm
 %                       
 %   requests:        acc=(x,y,z)         acceleration vector
@@ -17,12 +17,12 @@ e4 = Rpq4/norm(Rpq4);
 e5 = Rpq5/norm(Rpq5);
 e6 = Rpq6/norm(Rpq6);       % e is the unit vector in the direction of the force
 
-M1 = cross(Rpq1, e1);
-M2 = cross(Rpq1, e2);
-M3 = cross(Rpq1, e3);
-M4 = cross(Rpq1, e4);
-M5 = cross(Rpq1, e5);
-M6 = cross(Rpq1, e6);       % M is the unit vector giving the direction of the moment
+M1 = cross(r1, e1);
+M2 = cross(r1, e2);
+M3 = cross(r2, e3);
+M4 = cross(r2, e4);
+M5 = cross(r3, e5);
+M6 = cross(r3, e6);       % M is the unit vector giving the direction of the moment
 
 A = [e1(1), e2(1), e3(1), e4(1), e5(1), e6(1);
     e1(2), e2(2), e3(2), e4(2), e5(2), e6(2);

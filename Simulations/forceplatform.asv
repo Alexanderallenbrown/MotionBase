@@ -1,6 +1,6 @@
 function [F] = forceplatform(m, J, Rpq1, Rpq2, Rpq3, Rpq4, Rpq5,Rpq6, acc, theta)
 %inputs:
-%   for point(i) on top platform:
+%   for point R(i) on top platform:
 %                    Rpq(i)=(x,y,z)      vector of the arm
 %                       
 %   requests:        acc=(x,y,z)         acceleration vector
@@ -15,14 +15,14 @@ e2 = Rpq2/norm(Rpq2);
 e3 = Rpq3/norm(Rpq3);
 e4 = Rpq4/norm(Rpq4);
 e5 = Rpq5/norm(Rpq5);
-e6 = Rpq6/norm(Rpq6);
+e6 = Rpq6/norm(Rpq6);       % e is the unit vector in the direction of the force
 
 M1 = cross(Rpq1, e1);
 M2 = cross(Rpq1, e2);
 M3 = cross(Rpq1, e3);
 M4 = cross(Rpq1, e4);
 M5 = cross(Rpq1, e5);
-M6 = cross(Rpq1, e6);
+M6 = cross(Rpq1, e6);       % M is the unit vector giving the direction of the moment
 
 A = [e1(1), e2(1), e3(1), e4(1), e5(1), e6(1);
     e1(2), e2(2), e3(2), e4(2), e5(2), e6(2);
@@ -40,9 +40,12 @@ b = [m*acc(1);
 
 F = A\b;
 
-% 
 
-%%[F]=forceplatform(ax,ay,az,alphax,alphay,alphaz,m,j,e1,e2,e3,e4,e5,e6,r1,r2,r3,r4,r5,r6)
+
+
+
+
+% [F]=forceplatform(ax,ay,az,alphax,alphay,alphaz,m,j,e1,e2,e3,e4,e5,e6,r1,r2,r3,r4,r5,r6)
 % mage1=sqrt(e1(1)^2+e1(2)^2+e1(3)^2);
 % mage2=sqrt(e2(1)^2+e2(2)^2+e2(3)^2);
 % mage3=sqrt(e3(1)^2+e3(2)^2+e3(3)^2);
