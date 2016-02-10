@@ -32,6 +32,8 @@ a52=[];
 a61=[];
 a62=[];
 
+
+
 for i=1:length(xdesired)
  
    [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6]=traj(xdesired(i),ydesired(i),1,anglex(i)+axtilt(i),angley(i)+aytilt(i),anglez(i)); 
