@@ -78,7 +78,7 @@ OptAngle1(i) = fminsearch(WrapFtnObj, InitAngle);
 end
 
 figure(1)
-plot(time(1:101),L1)
+plot(time(1:101),a12)
 
 
 
