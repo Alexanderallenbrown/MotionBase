@@ -33,10 +33,10 @@ A = [e1(1), e2(1), e3(1), e4(1), e5(1), e6(1);
 
 b = [m*acc(1);
     m*acc(2);
-    m*(acc(3)+9.8);
-    J*theta(1);
-    J*theta(2);
-    J*theta(3)];
+    m*(acc(3))%+9.8);
+    J(1)*theta(1);
+    J(2)*theta(2);
+    J(3)*theta(3)];
 
 F = A\b;
 

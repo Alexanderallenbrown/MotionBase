@@ -10,10 +10,9 @@ ax=rawdata(:,11);
 ay=rawdata(:,12);
 az=rawdata(:,13);
 
-signalax=[time1,ax];
-signalay=[time1,ay];
-signalaz=[time1,az];
-
+signalax=[time,ax];
+signalay=[simtime,ay];
+signalaz=[time,az];
 sim('demostration.slx');
 time=simtime;
 shortleg=0.16;
