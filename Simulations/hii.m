@@ -61,6 +61,17 @@ y6=[];
 z6=[];
 error6=[];
 
+
+F1=[];
+F2=[];
+F3=[];
+F4=[];
+F5=[];
+F6=[];
+
+T1 = [];
+
+
 for i=1:length(xdesired)
  
    [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6]=traj(xdesired(i),ydesired(i),1+zdesired(i),anglex(i)+axtilt(i),angley(i)+aytilt(i),anglez(i)); 
@@ -138,10 +149,40 @@ y6=[y6,yy6];
 z6=[z6,zz6];
 error6=[error6,e6];
 
+
+r1= [Tx(1),Ty(1),Tz(1)];
+r2=[Tx(2),Ty(2),Tz(2)];
+r3=[Tx(3),Ty(3),Tz(3)];
+theta=[0,0,0];
+[f1,f2,f3,f4,f5,f6] = forceplatform(100, 0, l1,l2,l3,l4,l5,l6,r1, r2,r3,[ax(i),ay(i),az(i)],theta);
+F1=[F1,f1];
+F2=[F2,f2];
+F3=[F3,f3];
+F4=[F4,f4];
+F5=[F5,f5];
+F6=[F6,f6];
+
+D1 = [-shortleg*cos(opt1)*sin(a1(i)),shortleg*cos(opt1)*cos(a1(i)),shortleg*sin(opt1)];
+
+t1 = norm(cross(D1,l1)*f1/length1);
+T1 = [T1,t1];
+
+
+
+
+
 end
 
 figure(1)
-plot(error1)
+plot(F1)
 
+figure(2)
+plot(T1)
 
+for i = 1:100
+    omega1(i) = (a1(i+1)-a1(i))/.05;
+end
+
+figure(3)
+plot(omega1,T1(1:100))
 

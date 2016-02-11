@@ -1,4 +1,4 @@
-function [F] = forceplatform(m, J, Rpq1, Rpq2, Rpq3, Rpq4, Rpq5,Rpq6, r1, r2, r3, acc, theta)
+function [f1,f2,f3,f4,f5,f6] = forceplatform(m, J, Rpq1, Rpq2, Rpq3, Rpq4, Rpq5,Rpq6, r1, r2, r3,  acc, theta)
 %inputs:
 %   for point r(i) on top platform:
 %                    Rpq(i)=(x,y,z)      vector of the arm
@@ -33,13 +33,19 @@ A = [e1(1), e2(1), e3(1), e4(1), e5(1), e6(1);
 
 b = [m*acc(1);
     m*acc(2);
-    m*acc(3);
+    m*(acc(3)+9.8);
     J*theta(1);
     J*theta(2);
     J*theta(3)];
 
 F = A\b;
 
+f1=F(1);
+f2=F(2);
+f3=F(3);
+f4=F(4);
+f5=F(5);
+f6=F(6);
 
 
 
