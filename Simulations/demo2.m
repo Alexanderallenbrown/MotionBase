@@ -8,17 +8,17 @@ hold on
 [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6,Bx,By,Bz,Tx,Ty,Tz]=...
     traj(xdesired(i), ydesired(i),1,anglex(i),angley(i),anglez(i));
 
-quiver3(Bx(1),By(1), 0,l1(1),l1(2),l1(3))
-
-quiver3(Bx(2),By(2), 0,l2(1),l2(2),l2(3))
-
-quiver3(Bx(3),By(3), 0,l3(1),l3(2),l3(3))
-
-quiver3(Bx(4),By(4), 0,l4(1),l4(2),l4(3))
-
-quiver3(Bx(5),By(5), 0,l5(1),l5(2),l5(3))
-
-quiver3(Bx(6),By(6), 0,l6(1),l6(2),l6(3))
+% quiver3(Bx(1),By(1), 0,l1(1),l1(2),l1(3))
+% 
+% quiver3(Bx(2),By(2), 0,l2(1),l2(2),l2(3))
+% 
+% quiver3(Bx(3),By(3), 0,l3(1),l3(2),l3(3))
+% 
+% quiver3(Bx(4),By(4), 0,l4(1),l4(2),l4(3))
+% 
+% quiver3(Bx(5),By(5), 0,l5(1),l5(2),l5(3))
+% 
+% quiver3(Bx(6),By(6), 0,l6(1),l6(2),l6(3))
 
 %leg1
 quiver3(Bx(1),By(1),0,...
@@ -70,6 +70,8 @@ quiver3(Bx(6)+shortleg*cos(a6(i))*sin(9*pi/6),...
    By(6)-shortleg*cos(a6(i))*cos(9*pi/6),...
    shortleg*sin(a6(i)),x6(i),y6(i),z6(i))
 
+F(i) = getframe;
 
-pause(0.1)
+pause(0.05)
 end
+

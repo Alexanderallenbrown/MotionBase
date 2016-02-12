@@ -77,8 +77,13 @@ T3 = [];
 T4 = [];
 T5 = [];
 T6 = [];
+thetaDx=[];
+thetaDy=[];
+thetaDz=[];
 
-
+thetaDDx=[];
+thetaDDy=[];
+thetaDDz=[];
 for i=1:length(xdesired)
  
    [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6,Bx,By,Bz,Tx,Ty,Tz]=traj(xdesired(i),ydesired(i),1+zdesired(i),anglex(i)+axtilt(i),angley(i)+aytilt(i),anglez(i)); 
@@ -160,8 +165,37 @@ error6=[error6,e6];
 r1= [Tx(1),Ty(1),Tz(1)];
 r2=[Tx(2),Ty(2),Tz(2)];
 r3=[Tx(3),Ty(3),Tz(3)];
-theta=[0,0,0];
 
+if i>1
+   Dax=(anglex(i)-anglex(i-1))/0.05;
+   Day=(angley(i)-angley(i-1))/0.05;
+   Daz=0;
+   
+else
+    Dax=0;
+    Day=0;
+    Daz=0;
+      
+end
+   thetaDx=[thetaDx,Dax];
+   thetaDy=[thetaDy,Day];
+   thetaDz=[thetaDz,Daz];
+
+if i>2
+   DDax=(thetaDx(i-1)-thetaDx(i-2))/0.05;
+   DDay=(thetaDy(i-1)-thetaDy(i-2))/0.05;
+   DDaz=0;
+   
+else
+    DDax=0;
+    DDay=0;
+    DDaz=0;
+end
+   thetaDDx=[thetaDDx,DDax];
+   thetaDDy=[thetaDDy,DDay];
+   thetaDDz=[thetaDDz,DDaz];
+
+theta=[DDax,DDay,DDaz]/180*pi/4;
 m = 340/2.2;
 J = [15.63, 35.35, 40.50]; %kg-m^2 Found from initial Inventor model
 
