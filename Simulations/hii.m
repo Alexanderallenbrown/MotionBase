@@ -1,24 +1,31 @@
 rawdata=xlsread('rawdata.xlsx');
-%time,timestamp,recordtime,lat,long,alt,speed,course,verticalAccuracy,horizontalAccuracy,locTimeStamp,accelerationX,accelerationY,accelerationZ,HeadingX,HeadingY,HeadingZ,TrueHeading,MagneticHeading,HeadingAccuracy,RotationX,RotationY,RotationZ,motionYaw,motionRoll,motionPitch,motionRotationRateX,motionRotationRateY,motionRotationRateZ,motionUserAccelerationX,motionUserAccelerationY,motionUserAccelerationZ,en0,pdp_ip0,DeviceOrientation,Event
+%time
+time1 = rawdata(:,2);
 
-time1 = rawdata(:,1);
-anglex=rawdata(:,19);
-angley=rawdata(:,20);
-anglez=rawdata(:,21);
+%actual tilt
+anglex=rawdata(:,20);
+angley=rawdata(:,21);
+anglez=rawdata(:,22);
 
+%linear accelaration
 ax=rawdata(:,11);
 ay=rawdata(:,12);
 az=rawdata(:,13);
 
+%compose signals and send them to simulink
 signalax=[time1,ax];
 signalay=[time1,ay];
 signalaz=[time1,az];
 
+%run simulink
 sim('demostration.slx');
 time=simtime;
+
+%initialize the length of the two legs
 shortleg=0.16;
 longleg=1;
 
+%L1 is the vector that records the length of leg1
 L1=[];
 L2=[];
 L3=[];
@@ -26,6 +33,7 @@ L4=[];
 L5=[];
 L6=[];
 
+%a1 is the vector that record the angle of shortleg1
 a1=[];
 a2=[];
 a3=[];
@@ -33,6 +41,7 @@ a4=[];
 a5=[];
 a6=[];
 
+%x y z 
 x1=[];
 y1=[];
 z1=[];
