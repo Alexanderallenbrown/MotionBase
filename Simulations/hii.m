@@ -19,6 +19,7 @@ time=simtime;
 shortleg=0.16;
 longleg=1;
 
+% the length of the imaginary legs connecting point P to point O
 L1=[];
 L2=[];
 L3=[];
@@ -26,6 +27,7 @@ L4=[];
 L5=[];
 L6=[];
 
+%these are the local motor angles for each of the motors.
 a1=[];
 a2=[];
 a3=[];
@@ -33,11 +35,14 @@ a4=[];
 a5=[];
 a6=[];
 
+%position of the points Q
 x1=[];
 y1=[];
 z1=[];
+%this is the distance error |PQ|
 error1=[];
 
+%the next few are the same for each of the 6 points
 x2=[];
 y2=[];
 z2=[];
@@ -63,7 +68,7 @@ y6=[];
 z6=[];
 error6=[];
 
-
+%these are the forces in the connecting rods 1-6
 F1=[];
 F2=[];
 F3=[];
@@ -71,6 +76,7 @@ F4=[];
 F5=[];
 F6=[];
 
+%these are the torques.....
 T1 = [];
 T2 = [];
 T3 = [];

@@ -159,7 +159,7 @@ a6=[a6,opt6];
 x6=[x6,xx6];
 y6=[y6,yy6];
 z6=[z6,zz6];
-error6=[error6,e6];-1
+error6=[error6,e6];
 
 
 r1= [Tx(1),Ty(1),Tz(1)];
@@ -167,25 +167,35 @@ r2=[Tx(2),Ty(2),Tz(2)];
 r3=[Tx(3),Ty(3),Tz(3)];
 
 if i>1
-   Dax=(axtilt(i)-axtilt(i-1))/0.05;
-   Day=(aytilt(i)-aytilt(i-1))/0.05;
+   Dax=(anglex(i)-anglex(i-1))/0.05;
+   Day=(angley(i)-angley(i-1))/0.05;
    Daz=0;
    
 else
+    Dax=0;
+    Day=0;
+    Daz=0;
+      
+end
    thetaDx=[thetaDx,Dax];
    thetaDy=[thetaDy,Day];
    thetaDz=[thetaDz,Daz];
-end
 
 if i>2
    DDax=(thetaDx(i-1)-thetaDx(i-2))/0.05;
    DDay=(thetaDy(i-1)-thetaDy(i-2))/0.05;
    DDaz=0;
+   
+else
+    DDax=0;
+    DDay=0;
+    DDaz=0;
+end
    thetaDDx=[thetaDDx,DDax];
    thetaDDy=[thetaDDy,DDay];
    thetaDDz=[thetaDDz,DDaz];
-end
 
+theta=[DDax,DDay,DDaz]/180*pi/4;
 m = 340/2.2;
 J = [15.63, 35.35, 40.50]; %kg-m^2 Found from initial Inventor model
 
