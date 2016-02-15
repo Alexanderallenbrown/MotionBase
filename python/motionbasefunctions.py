@@ -230,37 +230,37 @@ def findthetam(x,y,z,roll,pitch,yaw,tol):
             # #length_error = findconroderror(thetam,x,y,z,roll,pitch,yaw,motor_ind)
             
             # #print length_error,motor_ind,iternum,errorprime
-            print iternum,motor_ind
+            #print iternum,motor_ind
         #print length_error
     return thetam
 
 
     
+if __name__=='__main__':
 
 
+        
+    #thetas = findthetam(0,0,0,0,0,.1,0.01)
+    makemovie = True
 
-    
-#thetas = findthetam(0,0,0,0,0,.1,0.01)
-makemovie = True
+    if makemovie==True:
+                import matplotlib
+                #matplotlib.use('Agg')
+                import matplotlib.animation as manimation
+                FFMpegWriter = manimation.writers['ffmpeg']
+                metadata = dict(title='Demo Movie',artist = 'Matplotlib',comment='motion base')
+                writer = FFMpegWriter(fps=30,metadata=metadata)
 
-if makemovie==True:
-            import matplotlib
-            #matplotlib.use('Agg')
-            import matplotlib.animation as manimation
-            FFMpegWriter = manimation.writers['ffmpeg']
-            metadata = dict(title='Demo Movie',artist = 'Matplotlib',comment='motion base')
-            writer = FFMpegWriter(fps=30,metadata=metadata)
+    ion()
+    t = linspace(0,10,100)
+    rolls = .1*sin(1*t)
+    zs = .05*(sin(1*t))
 
-ion()
-t = linspace(0,10,100)
-rolls = .1*sin(1*t)
-zs = .05*(sin(1*t))
-
-for ind in range(0,len(t)):
-    with writer.saving(fig,'output.mp4',len(t)):
-        plotbot(0,0,zs[ind],rolls[ind],0,0)
-        writer.grab_frame()
-        pause(.01)
+    for ind in range(0,len(t)):
+        with writer.saving(fig,'output.mp4',len(t)):
+            plotbot(0,0,zs[ind],rolls[ind],0,0)
+            writer.grab_frame()
+            pause(.01)
 
 
-show()
+    show()
