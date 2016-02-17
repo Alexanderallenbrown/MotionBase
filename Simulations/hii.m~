@@ -1,11 +1,11 @@
 rawdata=xlsread('rawdata.xlsx');
 %time
-time1 = rawdata(:,1);
+time1 = rawdata(:,2);
 
 %actual tilt
-anglex=rawdata(:,19);
-angley=rawdata(:,20);
-anglez=rawdata(:,21);
+anglex=rawdata(:,20);
+angley=rawdata(:,21);
+anglez=rawdata(:,22);
 
 %linear accelaration
 ax=rawdata(:,11);
@@ -25,7 +25,10 @@ time=simtime;
 shortleg=0.16;
 longleg=1;
 
+
 %L1 is the vector that records the length of leg1
+
+
 L1=[];
 L2=[];
 L3=[];
@@ -33,7 +36,9 @@ L4=[];
 L5=[];
 L6=[];
 
+
 %a1 is the vector that record the angle of shortleg1
+
 a1=[];
 a2=[];
 a3=[];
@@ -42,11 +47,13 @@ a5=[];
 a6=[];
 
 %x y z 
+
 x1=[];
 y1=[];
 z1=[];
 error1=[];
 
+%the next few are the same for each of the 6 points
 x2=[];
 y2=[];
 z2=[];
@@ -72,7 +79,7 @@ y6=[];
 z6=[];
 error6=[];
 
-
+%these are the forces in the connecting rods 1-6
 F1=[];
 F2=[];
 F3=[];
@@ -80,6 +87,7 @@ F4=[];
 F5=[];
 F6=[];
 
+%these are the torques
 T1 = [];
 T2 = [];
 T3 = [];
