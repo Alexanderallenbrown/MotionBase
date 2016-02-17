@@ -94,10 +94,13 @@ T3 = [];
 T4 = [];
 T5 = [];
 T6 = [];
+
+%angular velocity of short legs
 thetaDx=[];
 thetaDy=[];
 thetaDz=[];
 
+%angular acc of short legs
 thetaDDx=[];
 thetaDDy=[];
 thetaDDz=[];
@@ -111,6 +114,7 @@ for i=1:length(xdesired)
    L5=[L5,length5];
    L6=[L6,length6];
    
+   %find the angle for short leg1
 angle1=@ (parm) leg1(l1,shortleg,longleg,parm);
 init1=[0];
 [opt1]=fminsearch(angle1,init1);
@@ -178,7 +182,7 @@ y6=[y6,yy6];
 z6=[z6,zz6];
 error6=[error6,e6];
 
-
+%vector from top base origin to top base links
 r1= [Tx(1),Ty(1),Tz(1)];
 r2=[Tx(2),Ty(2),Tz(2)];
 r3=[Tx(3),Ty(3),Tz(3)];
@@ -216,7 +220,7 @@ theta=[DDax,DDay,DDaz]/180*pi/4;
 m = 340/2.2;
 J = [15.63, 35.35, 40.50]; %kg-m^2 Found from initial Inventor model
 
-
+%force on 6 long legs
 [f1,f2,f3,f4,f5,f6] = forceplatform(m, J, l1,l2,l3,l4,l5,l6,r1, r2,r3,[ax(i),ay(i),az(i)],theta);
 F1=[F1,f1];
 F2=[F2,f2];

@@ -1,5 +1,5 @@
 rawdata=xlsread('rawdata.xlsx');
-%time
+%time   
 time1 = rawdata(:,2);
 
 %actual tilt
@@ -94,10 +94,13 @@ T3 = [];
 T4 = [];
 T5 = [];
 T6 = [];
+
+%angular velocity of short legs
 thetaDx=[];
 thetaDy=[];
 thetaDz=[];
 
+%angular acc of short legs
 thetaDDx=[];
 thetaDDy=[];
 thetaDDz=[];

@@ -1,5 +1,5 @@
 function [error,x,y,z]=leg1(l1,L2,L3,a)
-
+%vector pq based on a given angle
 x=l1(1)+L2*cos(a)*sin(-pi/6);
 y=l1(2)-L2*cos(a)*cos(-pi/6);
 z=l1(3)-L2*sin(a);
