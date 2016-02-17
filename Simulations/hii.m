@@ -29,18 +29,14 @@ time=simtime;
 shortleg=0.16;
 longleg=1;
 
-<<<<<<< HEAD
+
+
+
 
 %L1 is the vector that records the length of leg1
 
-
-=======
-%<<<<<<< HEAD
-%L1 is the vector that records the length of leg1
-%=======
 % the length of the imaginary legs connecting point P to point O
-%>>>>>>> 7d63f8bbbc886981d473b8914aaa42252d216686
->>>>>>> 86ec02a426a1e85d4cb82852685d41456dce5045
+
 L1=[];
 L2=[];
 L3=[];
@@ -48,17 +44,14 @@ L4=[];
 L5=[];
 L6=[];
 
-<<<<<<< HEAD
 
 %a1 is the vector that record the angle of shortleg1
 
-=======
-%<<<<<<< HEAD
+
 %a1 is the vector that record the angle of shortleg1
-%=======
+
 %these are the local motor angles for each of the motors.
-%>>>>>>> 7d63f8bbbc886981d473b8914aaa42252d216686
->>>>>>> 86ec02a426a1e85d4cb82852685d41456dce5045
+
 a1=[];
 a2=[];
 a3=[];
@@ -68,8 +61,6 @@ a6=[];
 
 %x y z 
 
-<<<<<<< HEAD
-=======
 %position of the points Q
 
 >>>>>>> 86ec02a426a1e85d4cb82852685d41456dce5045
