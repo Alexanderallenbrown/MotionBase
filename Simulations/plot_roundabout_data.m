@@ -1,7 +1,5 @@
-clear all
-
+clear
 close all
-clc
 
 rawdata=csvread('2015-01-24_11-49-26.csv');   % read truck roundabout data file
 
