@@ -188,11 +188,12 @@ y6=[y6,yy6];
 z6=[z6,zz6];
 error6=[error6,e6];
 
-
+% point of triangle connections 
 r1= [Tx(1),Ty(1),Tz(1)];
 r2=[Tx(2),Ty(2),Tz(2)];
 r3=[Tx(3),Ty(3),Tz(3)];
 
+% derivatives omega and alpha 
 if i>1
    Dax=(anglex(i)-anglex(i-1))/0.05;
    Day=(angley(i)-angley(i-1))/0.05;
