@@ -84,7 +84,7 @@ def plotbase():
     #connect the ends
     ax.plot([motor_X[-1],motor_X[0]],[motor_Y[-1],motor_Y[0]],[motor_Z[-1],motor_Z[0]],'k',marker='o')
     for ind in range(0,6):
-        annotate(str(ind+1),xy=(motor_X[ind],motor_Y[ind]),xytext=(motor_X[ind],motor_Y[ind]))
+        ax.annotate(str(ind+1),xy=(motor_X[ind],motor_Y[ind]),xytext=(motor_X[ind],motor_Y[ind]))
 
 def plotplatform(PX,PY,PZ):
     #plot the lines
@@ -103,10 +103,13 @@ def plotmotorarms(qx,qy,qz):
 
 def plotconrods(QX,QY,QZ,PX,PY,PZ):
     for ind in range(0,len(QX)):
-        plot([QX[ind],PX[ind]],[QY[ind],PY[ind]],[QZ[ind],PZ[ind]],'m',marker='o')
+        ax.plot([QX[ind],PX[ind]],[QY[ind],PY[ind]],[QZ[ind],PZ[ind]],'m',marker='o')
 
 def plotbot(x,y,z,roll,pitch,yaw):#plots the whole kit.
     ax.clear()
+    #ax.axis('equal')
+    #ax.xlabel('X (m)')
+    #ax.ylabel('Y (m)')
     #plot the base footprint
     plotbase()
     #plot the platform as we want it.
@@ -125,9 +128,7 @@ def plotbot(x,y,z,roll,pitch,yaw):#plots the whole kit.
     ax.set_ylim3d(-2*baseradius,2*baseradius)
     ax.set_zlim3d(0,4*baseradius)
     
-    axis('equal')
-    xlabel('X (m)')
-    ylabel('Y (m)')
+    
 
 def findrpo(x,y,z,roll,pitch,yaw):
     #first calculate the positions of the three platform points.
