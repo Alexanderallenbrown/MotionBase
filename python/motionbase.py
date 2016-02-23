@@ -27,6 +27,89 @@ class MotionBase:
 
         self.motor_thetas = zeros(6)#array([5*pi/6,pi/6,5*pi/6,pi/6,5*pi/6,pi/6])#zeros(6)
 
+        #call the findEnvelope() function to set all of the class-owned vars associated with the minimum and maximum movement dimensions
+        print "initializing base..."
+        self.findEnvelope()
+        print "done"
+
+    def findEnvelope(self):
+        """findEnvelope() sets min and max values for each of the platform's 6 DOF by iterating through (hardcoded) ranges of displacements and angles.
+            these values can then be accessed by calling self.xmin,self.xmax,self.ymin,self.ymax,self.zmin,self.zmax,self.rollmin,self.rollmax,self.pitchmin,self.pitchmax,self.yawmin,self.yawmax.
+
+            Additionally, self.platform_z0 is reset to the mid height after this function is run. This function is called in __init__ so that these variables are available when the motionbase is initialized.
+        """
+        numpoints = 50
+        #probe z height at many different locations
+        z_vector = linspace(-1,1,numpoints)
+        successes = zeros(len(z_vector))
+        for ind in range(0,len(z_vector)):
+            motor_thetas,success = self.findthetam(0,0,z_vector[ind],0,0,0,.001)
+            successes[ind]=success
+        #now pull out the valid indices
+        valid_indices = where(successes==1)
+        valid_heights = z_vector[valid_indices]
+        mid_height = (valid_heights[-1]-valid_heights[0])/2
+        #reset platform resting position
+        self.platform_z0 = mid_height+self.platform_z0
+        self.zmin = valid_heights[0]
+        self.zmax = valid_heights[-1]
+
+        #yaw
+        yaw_vector = linspace(0,3.14,numpoints)#vector of yaw angles to test
+        successes = zeros(len(yaw_vector))
+        for ind in range(0,len(yaw_vector)):
+            motor_thetas,success = self.findthetam(0,0,0,0,0,yaw_vector[ind],.001)
+            successes[ind] = success
+        #now pull out the valid indices
+        valid_indices = where(successes==1)
+        valid_yaws = yaw_vector[valid_indices]
+        self.yawmin,self.yawmax= -valid_yaws[-1],valid_yaws[-1]
+
+        #pitch
+        pitch_vector = linspace(0,3.14,numpoints)#vector of pitch angles to test
+        successes = zeros(len(pitch_vector))
+        for ind in range(0,len(pitch_vector)):
+            motor_thetas,success = self.findthetam(0,0,0,0,pitch_vector[ind],0,.001)
+            successes[ind] = success
+        #now pull out the valid indices
+        valid_indices = where(successes==1)
+        valid_pitchs = pitch_vector[valid_indices]
+        self.pitchmin,self.pitchmax= -valid_pitchs[-1],valid_pitchs[-1]
+
+        #roll
+        roll_vector = linspace(0,3.14,numpoints)#vector of roll angles to test
+        successes = zeros(len(roll_vector))
+        for ind in range(0,len(roll_vector)):
+            motor_thetas,success = self.findthetam(0,0,0,roll_vector[ind],0,0,.001)
+            successes[ind] = success
+        #now pull out the valid indices
+        valid_indices = where(successes==1)
+        valid_rolls = roll_vector[valid_indices]
+        self.rollmin,self.rollmax= -valid_rolls[-1],valid_rolls[-1]
+
+        #y
+        y_vector = linspace(-1,1,numpoints)#vector of y angles to test
+        successes = zeros(len(y_vector))
+        for ind in range(0,len(y_vector)):
+            motor_thetas,success = self.findthetam(0,y_vector[ind],0,0,0,0,.001)
+            successes[ind] = success
+        #now pull out the valid indices
+        valid_indices = where(successes==1)
+        valid_ys = y_vector[valid_indices]
+        self.ymin,self.ymax= valid_ys[0],valid_ys[-1]
+
+        #x
+        x_vector = linspace(-1,1,numpoints)#vector of x angles to test
+        successes = zeros(len(x_vector))
+        for ind in range(0,len(x_vector)):
+            motor_thetas,success = self.findthetam(x_vector[ind],0,0,0,0,0,.001)
+            successes[ind] = success
+        #now pull out the valid indices
+        valid_indices = where(successes==1)
+        valid_xs = x_vector[valid_indices]
+        self.xmin,self.xmax= valid_xs[0],valid_xs[-1]
+
+
     def calculate_P(self,X,Y,Z,roll,pitch,yaw):
         #our goal is to take a platform pose and calculate a vector of 3 points on an equillateral triangle, to which all 6 motor con rods are attached.
         platform_yaw0 = array([0,2*pi/3,4*pi/3])
@@ -193,7 +276,7 @@ class MotionBase:
     
 if __name__=='__main__':
 
-    base = MotionBase(1.0,0.5,0.3,0.3,1.0)
+    base = MotionBase(1.0,0.5,0.5,0.3,1.0)
         
     #thetas = findthetam(0,0,0,0,0,.1,0.01)
     makemovie = True
@@ -207,15 +290,38 @@ if __name__=='__main__':
                 writer = FFMpegWriter(fps=30,metadata=metadata)
 
     ion()
-    t = linspace(0,10,100)
-    rolls = .1*sin(1*t)
-    zs = .05*(sin(1*t))
-
-    for ind in range(0,len(t)):
-        with writer.saving(base.fig,'output.mp4',len(t)):
-            base.plotbot(0,0,zs[ind],rolls[ind],0,0)
-            writer.grab_frame()
-            pause(.01)
+    t = linspace(0,2,100)
+    rolls = base.rollmax*sin(pi*t)
+    pitchs = base.pitchmax*sin(pi*t)
+    yaws = base.yawmax*(sin(pi*t))
+    xs = base.xmax*sin(pi*t)
+    ys = base.ymax*sin(pi*t)
+    zs = base.zmax*(sin(pi*t))
+    with writer.saving(base.fig,'output.mp4',6*len(t)):
+        for ind in range(0,len(t)):
+                base.plotbot(0,0,0,rolls[ind],0,0)
+                writer.grab_frame()
+                pause(.01)
+        for ind in range(0,len(t)):
+                base.plotbot(0,0,0,0,pitchs[ind],0)
+                writer.grab_frame()
+                pause(.01)
+        for ind in range(0,len(t)):
+                base.plotbot(0,0,0,0,0,yaws[ind])
+                writer.grab_frame()
+                pause(.01)
+        for ind in range(0,len(t)):
+                base.plotbot(xs[ind],0,0,0,0,0)
+                writer.grab_frame()
+                pause(.01)
+        for ind in range(0,len(t)):
+                base.plotbot(0,ys[ind],0,0,0,0)
+                writer.grab_frame()
+                pause(.01)
+        for ind in range(0,len(t)):
+                base.plotbot(0,0,zs[ind],0,0,0)
+                writer.grab_frame()
+                pause(.01)
 
 
     show()
