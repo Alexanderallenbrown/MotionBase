@@ -125,16 +125,24 @@ for i=1:91
    L5=[L5,length5];
    L6=[L6,length6];
    
-angle1=@ (parm) leg1(l1,shortleg,longleg,parm);
-init1=[0];
-[opt1]=fminsearch(angle1,init1);
-%opt1=opt1/pi*180;
+% angle1=@ (parm) leg11(l1,shortleg,longleg,parm);
+% init1=[0];
+% [opt1]=fminsearch(angle1,init1);
+% %opt1=opt1/pi*180;
+% a1=[a1,opt1];
+% [e1,xx1,yy1,zz1]=angle1(opt1);
+% x1=[x1,xx1];
+% y1=[y1,yy1];
+% z1=[z1,zz1];
+% error1=[error1,e1];
+
+[e1,xx1,yy1,zz1,opt1]=leg1(l1,shortleg,longleg);
 a1=[a1,opt1];
-[e1,xx1,yy1,zz1]=angle1(opt1);
+error1=[error1,e1];
 x1=[x1,xx1];
 y1=[y1,yy1];
 z1=[z1,zz1];
-error1=[error1,e1];
+
 
 angle2=@ (parm) leg2(l2,shortleg,longleg,parm);
 init2=[0];
@@ -170,27 +178,40 @@ y4=[y4,yy4];
 z4=[z4,zz4];
 error4=[error4,e4];
 
-angle5=@ (parm) leg5(l5,shortleg,longleg,parm);
-init5=[0];
-[opt5]=fminsearch(angle5,init5);
-%opt5=opt5/pi*180;
+% angle5=@ (parm) leg55(l5,shortleg,longleg,parm);
+% init5=[0];
+% [opt5]=fminsearch(angle5,init5);
+% %opt5=opt5/pi*180;
+% a5=[a5,opt5];
+% [e5,xx5,yy5,zz5]=angle5(opt5);
+% x5=[x5,xx5];
+% y5=[y5,yy5];
+% z5=[z5,zz5];
+% error5=[error5,e5];
+[e5,xx5,yy5,zz5,opt5]=leg5(l5,shortleg,longleg);
 a5=[a5,opt5];
-[e5,xx5,yy5,zz5]=angle5(opt5);
+error5=[error5,e5];
 x5=[x5,xx5];
 y5=[y5,yy5];
 z5=[z5,zz5];
-error5=[error5,e5];
+% angle6=@ (parm) leg66(l6,shortleg,longleg,parm);
+% init6=[0];
+% [opt6]=fminsearch(angle6,init6);
+% %opt6=opt6/pi*180;
+% a6=[a6,opt6];
+% [e6,xx6,yy6,zz6]=angle6(opt6);
+% x6=[x6,xx6];
+% y6=[y6,yy6];
+% z6=[z6,zz6];
+% error6=[error6,e6];
 
-angle6=@ (parm) leg6(l6,shortleg,longleg,parm);
-init6=[0];
-[opt6]=fminsearch(angle6,init6);
-%opt6=opt6/pi*180;
+[e6,xx6,yy6,zz6,opt6]=leg6(l6,shortleg,longleg);
 a6=[a6,opt6];
-[e6,xx6,yy6,zz6]=angle6(opt6);
+error6=[error6,e6];
 x6=[x6,xx6];
 y6=[y6,yy6];
 z6=[z6,zz6];
-error6=[error6,e6];
+
 
 % point of triangle connections 
 r1= [Tx(1),Ty(1),Tz(1)];
@@ -281,7 +302,7 @@ T6 = [T6,t6];
 end
 
 figure()
-plot(time1,error6)
+plot(time1,error5)
 
 
 % figure(1)

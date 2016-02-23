@@ -121,16 +121,23 @@ for i=1:length(xdesired)
    L5=[L5,length5];
    L6=[L6,length6];
    
-angle1=@ (parm) leg1(l1,shortleg,longleg,parm);
-init1=[0];
-[opt1]=fminsearch(angle1,init1);
-%opt1=opt1/pi*180;
+% angle1=@ (parm) leg11(l1,shortleg,longleg,parm);
+% init1=[0];
+% [opt1]=fminsearch(angle1,init1);
+% %opt1=opt1/pi*180;
+% a1=[a1,opt1];
+% [e1,xx1,yy1,zz1]=angle1(opt1);
+% x1=[x1,xx1];
+% y1=[y1,yy1];
+% z1=[z1,zz1];
+% error1=[error1,e1];
+
+[e1,xx1,yy1,zz1,opt1]=leg1(l1,shortleg,longleg);
 a1=[a1,opt1];
-[e1,xx1,yy1,zz1]=angle1(opt1);
+error1=[error1,e1];
 x1=[x1,xx1];
 y1=[y1,yy1];
 z1=[z1,zz1];
-error1=[error1,e1];
 
 angle2=@ (parm) leg2(l2,shortleg,longleg,parm);
 init2=[0];
@@ -187,6 +194,7 @@ x6=[x6,xx6];
 y6=[y6,yy6];
 z6=[z6,zz6];
 error6=[error6,e6];
+
 
 % point of triangle connections 
 r1= [Tx(1),Ty(1),Tz(1)];
