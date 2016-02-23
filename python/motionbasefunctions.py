@@ -116,7 +116,7 @@ def plotbot(x,y,z,roll,pitch,yaw):#plots the whole kit.
     PX,PY,PZ = calculate_P(x,y,z,roll,pitch,yaw)
     rpox,rpoy,rpoz = findrpo(x,y,z,roll,pitch,yaw)
     #make up some angles for the motors. TODO make this a function to solve for them.
-    motor_thetas = findthetam(x,y,z,roll,pitch,yaw,0.01)
+    motor_thetas,junk = findthetam(x,y,z,roll,pitch,yaw,0.01)
     qx,qy,qz = calcQ(motor_thetas)
     plotplatform(PX,PY,PZ)
     plotlegs(rpox,rpoy,rpoz)
@@ -188,6 +188,7 @@ def findthetam(x,y,z,roll,pitch,yaw,tol):
 
     #thetam = motor_thetas
     thetam = zeros(6)
+    success = 1 #initialize to success
 
     for motor_ind in range(0,6):
         length_error = 1000
@@ -195,12 +196,9 @@ def findthetam(x,y,z,roll,pitch,yaw,tol):
         min_theta = 0
         max_theta = pi/2
 
-        while (abs(length_error)>tol and iternum<200) :
+        while (abs(length_error)>tol and iternum<20) :
             
-            #the newton raphson method says that we adjust theta = theta - error(theta)/(d error/d theta)
-
-            #we will calculate the derivative manually. We don't have a closed form solution for it.
-            #dy/dx ~= (y2-y1)/(x2-x1)
+            #use the bisection method to find theta_m
             
             length_error = findconroderror(thetam,x,y,z,roll,pitch,yaw,motor_ind) #this is actually error squared.
             if length_error<0:#this means the con rod would have to be longer, so need an angle increase
@@ -212,28 +210,16 @@ def findthetam(x,y,z,roll,pitch,yaw,tol):
             #adjust current angle based on max    
             if abs(length_error)>tol:
                 thetam[motor_ind]=min_theta+(max_theta-min_theta)/2
-            # #create a new vector of thetas for the derivative calculation.
-            # newthetam = thetam
-            # deltatheta = 0.001#the amount that we perturb the motor by to find the derivative.
-            # newthetam[motor_ind]+=deltatheta#this adds a little bit of angle to our current motor so we can calculate the derivative.
-            # #calculate the length error at a perturbed position
-            # length_errorplus = findconroderror(newthetam,x,y,z,roll,pitch,yaw,motor_ind)
-            # #calculate the derivative of the error function
-            # errorprime = (length_errorplus-length_error)/deltatheta#this is the derivative of the length error function
 
-            # if abs(length_error)>tol:
-            #     thetam[motor_ind] = thetam[motor_ind]-.1*length_error/errorprime
-            # # if thetam[motor_ind] < 0:
-            # #     thetam[motor_ind]=0
-            # # if thetam[motor_ind]>pi/2:
-            # #     thetam[motor_ind]=pi/2
-            # #print motor_ind,length_error
-            # #length_error = findconroderror(thetam,x,y,z,roll,pitch,yaw,motor_ind)
-            
-            # #print length_error,motor_ind,iternum,errorprime
-            #print iternum,motor_ind
-        #print length_error
-    return thetam
+            if max_theta<=0:
+                max_theta=0
+            if min_theta>=pi/2:
+                max_theta = pi/2
+
+        #if iternum is greater than 19, then we have failed. we need to set success to 0.
+        if iternum>=19:
+            success=0
+    return thetam,success
 
 
     
