@@ -26,7 +26,7 @@ signal_z=[time1,accel(:,3)];
 
 % run simulink --> output is axtilt, aytilt, xdesired, ydesired, zdesired,
 %                   simtime
-sim('demostration.slx');
+sim('demostration.slx', 'timeout', 45.77);
 time=simtime;
 motion_des = [xdesired, ydesired, 1+zdesired];
 angle_des = [angle_x+axtilt, angle_y+aytilt, angle_z];
