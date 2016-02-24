@@ -1,8 +1,8 @@
-function [error,x,y,z,a]=leg5(l1,L2,L3,a)
+function [error,x,y,z,a]=leg5(l1,L2,L3)
 
 
 amin=0;
-amax=pi/2;
+amax=pi;
 tol=0.001;
 iter=0;
 error=10;

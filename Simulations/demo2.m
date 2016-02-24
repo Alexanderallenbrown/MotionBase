@@ -1,12 +1,12 @@
 figure(1)
-for i=1:101
+for i=1:91
   
 clf
-view([0 1 1])
+view([1 1 1])
 axis([-1 1 -1 1 -1 1])  
 hold on
 [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6,Bx,By,Bz,Tx,Ty,Tz]=...
-    traj(xdesired(i), ydesired(i),1,anglex(i),angley(i),anglez(i));
+    traj(0, 0,1,0,0,i);
 
 % quiver3(Bx(1),By(1), 0,l1(1),l1(2),l1(3))
 % 

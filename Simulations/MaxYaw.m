@@ -117,7 +117,7 @@ thetaDDz=[];
 %while max([e1,e2,e3,e4,e5,e6]) < .1
 for i=1:91
  
-   [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6,Bx,By,Bz,Tx,Ty,Tz]=traj(xdesired(i),ydesired(i),1+zdesired(i),anglex(i)+axtilt(i),angley(i)+aytilt(i),anglez(i)); 
+   [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6,Bx,By,Bz,Tx,Ty,Tz]=traj(0,0,1,0,0,i); 
    L1=[L1,length1];
    L2=[L2,length2];
    L3=[L3,length3];
@@ -143,40 +143,60 @@ x1=[x1,xx1];
 y1=[y1,yy1];
 z1=[z1,zz1];
 
+% 
+% angle2=@ (parm) leg2(l2,shortleg,longleg,parm);
+% init2=[0];
+% [opt2]=fminsearch(angle2,init2);
+% %opt2=opt2/pi*180;
+% a2=[a2,opt2];
+% [e2,xx2,yy2,zz2]=angle2(opt2);
+% x2=[x2,xx2];
+% y2=[y2,yy2];
+% z2=[z2,zz2];
+% error2=[error2,e2];
 
-angle2=@ (parm) leg2(l2,shortleg,longleg,parm);
-init2=[0];
-[opt2]=fminsearch(angle2,init2);
-%opt2=opt2/pi*180;
+[e2,xx2,yy2,zz2,opt2]=leg2(l2,shortleg,longleg);
 a2=[a2,opt2];
-[e2,xx2,yy2,zz2]=angle2(opt2);
+error2=[error2,e2];
 x2=[x2,xx2];
 y2=[y2,yy2];
 z2=[z2,zz2];
-error2=[error2,e2];
 
+% angle3=@ (parm) leg3(l3,shortleg,longleg,parm);
+% init3=[0];
+% [opt3]=fminsearch(angle3,init3);
+% %opt3=opt3/pi*180;
+% a3=[a3,opt3];
+% [e3,xx3,yy3,zz3]=angle3(opt3);
+% x3=[x3,xx3];
+% y3=[y3,yy3];
+% z3=[z3,zz3];
+% error3=[error3,e3];
 
-angle3=@ (parm) leg3(l3,shortleg,longleg,parm);
-init3=[0];
-[opt3]=fminsearch(angle3,init3);
-%opt3=opt3/pi*180;
+[e3,xx3,yy3,zz3,opt3]=leg3(l3,shortleg,longleg);
 a3=[a3,opt3];
-[e3,xx3,yy3,zz3]=angle3(opt3);
+error3=[error3,e3];
 x3=[x3,xx3];
 y3=[y3,yy3];
 z3=[z3,zz3];
-error3=[error3,e3];
+% 
+% angle4=@ (parm) leg4(l4,shortleg,longleg,parm);
+% init4=[0];
+% [opt4]=fminsearch(angle4,init4);
+% %opt4=opt4/pi*180;
+% a4=[a4,opt4];
+% [e4,xx4,yy4,zz4]=angle4(opt4);
+% x4=[x4,xx4];
+% y4=[y4,yy4];
+% z4=[z4,zz4];
+% error4=[error4,e4];
 
-angle4=@ (parm) leg4(l4,shortleg,longleg,parm);
-init4=[0];
-[opt4]=fminsearch(angle4,init4);
-%opt4=opt4/pi*180;
+[e4,xx4,yy4,zz4,opt4]=leg4(l4,shortleg,longleg);
 a4=[a4,opt4];
-[e4,xx4,yy4,zz4]=angle4(opt4);
+error4=[error4,e4];
 x4=[x4,xx4];
 y4=[y4,yy4];
 z4=[z4,zz4];
-error4=[error4,e4];
 
 % angle5=@ (parm) leg55(l5,shortleg,longleg,parm);
 % init5=[0];
