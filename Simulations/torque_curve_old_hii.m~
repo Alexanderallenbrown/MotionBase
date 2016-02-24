@@ -110,7 +110,7 @@ thetaDDz=[];
 
 for i=1:length(xdesired)
  
-    [l, Length, Bx, By, Bz, Tx, Ty, Tz]=traj(motion_des(i,:),angle_des(i,:)); 
+    [l, Length, Bx, By, Bz, Tx, Ty, Tz]=traj(motion_des(:,i),angle_des(:,i)); 
 
     L1=[l(1), Length(1)];
     L2=[l(2), Length(2)];

@@ -1,8 +1,8 @@
-function [L, length, Bx,By,Bz,Tx,Ty,Tz] = traj(motion_desired, angle_desired)
+function [L, length, Bx,By,Bz,Tx,Ty,Tz] = traj(motion_desired, acc_desired)
 %traj(xdesired(i),ydesired(i),1+zdesired(i),anglex(i)+axtilt(i),angley(i)+aytilt(i),anglez(i)); 
 % Computes distance from motor shaft to connection point on top platform
 %       Inputs:     motion_desired   vector(x,y,z) of the desired lateral motion
-%                   angle_desired    vector(x,y,z) of the desired acceleration
+%                   acc_desired      vector(x,y,z) of the desired acceleration
 %       Outputs:    L                matrix of vectors for legs 1-6
 %                   length           matrix of length magnitudes
 %                   B                xyz location of base
@@ -43,9 +43,9 @@ B4 = -1.*[Bx(4);By(4);Bz(4)];
 B5 = -1.*[Bx(5);By(5);Bz(5)];
 B6 = -1.*[Bx(6);By(6);Bz(6)];   % these are vectors from the motor shaft to the middle of the base (at corners of hexagon)
 
-Rx=[1 0 0; 0 cos(angle_desired(1)) -sin(angle_desired(1)); 0 sin(angle_desired(1)) cos(angle_desired(1))];
-Ry=[cos(angle_desired(2)) 0 sin(angle_desired(2)); 0 1 0; -sin(angle_desired(2)) 0 cos(angle_desired(2))];
-Rz=[cos(angle_desired(3)) -sin(angle_desired(3)) 0; sin(angle_desired(3)) cos(angle_desired(3)) 0; 0 0 1];  % rotation matrices
+Rx=[1 0 0; 0 cos(ax) -sin(ax); 0 sin(ax) cos(ax)];
+Ry=[cos(ay) 0 sin(ay); 0 1 0; -sin(ay) 0 cos(ay)];
+Rz=[cos(az) -sin(az) 0; sin(az) cos(az) 0; 0 0 1];  % rotation matrices
 
 % rotate the top vectors using rotation matrices, x then y then z
 T1=Rx*T1;
