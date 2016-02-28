@@ -25,6 +25,7 @@ SignalYaw = [time1,anglez];
 sim('demostration.slx');
 time=simtime;
 
+
 %initialize the length of the two legs
 shortleg=0.16;
 longleg=1;
@@ -113,7 +114,9 @@ thetaDDy=[];
 thetaDDz=[];
 for i=1:length(xdesired)
  
-   [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6,Bx,By,Bz,Tx,Ty,Tz]=traj(xdesired(i),ydesired(i),1+zdesired(i),anglex(i)+axtilt(i),angley(i)+aytilt(i),anglez(i)); 
+   
+    
+   [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6,Bx,By,Bz,Tx,Ty,Tz]=traj(xdesired(i),ydesired(i),1+zdesired(i),axfiltered(i),ayfiltered(i),anglez(i)); 
    L1=[L1,length1];
    L2=[L2,length2];
    L3=[L3,length3];
@@ -139,61 +142,45 @@ x1=[x1,xx1];
 y1=[y1,yy1];
 z1=[z1,zz1];
 
-angle2=@ (parm) leg2(l2,shortleg,longleg,parm);
-init2=[0];
-[opt2]=fminsearch(angle2,init2);
-%opt2=opt2/pi*180;
-a2=[a2,opt2];
-[e2,xx2,yy2,zz2]=angle2(opt2);
+% angle2=@ (parm) leg2(l2,shortleg,longleg,parm);
+% init2=[0];
+% [opt2]=fminsearch(angle2,init2);
+% %opt2=opt2/pi*180;
+
+[e2,xx2,yy2,zz2,opt2]=leg2(l2,shortleg,longleg);
 x2=[x2,xx2];
 y2=[y2,yy2];
 z2=[z2,zz2];
 error2=[error2,e2];
+a2=[a2,opt2];
 
-
-angle3=@ (parm) leg3(l3,shortleg,longleg,parm);
-init3=[0];
-[opt3]=fminsearch(angle3,init3);
-%opt3=opt3/pi*180;
-a3=[a3,opt3];
-[e3,xx3,yy3,zz3]=angle3(opt3);
+[e3,xx3,yy3,zz3,opt3]=leg3(l3,shortleg,longleg);
 x3=[x3,xx3];
 y3=[y3,yy3];
 z3=[z3,zz3];
 error3=[error3,e3];
+a3=[a3,opt3];
 
-angle4=@ (parm) leg4(l4,shortleg,longleg,parm);
-init4=[0];
-[opt4]=fminsearch(angle4,init4);
-%opt4=opt4/pi*180;
-a4=[a4,opt4];
-[e4,xx4,yy4,zz4]=angle4(opt4);
+[e4,xx4,yy4,zz4,opt4]=leg4(l4,shortleg,longleg);
 x4=[x4,xx4];
 y4=[y4,yy4];
 z4=[z4,zz4];
 error4=[error4,e4];
+a4=[a4,opt4];
 
-angle5=@ (parm) leg5(l5,shortleg,longleg,parm);
-init5=[0];
-[opt5]=fminsearch(angle5,init5);
-%opt5=opt5/pi*180;
-a5=[a5,opt5];
-[e5,xx5,yy5,zz5]=angle5(opt5);
+[e5,xx5,yy5,zz5,opt5]=leg5(l5,shortleg,longleg);
 x5=[x5,xx5];
 y5=[y5,yy5];
 z5=[z5,zz5];
 error5=[error5,e5];
+a5=[a5,opt5];
 
-angle6=@ (parm) leg6(l6,shortleg,longleg,parm);
-init6=[0];
-[opt6]=fminsearch(angle6,init6);
-%opt6=opt6/pi*180;
-a6=[a6,opt6];
-[e6,xx6,yy6,zz6]=angle6(opt6);
+[e6,xx6,yy6,zz6,opt6]=leg6(l6,shortleg,longleg);
 x6=[x6,xx6];
 y6=[y6,yy6];
 z6=[z6,zz6];
 error6=[error6,e6];
+a6=[a6,opt6];
 
 
 % point of triangle connections 
@@ -201,10 +188,10 @@ r1= [Tx(1),Ty(1),Tz(1)];
 r2=[Tx(2),Ty(2),Tz(2)];
 r3=[Tx(3),Ty(3),Tz(3)];
 
-% derivatives omega and alpha 
+%derivatives omega and alpha 
 if i>1
-   Dax=(anglex(i)-anglex(i-1))/0.05;
-   Day=(angley(i)-angley(i-1))/0.05;
+   Dax=(axfiltered(i)-axfiltered(i-1))/0.05;
+   Day=(ayfiltered(i)-ayfiltered(i-1))/0.05;
    Daz=0;
    
 else

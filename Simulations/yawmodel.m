@@ -34,9 +34,13 @@ C=[0 1];
 
 D=[0];
 
+%high pass filter
+s=tf('s');
+hp=s^2/(s^2+7*s+50);
+
 [num_r,den_r]=ss2tf(A,B,C,D);
-delta_to_r(k) = tf(num_r,den_r)
-bode(delta_to_r(k),plotStyle{k})
+delta_to_r(k) = tf(num_r,den_r);
+bode(delta_to_r(k)*hp,plotStyle{k})
 legendInfo{k} = ['U = ' num2str(U)];
 end
 legend(legendInfo)
