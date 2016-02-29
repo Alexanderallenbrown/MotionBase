@@ -34,13 +34,27 @@ C=[0 1];
 
 D=[0];
 
+C2 = [(Caf+Car)/(m*U) (a*Caf-b*Car)/(m*U)];
+D2 = [-Caf/m];
+
 %high pass filter
 s=tf('s');
 hp=s^2/(s^2+7*s+50);
 
 [num_r,den_r]=ss2tf(A,B,C,D);
+[num_ay,den_ay] = ss2tf(A,B,C2,D2);
 delta_to_r(k) = tf(num_r,den_r);
-bode(delta_to_r(k)*hp,plotStyle{k})
-legendInfo{k} = ['U = ' num2str(U)];
+delta_to_ay(k) = tf(num_ay,den_ay);
+% subplot(1,2,1)
+%hold on
+% bode(delta_to_r(k)*hp,plotStyle{k})
+% subplot(1,2,2)
+% %hold on
+% bode(delta_to_ay(k)*hp,plotStyle{k})
+% legendInfo{k} = ['U = ' num2str(U)];
+
+
+
+
 end
 legend(legendInfo)
