@@ -3,7 +3,7 @@ function [error,x,y,z,a]=leg5(l1,L2,L3)
 
 amin=0;
 amax=pi;
-tol=0.001;
+tol=0.00001;
 iter=0;
 error=10;
 

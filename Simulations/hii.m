@@ -1,29 +1,30 @@
 rawdata=xlsread('rawdata.xlsx');
 %time
 time1 = rawdata(:,2);
-
+delta=5*pi/180*sin(4*pi*time1);
+input=[time1,delta];
 %actual tilt
-anglex=rawdata(:,20);
-angley=rawdata(:,21);
-anglez=rawdata(:,22);
-
-%linear accelaration
-ax=rawdata(:,11);
-ay=rawdata(:,12);
-az=rawdata(:,13);
-
-%compose signals and send them to simulink
-signalax=[time1,ax];
-signalay=[time1,ay];
-signalaz=[time1,az];
-% added roll pitch yaw, 2/16/16
-SignalRoll = [time1,anglex]; 
-SignalPitch = [time1,angley];
-SignalYaw = [time1,anglez];
-
+% anglex=rawdata(:,20);
+% angley=rawdata(:,21);
+% anglez=rawdata(:,22);
+% 
+% %linear accelaration
+% ax=rawdata(:,11);
+% ay=rawdata(:,12);
+% az=rawdata(:,13);
+% 
+% %compose signals and send them to simulink
+% signalax=[time1,ax];
+% signalay=[time1,ay];
+% signalaz=[time1,az];
+% % added roll pitch yaw, 2/16/16
+% SignalRoll = [time1,anglex]; 
+% SignalPitch = [time1,angley];
+% SignalYaw = [time1,anglez];
+% 
 %run simulink
-sim('demostration.slx');
-time=simtime;
+sim('demostration2.slx');
+% time=simtime;
 
 
 %initialize the length of the two legs
@@ -112,11 +113,11 @@ thetaDz=[];
 thetaDDx=[];
 thetaDDy=[];
 thetaDDz=[];
-for i=1:length(xdesired)
+for i=1:length(ydesired)
  
    
     
-   [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6,Bx,By,Bz,Tx,Ty,Tz]=traj(xdesired(i),ydesired(i),1+zdesired(i),axfiltered(i),ayfiltered(i),anglez(i)); 
+   [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6,Bx,By,Bz,Tx,Ty,Tz]=traj(0,ydesired(i),1,axtilt(i)/pi*180,0,anglez(i)*180/pi); 
    L1=[L1,length1];
    L2=[L2,length2];
    L3=[L3,length3];
@@ -190,40 +191,40 @@ r3=[Tx(3),Ty(3),Tz(3)];
 
 %derivatives omega and alpha 
 if i>1
-   Dax=(axfiltered(i)-axfiltered(i-1))/0.05;
-   Day=(ayfiltered(i)-ayfiltered(i-1))/0.05;
-   Daz=0;
+   Dax=(axtilt(i)-axtilt(i-1))/0.05;
+   %Day=(ayfiltered(i)-ayfiltered(i-1))/0.05;
+   %Daz=0;
    
 else
-    Dax=0;
-    Day=0;
-    Daz=0;
+   Dax=0;
+   % Day=0;
+    %Daz=0;
       
 end
    thetaDx=[thetaDx,Dax];
-   thetaDy=[thetaDy,Day];
-   thetaDz=[thetaDz,Daz];
+   %thetaDy=[thetaDy,Day];
+  % thetaDz=[thetaDz,Daz];
 
 if i>2
-   DDax=(thetaDx(i-1)-thetaDx(i-2))/0.05;
-   DDay=(thetaDy(i-1)-thetaDy(i-2))/0.05;
-   DDaz=0;
+  DDax=(thetaDx(i-1)-thetaDx(i-2))/0.05;
+   %DDay=(thetaDy(i-1)-thetaDy(i-2))/0.05;
+ %  DDaz=0;
    
 else
-    DDax=0;
-    DDay=0;
-    DDaz=0;
+   DDax=0;
+    %DDay=0;
+   % DDaz=0;
 end
-   thetaDDx=[thetaDDx,DDax];
-   thetaDDy=[thetaDDy,DDay];
-   thetaDDz=[thetaDDz,DDaz];
+  thetaDDx=[thetaDDx,DDax];
+   %thetaDDy=[thetaDDy,DDay];
+  % thetaDDz=[thetaDDz,DDaz];
 
-theta=[DDax,DDay,DDaz]/180*pi/4;
+theta=[DDax,0,0]/180*pi/4;
 m = 340/2.2;
 J = [15.63, 35.35, 40.50]; %kg-m^2 Found from initial Inventor model
 
 
-[f1,f2,f3,f4,f5,f6] = forceplatform(m, J, l1,l2,l3,l4,l5,l6,r1, r2,r3,[ax(i),ay(i),az(i)],theta);
+[f1,f2,f3,f4,f5,f6] = forceplatform(m, J, l1,l2,l3,l4,l5,l6,r1, r2,r3,[0,ay(i),0],theta);
 F1=[F1,f1];
 F2=[F2,f2];
 F3=[F3,f3];
