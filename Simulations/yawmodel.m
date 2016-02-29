@@ -6,10 +6,10 @@ clc
 Caf=-8.5*10^4;% %N/rad
 Car=-10*10^4; % %N/rad
 %U=18; %m/s
-I=3000; %kg*m^2
-m=2000; %kg
-a=1; %m
-b=1; %m
+I=2500; %kg*m^2
+m=1500; %kg
+a=1.18; %m
+b=1.50; %m
 U=5;
 
 
@@ -52,15 +52,15 @@ lp_axtilt=1300/(s^2+100*s+1300)/4/9.81;
 figure(1)
 hold on
 bode(delta_to_ay(k)*hp_linearay,plotStyle{k})
-title('delta->linear ay')
+title('delta->linear ay commanded')
 figure(2)
 hold on
 bode(delta_to_ay(k)*lp_axtilt,plotStyle{k})
-title('delta->ax tilt')
+title('delta->ax tilt commanded')
 figure(3)
 hold on
 bode(delta_to_r(k)*hp/s,plotStyle{k})
-title('delta->yaw')
+title('delta->yaw commanded')
 % subplot(1,2,2)
 % %hold on
 % bode(delta_to_ay(k)*hp,plotStyle{k})
