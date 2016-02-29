@@ -1,5 +1,5 @@
 figure(1)
-for i=1:91
+for i=1:924
   
 clf
 view([1 1 1])
