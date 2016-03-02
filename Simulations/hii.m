@@ -114,11 +114,12 @@ thetaDz=[];
 thetaDDx=[];
 thetaDDy=[];
 thetaDDz=[];
-for i=1:length(ydesired)
+anglex=0:5:50;
+for i=1:length(ax)
  
-   
+   z_default=1.06;
     
-   [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6,Bx,By,Bz,Tx,Ty,Tz]=traj(0,ydesired(i),1,axtilt(i)/pi*180,0,anglez(i)*180/pi); 
+   [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6,Bx,By,Bz,Tx,Ty,Tz]=traj(0,0,z_default,ax(i),0,0); 
    L1=[L1,length1];
    L2=[L2,length2];
    L3=[L3,length3];
@@ -272,7 +273,6 @@ T6 = [T6,t6];
 
 
 end
-
 
 figure(1)
 plot(time1(1:1838),error1,time1(1:1838),error2,time1(1:1838),error3,time1(1:1838),error4,time1(1:1838),error5,time1(1:1838),error6)

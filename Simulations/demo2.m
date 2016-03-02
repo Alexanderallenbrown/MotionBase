@@ -1,12 +1,12 @@
 figure(1)
-for i=1:1000
+for i=1:length(z_default)
   
 clf
 view([1 1 1])
 axis([-1 1 -1 1 -1 1])  
 hold on
 [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6,Bx,By,Bz,Tx,Ty,Tz]=...
-  traj(0,ydesired(i),1,axtilt(i)/pi*180,0,anglez(i)*180/pi); 
+  traj(0,0,z_default(i),0,0,0);  
 
 % quiver3(Bx(1),By(1), 0,l1(1),l1(2),l1(3))
 % 
@@ -31,6 +31,8 @@ quiver3(Bx(1),By(1),0,...
 quiver3(Bx(1)-shortleg*cos(a1(i))*sin(-pi/6),...
    By(1) + shortleg*cos(a1(i))*cos(-pi/6),...
    shortleg*sin(a1(i)),x1(i),y1(i),z1(i))
+
+p1=[Bx(1)-shortleg*cos(a1(i))*sin(-pi/6)+x1(i),By(1) + shortleg*cos(a1(i))*cos(-pi/6)+y1(i), shortleg*sin(a1(i))+z1(i)];
 %leg2
 quiver3(Bx(2),By(2),0,...
     -shortleg*cos(a2(i))*sin(pi/6), shortleg*cos(a2(i))*cos(pi/6),shortleg*sin(a2(i)))
@@ -38,6 +40,10 @@ quiver3(Bx(2),By(2),0,...
 quiver3(Bx(2)-shortleg*cos(a2(i))*sin(pi/6),...
    By(2)+ shortleg*cos(a2(i))*cos(pi/6),...
    shortleg*sin(a2(i)),x2(i),y2(i),z2(i))
+
+p2=[Bx(2)-shortleg*cos(a2(i))*sin(pi/6)+x2(i), By(2)+ shortleg*cos(a2(i))*cos(pi/6)+y2(i),shortleg*sin(a2(i))+z2(i)];
+
+quiver3(p1(1),p1(2),p1(3),p2(1),p2(2),p2(3))
 %leg3
 quiver3(Bx(3),By(3),0,...
     -shortleg*cos(a3(i))*sin(pi/2), -shortleg*cos(a3(i))*cos(pi/2),shortleg*sin(a3(i)))
