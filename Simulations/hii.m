@@ -273,8 +273,12 @@ T6 = [T6,t6];
 
 end
 
+
 figure(1)
-plot(F1)
+plot(time1(1:1838),error1,time1(1:1838),error2,time1(1:1838),error3,time1(1:1838),error4,time1(1:1838),error5,time1(1:1838),error6)
+xlabel('time')
+ylabel('error(m)')
+legend('1','2','3','4','5','6')
 
 figure(2)
 plot(T1)
