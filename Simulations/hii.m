@@ -1,8 +1,9 @@
 rawdata=xlsread('rawdata.xlsx');
 %time
-time1 = rawdata(:,2);
+%time1 = rawdata(:,2);
+time1=0:0.05:100;
 delta=5*pi/180*sin(4*pi*time1);
-input=[time1,delta];
+input=[time1',delta'];
 %actual tilt
 % anglex=rawdata(:,20);
 % angley=rawdata(:,21);

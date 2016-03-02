@@ -1,12 +1,12 @@
 figure(1)
-for i=1:924
+for i=1:11
   
 clf
 view([1 1 1])
 axis([-1 1 -1 1 -1 1])  
 hold on
 [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6,Bx,By,Bz,Tx,Ty,Tz]=...
-    traj(0, 0,1,0,0,i);
+   traj(0,0,1,ax(i),0,0);
 
 % quiver3(Bx(1),By(1), 0,l1(1),l1(2),l1(3))
 % 
@@ -76,6 +76,6 @@ quiver3(Bx(6)-shortleg*cos(a6(i))*sin(9*pi/6),...
 
 F(i) = getframe;
 
-pause(0.05)
+pause(0.5)
 end
 
