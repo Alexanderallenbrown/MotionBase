@@ -1,3 +1,6 @@
+close all
+clear all
+clc
 rawdata=xlsread('rawdata.xlsx');
 %time
 %time1 = rawdata(:,2);
@@ -114,12 +117,12 @@ thetaDz=[];
 thetaDDx=[];
 thetaDDy=[];
 thetaDDz=[];
-
-for i=1:length(ax)
+z_default=.5:0.01:2;
+for i=1:length(z_default)
  
-   z_default=1.06;
+   
     
-   [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6,Bx,By,Bz,Tx,Ty,Tz]=traj(0,0,z_default,ax(i),0,0); 
+   [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6,Bx,By,Bz,Tx,Ty,Tz]=traj(0,0,z_default(i),0,0,0); 
    L1=[L1,length1];
    L2=[L2,length2];
    L3=[L3,length3];
@@ -275,24 +278,30 @@ T6 = [T6,t6];
 end
 
 figure(1)
-plot(time1(1:1838),error1,time1(1:1838),error2,time1(1:1838),error3,time1(1:1838),error4,time1(1:1838),error5,time1(1:1838),error6)
-xlabel('time')
+plot(z_default,error1,z_default,error2,z_default,error3,z_default,error4,z_default,error5,z_default,error6)
+xlabel('roll')
 ylabel('error(m)')
 legend('1','2','3','4','5','6')
 
 figure(2)
 plot(T1)
 
-for i = 1:100
-    omega1(i) = (a1(i+1)-a1(i))/.05;
-    omega2(i) = (a2(i+1)-a2(i))/.05;
-    omega3(i) = (a3(i+1)-a3(i))/.05;
-    omega4(i) = (a4(i+1)-a4(i))/.05;
-    omega5(i) = (a5(i+1)-a5(i))/.05;
-    omega6(i) = (a6(i+1)-a6(i))/.05;
-end
+% for i = 1:100
+%     omega1(i) = (a1(i+1)-a1(i))/.05;
+%     omega2(i) = (a2(i+1)-a2(i))/.05;
+%     omega3(i) = (a3(i+1)-a3(i))/.05;
+%     omega4(i) = (a4(i+1)-a4(i))/.05;
+%     omega5(i) = (a5(i+1)-a5(i))/.05;
+%     omega6(i) = (a6(i+1)-a6(i))/.05;
+% end
+% 
+% figure(3)
+% plot(abs(omega1),T1(1:100),abs(omega2),T2(1:100),abs(omega3),T3(1:100),abs(omega4),T4(1:100),...
+%     abs(omega5),T5(1:100),abs(omega6),T6(1:100))
 
-figure(3)
-plot(abs(omega1),T1(1:100),abs(omega2),T2(1:100),abs(omega3),T3(1:100),abs(omega4),T4(1:100),...
-    abs(omega5),T5(1:100),abs(omega6),T6(1:100))
+figure()
 
+plot(z_default,a1,z_default,a2,z_default,a3,z_default,a4,z_default,a5,z_default,a6)
+legend('1','2','3','4','5','6')
+xlabel('platform height (m)')
+ylabel('motor angles (rad)')

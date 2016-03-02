@@ -1,5 +1,4 @@
 function [length1,L1,length2,L2,length3,L3 ,length4,L4 ,length5,L5 ,length6,L6,Bx,By,Bz,Tx,Ty,Tz] = traj(x2,y2,z2,ax,ay,az )
-%traj(xdesired(i),ydesired(i),1+zdesired(i),anglex(i)+axtilt(i),angley(i)+aytilt(i),anglez(i)); 
 
 %Define radii of Top and Base (meters)
 r1 = 0.402;
@@ -8,18 +7,19 @@ r2 = 0.265;
 %Establish Angles for the points on the hexagon(base) and the triangle(top)
 %The right edge of the triangle is deemed to be 0. The hex begins at +/- 30
 %degrees
+
 hex_angles = [-pi/6:pi/3:9*pi/6];
 tri_angles = [0,2*pi/3,4*pi/3];
 
 %Establish the points of the base
 Bx = r1.*cos(hex_angles);
 By = r1.*sin(hex_angles);
-Bz = zeros(size(hex_angles));
+Bz = zeros(length(hex_angles));
 
 %Establish the points of the top
 Tx = r2.*cos(tri_angles);
 Ty = r2.*sin(tri_angles);
-Tz = zeros(size(tri_angles));
+Tz = zeros(length(tri_angles));
 
 %Initialize the platform location
 P=[x2; y2; z2];
@@ -35,6 +35,7 @@ B3 = -1.*[Bx(3);By(3);Bz(3)];
 B4 = -1.*[Bx(4);By(4);Bz(4)];
 B5 = -1.*[Bx(5);By(5);Bz(5)];
 B6 = -1.*[Bx(6);By(6);Bz(6)];
+
 
 ax=ax/180*pi;
 ay=ay/180*pi;
@@ -62,6 +63,7 @@ L3=B3+P+T2;
 L4=B4+P+T2;
 L5=B5+P+T3;
 L6=B6+P+T3;
+
 
 % T4=Rx*T4;
 % T4=Ry*T4;

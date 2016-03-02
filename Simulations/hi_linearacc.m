@@ -1,9 +1,9 @@
 rawdata=xlsread('rawdata.xlsx');
 %time
 %time1 = rawdata(:,2);
-time1=0:0.05:100;
-delta=5*pi/180*sin(4*pi*time1);
-input=[time1',delta'];
+% time1=0:0.05:10;
+% delta=5*pi/180*sin(4*pi*time1);
+% input=[time1',delta'];
 %actual tilt
 % anglex=rawdata(:,20);
 % angley=rawdata(:,21);
@@ -24,8 +24,8 @@ input=[time1',delta'];
 % SignalYaw = [time1,anglez];
 % 
 %run simulink
-sim('demostration2.slx');
-% time=simtime;
+sim('demostration3.slx');
+time1=0:0.05:10;
 
 
 %initialize the length of the two legs
@@ -115,11 +115,12 @@ thetaDDx=[];
 thetaDDy=[];
 thetaDDz=[];
 
-for i=1:length(ax)
+
+for i=1:length(time1)
  
    z_default=1.06;
     
-   [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6,Bx,By,Bz,Tx,Ty,Tz]=traj(0,0,z_default,ax(i),0,0); 
+   [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6,Bx,By,Bz,Tx,Ty,Tz]=traj(xdesired(i),0,z_default,0,aytilt(i)/pi*180,0); 
    L1=[L1,length1];
    L2=[L2,length2];
    L3=[L3,length3];
@@ -191,42 +192,42 @@ r1= [Tx(1),Ty(1),Tz(1)];
 r2=[Tx(2),Ty(2),Tz(2)];
 r3=[Tx(3),Ty(3),Tz(3)];
 
-%derivatives omega and alpha 
+% derivatives omega and alpha 
 if i>1
-   Dax=(axtilt(i)-axtilt(i-1))/0.05;
-   %Day=(ayfiltered(i)-ayfiltered(i-1))/0.05;
-   %Daz=0;
+%    Dax=(axtilt(i)-axtilt(i-1))/0.05;
+   Day=(aytilt(i)-aytilt(i-1))/0.05;
+%    Daz=0;
    
 else
-   Dax=0;
-   % Day=0;
-    %Daz=0;
+  % Dax=0;
+   Day=0;
+   % Daz=0;
       
 end
-   thetaDx=[thetaDx,Dax];
-   %thetaDy=[thetaDy,Day];
-  % thetaDz=[thetaDz,Daz];
+  % thetaDx=[thetaDx,Dax];
+   thetaDy=[thetaDy,Day];
+ % thetaDz=[thetaDz,Daz];
 
 if i>2
-  DDax=(thetaDx(i-1)-thetaDx(i-2))/0.05;
-   %DDay=(thetaDy(i-1)-thetaDy(i-2))/0.05;
- %  DDaz=0;
+  %DDax=(thetaDx(i-1)-thetaDx(i-2))/0.05;
+   DDay=(thetaDy(i-1)-thetaDy(i-2))/0.05;
+ % DDaz=0;
    
 else
-   DDax=0;
-    %DDay=0;
-   % DDaz=0;
+   %DDax=0;
+    DDay=0;
+ %  DDaz=0;
 end
-  thetaDDx=[thetaDDx,DDax];
-   %thetaDDy=[thetaDDy,DDay];
-  % thetaDDz=[thetaDDz,DDaz];
+ % thetaDDx=[thetaDDx,DDax];
+   thetaDDy=[thetaDDy,DDay];
+  %thetaDDz=[thetaDDz,DDaz];
 
-theta=[DDax,0,0]/180*pi/4;
+theta=[0,DDay,0]/180*pi/4;
 m = 340/2.2;
 J = [15.63, 35.35, 40.50]; %kg-m^2 Found from initial Inventor model
 
 
-[f1,f2,f3,f4,f5,f6] = forceplatform(m, J, l1,l2,l3,l4,l5,l6,r1, r2,r3,[0,ay(i),0],theta);
+[f1,f2,f3,f4,f5,f6] = forceplatform(m, J, l1,l2,l3,l4,l5,l6,r1, r2,r3,[ax(i),0,0],theta);
 F1=[F1,f1];
 F2=[F2,f2];
 F3=[F3,f3];
@@ -274,16 +275,21 @@ T6 = [T6,t6];
 
 end
 
-figure(1)
-plot(time1(1:1838),error1,time1(1:1838),error2,time1(1:1838),error3,time1(1:1838),error4,time1(1:1838),error5,time1(1:1838),error6)
-xlabel('time')
-ylabel('error(m)')
-legend('1','2','3','4','5','6')
+% figure(1)
+% plot(z,error1,z,error2,z,error3,z,error4,z,error5,z,error6)
+% xlabel('z(m)')
+% ylabel('error(m)')
+% legend('1','2','3','4','5','6')
 
 figure(2)
-plot(T1)
 
-for i = 1:100
+plot(xdesired,a1,xdesired,a2,xdesired,a3,xdesired,a4,xdesired,a5,xdesired,a6)
+legend('Motor 1','Motor 2','Motor 3','Motor 4','Motor 5','Motor 6')
+title('Motor angle angle vs x')
+ylabel('Motor Angles (Rad)')
+xlabel('Platform x')
+
+for i = 1:200
     omega1(i) = (a1(i+1)-a1(i))/.05;
     omega2(i) = (a2(i+1)-a2(i))/.05;
     omega3(i) = (a3(i+1)-a3(i))/.05;
@@ -293,6 +299,13 @@ for i = 1:100
 end
 
 figure(3)
-plot(abs(omega1),T1(1:100),abs(omega2),T2(1:100),abs(omega3),T3(1:100),abs(omega4),T4(1:100),...
-    abs(omega5),T5(1:100),abs(omega6),T6(1:100))
+plot(abs(omega1),T1(1:200),abs(omega2),T2(1:200),abs(omega3),T3(1:200),abs(omega4),T4(1:200),...
+    abs(omega5),T5(1:200),abs(omega6),T6(1:200))
 
+figure(4)
+
+plot(time1,a1,time1,a2,time1,a3,time1,a4,time1,a5,time1,a6)
+legend('Motor 1','Motor 2','Motor 3','Motor 4','Motor 5','Motor 6')
+title('Motor angle angle vs time')
+ylabel('Motor Angles (Rad)')
+xlabel('time')

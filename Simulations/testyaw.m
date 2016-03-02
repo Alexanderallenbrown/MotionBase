@@ -115,11 +115,11 @@ thetaDDx=[];
 thetaDDy=[];
 thetaDDz=[];
 
-for i=1:length(ax)
+for i=1:length(ydesired)
  
    z_default=1.06;
     
-   [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6,Bx,By,Bz,Tx,Ty,Tz]=traj(0,0,z_default,ax(i),0,0); 
+   [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6,Bx,By,Bz,Tx,Ty,Tz]=traj(0,ydesired(i),z_default,axtilt(i)*180/pi,0,anglez(i)*180/pi); 
    L1=[L1,length1];
    L2=[L2,length2];
    L3=[L3,length3];
@@ -293,6 +293,13 @@ for i = 1:100
 end
 
 figure(3)
-plot(abs(omega1),T1(1:100),abs(omega2),T2(1:100),abs(omega3),T3(1:100),abs(omega4),T4(1:100),...
-    abs(omega5),T5(1:100),abs(omega6),T6(1:100))
+plot(abs(omega1(1:100)),T1(1:100),abs(omega2(1:100)),T2(1:100),abs(omega3(1:100)),T3(1:100),abs(omega4(1:100)),T4(1:100),...
+    abs(omega5(1:100)),T5(1:100),abs(omega6(1:100)),T6(1:100))
 
+figure(4)
+
+plot(anglez,a1,anglez,a2,anglez,a3,anglez,a4,anglez,a5,anglez,a6)
+legend('Motor 1','Motor 2','Motor 3','Motor 4','Motor 5','Motor 6')
+title('Platform yaw angle vs Motor Angles')
+ylabel('Motor Angles (Rad)')
+xlabel('Platform yaw Angle (degrees)')

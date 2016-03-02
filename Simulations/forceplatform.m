@@ -6,8 +6,8 @@ function [f1,f2,f3,f4,f5,f6] = forceplatform(m, J, Rpq1, Rpq2, Rpq3, Rpq4, Rpq5,
 %   requests:        acc=(x,y,z)         acceleration vector
 %                    theta=(x,y,z)       angle
 %                       
-%   properties:     m                   mass
-%                   J                   inertia
+%   properties:      m                   mass
+%                    J                   inertia
 %
 
 e1 = Rpq1/norm(Rpq1);
