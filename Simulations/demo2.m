@@ -6,7 +6,7 @@ view([1 1 1])
 axis([-1 1 -1 1 -1 1])  
 hold on
 [length1,l1,length2,l2,length3,l3,length4,l4,length5,l5,length6,l6,Bx,By,Bz,Tx,Ty,Tz]=...
- traj(xdesired(i),0,z_default,0,aytilt(i),0); 
+ traj(xdesired(i),ydesired(i),z_default+zdesired(i),axfiltered(i),ayfiltered(i),anglez(i));  
 
 % quiver3(Bx(1),By(1), 0,l1(1),l1(2),l1(3))
 % 
