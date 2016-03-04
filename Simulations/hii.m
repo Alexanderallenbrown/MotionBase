@@ -62,8 +62,6 @@ a6=[];
 %x y z 
 
 %position of the points Q
-
->>>>>>> 86ec02a426a1e85d4cb82852685d41456dce5045
 x1=[];
 y1=[];
 z1=[];

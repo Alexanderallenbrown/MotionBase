@@ -1,4 +1,4 @@
-function [Length, Base, Platform, hex_angles, platformLocal] = platformposition(motion_desired, angle_desired, r_base, r_platform, initial_platform_height)
+function [Length, Base, Platform, hex_angles, makefig] = platformposition(motion_desired, angle_desired, r_base, r_platform, initial_platform_height)
 %traj(xdesired(i),ydesired(i),1+zdesired(i),anglex(i)+axtilt(i),angley(i)+aytilt(i),anglez(i)); 
 % Computes distance from motor shaft to connection point on top platform
 %       Inputs:     motion_desired   vector(x,y,z) of the desired lateral motion
@@ -21,7 +21,6 @@ Base = B';
 Tx = r_platform.*cos(tri_angles);
 Ty = r_platform.*sin(tri_angles);
 Tz = zeros(size(tri_angles));       % these are local coordinates
-platformLocal = [Tx; Ty; Tz];
 
 % get ready for platform movement
 motion=[motion_desired(1); motion_desired(2); motion_desired(3)];
@@ -75,19 +74,19 @@ L6 = Platform(3,:)-Base(6,:);
 Length = [L1; L2; L3; L4; L5; L6];
 
 
-% % plot
-% platformX = [p1_x, p2_x, p3_x, p1_x];
-% platformY = [p1_y, p2_y, p3_y, p1_y];
-% platformZ = [p1_z, p2_z, p3_z, p1_z];
-% baseX = [Bx, Bx(1)];
-% baseY = [By, By(1)];
-% baseZ = [Bz, Bz(1)];
-% makefig = figure();
-% hold on
-% plot3(platformX, platformY, platformZ)
-% plot3(baseX, baseY, baseZ)
-% view(-205,45)
-% grid on
+% plot
+platformX = [p1_x, p2_x, p3_x, p1_x];
+platformY = [p1_y, p2_y, p3_y, p1_y];
+platformZ = [p1_z, p2_z, p3_z, p1_z];
+baseX = [Bx, Bx(1)];
+baseY = [By, By(1)];
+baseZ = [Bz, Bz(1)];
+makefig = figure();
+hold on
+plot3(platformX, platformY, platformZ)
+plot3(baseX, baseY, baseZ)
+view(-205,45)
+grid on
 
 
 end

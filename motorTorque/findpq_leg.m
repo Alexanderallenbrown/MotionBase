@@ -1,4 +1,4 @@
-function [error, x, y, z] = findpq_leg(Rpo, motor_arm, conrod, pos_motor, angle)
+function [error, x, y, z] = findpq_leg(Rpo, motor_arm, conrod, pos_motor, a)
 % finding vector pq based on a given angle
 x=Rpo(1)+motor_arm*cos(a)*sin(pos_motor);
 y=Rpo(2)-motor_arm*cos(a)*cos(pos_motor);

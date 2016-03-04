@@ -38,15 +38,15 @@ b = [m*acc(1);
     J(2)*theta(2);
     J(3)*theta(3)];
 
-F = inv(A)*b;
+F_mag = inv(A)*b;
 
 F1 = F(1)*e1;
 F2 = F(2)*e2;
 F3 = F(3)*e3;
 F4 = F(4)*e4;
 F5 = F(5)*e5;
-F6 = F(6)*e6;       % solve for force vectors
+F6 = F(6)*e6;       % solve for 
 
-F_pq = [F1; F2; F3; F4; F5; F6];        % compose matrix to send back to main code
+F_pq = [F1; F2; F3; F4; F5; F6];
 
 end
