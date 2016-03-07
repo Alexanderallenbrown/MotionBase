@@ -43,6 +43,8 @@ angle_y = interp1(time1, angle(:,2), simtime);
 angle_z = interp1(time1, angle(:,3), simtime);
 angle_x= angle_x(~isnan(angle_x));
 angle_y= angle_y(~isnan(angle_y));
+
+% manually change simulation time to 45.77 to get it to work
 angle_des = [angle_x(3:end)+axtilt, angle_y(3:end)+aytilt, angle_z(6:end)]; %% had to do stupid things to trim vectors, should fix this later %%
 
 %% Run loop to determine platform position, motor arm angles, motor torques
@@ -73,6 +75,9 @@ T_qo = zeros(6,3);
 Rpq_x = zeros(6,1);
 Rpq_y = zeros(6,1);
 Rpq_z = zeros(6,1);
+R_qo_x = zeros(6,1);
+R_qo_y = zeros(6,1);
+R_qo_z = zeros(6,1);
 T_qo_x = zeros(6,1);
 T_qo_y = zeros(6,1);
 T_qo_z = zeros(6,1);
@@ -139,23 +144,25 @@ for i=1:length(motion_des)    % motion index
         angle = @ (parm) findpq_leg(R_po(j,:), shortleg, longleg, pos_motor(j), parm);
         [opt(i,j)] = fminsearch(angle, initial);
         [error, x, y, z] = angle(opt(i,j));
-        R_qo = [x, y, z];
-        R_pq = R_po(j,:) - R_qo;
-        Rpq_x(j) = R_pq(1);     % had to disassemble R_pq so that it would write to j
+        R_pq = [x, y, z];
+        Rpq_x(j) = R_pq(1);     % had to disassemble so that they write to j
         Rpq_y(j) = R_pq(2);
         Rpq_z(j) = R_pq(3);
-        
+        R_qo_x(j) = -shortleg*cos(opt(i,j))*sin(opt(i,j));
+        R_qo_y(j) = shortleg*cos(opt(i,j))*cos(opt(i,j));
+        R_qo_z(j) = shortleg*sin(opt(i,j));
     end
     
     R_pq = [Rpq_x, Rpq_y, Rpq_z];       % reassemble
+    R_qo = [R_qo_x, R_qo_y, R_qo_z];
     
     % find force, torque on each leg
     for k = 1:6
         [F_pq] = forceplatform(m, J, R_pq(1,:), R_pq(2,:), R_pq(3,:), R_pq(4,:), R_pq(5,:), R_pq(6,:), platformLocal(1,:), platformLocal(2,:), platformLocal(3,:), motion_des(i,:), theta);
         
         for m = 1:6
-            T_qo = cross(R_qo, -F_pq(m,:));
-            T_qo_x(m) = T_qo(1);     % had to disassemble R_pq so that it would write to j
+            T_qo = cross(R_qo(m,:), -F_pq(m,:));
+            T_qo_x(m) = T_qo(1);     % had to disassemble so that it would write to m
             T_qo_y(m) = T_qo(2);
             T_qo_z(m) = T_qo(3);
         end
@@ -163,8 +170,6 @@ for i=1:length(motion_des)    % motion index
         T_qo = [T_qo_x, T_qo_y, T_qo_z];    % reassemble
         T(k) = dot(motors(k,:), T_qo(k,:));
     end
-    
-
     
     torque = [torque; T];
 
@@ -179,7 +184,7 @@ omega = zeros(size(torque));
 
 for n = 1:6
     opt_new = opt(:,n);               % split angle matrix into columns
-    for i=1:length(motion_des)        % motion index
+    for i=1:length(opt_new)        % motion index
         if i>1
             omega(i)= (opt(i)-opt(i-1))/.05;
         else
@@ -190,7 +195,8 @@ for n = 1:6
 end
 
 figure()
-plot(abs(om),torque)
+plot(abs(om(1:13734)), abs(torque))
+xlim([0 2])
 xlabel 'omega'
 ylabel 'torque'
 
