@@ -1,4 +1,4 @@
-function [Length, Base, Platform, hex_angles, platformLocal] = platformposition(motion_desired, angle_desired, r_base, r_platform, initial_platform_height)
+function [Length, Base, Platform, hex_angles, R_pc] = platformposition(motion_desired, angle_desired, r_base, r_platform, initial_platform_height)
 %traj(xdesired(i),ydesired(i),1+zdesired(i),anglex(i)+axtilt(i),angley(i)+aytilt(i),anglez(i)); 
 % Computes distance from motor shaft to connection point on top platform
 %       Inputs:     motion_desired   vector(x,y,z) of the desired lateral motion
@@ -24,7 +24,9 @@ Tz = zeros(size(tri_angles));       % these are local coordinates
 platformLocal = [Tx; Ty; Tz];
 
 % get ready for platform movement
-motion=[motion_desired(1); motion_desired(2); motion_desired(3)];
+motion=[motion_desired(1); motion_desired(2); motion_desired(3)]; 
+R_cg = [motion_desired(1), motion_desired(2), motion_desired(3) + initial_platform_height]; 
+R_cg = ones(3,1)*R_cg;
 
 % points on platform, not yet rotated
 T1 = [Tx(1); Ty(1); Tz(1)];
@@ -63,7 +65,8 @@ p3_x = T3(1) + motion(1);
 p3_y = T3(2) + motion(2);
 p3_z = T3(3) + motion(3) + initial_platform_height;
 
-Platform = [p1_x, p1_y, p1_z; p2_x, p2_y, p2_z; p3_x, p3_y, p3_z];
+Platform = [p1_x, p1_y, p1_z; p2_x, p2_y, p2_z; p3_x, p3_y, p3_z]; % R_p/g
+R_pc = Platform - R_cg;  % has been fixed
 
 % compute vector from motor shaft to triangle points
 L1 = Platform(1,:)-Base(1,:);
