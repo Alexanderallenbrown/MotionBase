@@ -32,11 +32,11 @@ sim('demostration.slx');
 shortleg=0.16;
 longleg=1;
 
-%<<<<<<< HEAD
+
 %L1 is the vector that records the length of leg1
-%=======
+
 % the length of the imaginary legs connecting point P to point O
-%>>>>>>> 7d63f8bbbc886981d473b8914aaa42252d216686
+
 L1=[];
 L2=[];
 L3=[];
@@ -194,33 +194,33 @@ r3=[Tx(3),Ty(3),Tz(3)];
 
 %derivatives omega and alpha 
 if i>1
-   Dax=(axtilt(i)-axtilt(i-1))/0.05;
-   %Day=(ayfiltered(i)-ayfiltered(i-1))/0.05;
-   %Daz=0;
+   Dax=(axfiltered(i)-axfiltered(i-1))/0.05;
+   Day=(ayfiltered(i)-ayfiltered(i-1))/0.05;
+   Daz=(anglez(i)-anglez(i-1))/0.05;;
    
 else
    Dax=0;
-   % Day=0;
-    %Daz=0;
+   Day=0;
+   Daz=0;
       
 end
    thetaDx=[thetaDx,Dax];
-   %thetaDy=[thetaDy,Day];
-  % thetaDz=[thetaDz,Daz];
+   thetaDy=[thetaDy,Day];
+   thetaDz=[thetaDz,Daz];
 
 if i>2
   DDax=(thetaDx(i-1)-thetaDx(i-2))/0.05;
-   %DDay=(thetaDy(i-1)-thetaDy(i-2))/0.05;
- %  DDaz=0;
+  DDay=(thetaDy(i-1)-thetaDy(i-2))/0.05;
+  DDaz=(thetaDz(i-1)-thetaDz(i-2))/0.05;
    
 else
    DDax=0;
-    %DDay=0;
-   % DDaz=0;
+   DDay=0;
+   DDaz=0;
 end
   thetaDDx=[thetaDDx,DDax];
-   %thetaDDy=[thetaDDy,DDay];
-  % thetaDDz=[thetaDDz,DDaz];
+  thetaDDy=[thetaDDy,DDay];
+  thetaDDz=[thetaDDz,DDaz];
 
 theta=[DDax,0,0]/180*pi/4;
 m = 340/2.2;
