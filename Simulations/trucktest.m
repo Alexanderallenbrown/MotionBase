@@ -301,4 +301,10 @@ end
 figure(3)
 plot(abs(omega1),T1(1:100),abs(omega2),T2(1:100),abs(omega3),T3(1:100),abs(omega4),T4(1:100),...
     abs(omega5),T5(1:100),abs(omega6),T6(1:100))
+xlabel('omega(rad/s)')
+ylabel('torque(N*m)')
+title('T-w for truck data')
+
+
+
 
