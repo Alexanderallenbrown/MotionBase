@@ -1,5 +1,5 @@
 figure(1)
-for i=1:length(aytilt)
+for i=1:length(error1)
   
 clf
 view([1 1 1])

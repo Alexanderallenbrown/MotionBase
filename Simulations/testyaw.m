@@ -2,7 +2,7 @@ rawdata=xlsread('rawdata.xlsx');
 %time
 %time1 = rawdata(:,2);
 time1=0:0.05:100;
-delta=5*pi/180*sin(4*pi*time1);
+delta=5*pi/180*sin(2*5*pi*time1);
 input=[time1',delta'];
 %actual tilt
 % anglex=rawdata(:,20);
@@ -273,28 +273,30 @@ T6 = [T6,t6];
 
 
 end
+idx=size(error1,2);
 
 figure(1)
-plot(time1(1:1838),error1,time1(1:1838),error2,time1(1:1838),error3,time1(1:1838),error4,time1(1:1838),error5,time1(1:1838),error6)
+plot(time1(1:idx),error1,time1(1:idx),error2,time1(1:idx),error3,time1(1:idx),error4,time1(1:idx),error5,time1(1:idx),error6)
 xlabel('time')
 ylabel('error(m)')
 legend('1','2','3','4','5','6')
+title('error, yaw freq@x tilt natural freq')
 
 figure(2)
 plot(T1)
 
-for i = 1:100
-    omega1(i) = (a1(i+1)-a1(i))/.05;
-    omega2(i) = (a2(i+1)-a2(i))/.05;
-    omega3(i) = (a3(i+1)-a3(i))/.05;
-    omega4(i) = (a4(i+1)-a4(i))/.05;
-    omega5(i) = (a5(i+1)-a5(i))/.05;
-    omega6(i) = (a6(i+1)-a6(i))/.05;
-end
-
-figure(3)
-plot(abs(omega1(1:100)),T1(1:100),abs(omega2(1:100)),T2(1:100),abs(omega3(1:100)),T3(1:100),abs(omega4(1:100)),T4(1:100),...
-    abs(omega5(1:100)),T5(1:100),abs(omega6(1:100)),T6(1:100))
+% for i = 1:100
+%     omega1(i) = (a1(i+1)-a1(i))/.05;
+%     omega2(i) = (a2(i+1)-a2(i))/.05;
+%     omega3(i) = (a3(i+1)-a3(i))/.05;
+%     omega4(i) = (a4(i+1)-a4(i))/.05;
+%     omega5(i) = (a5(i+1)-a5(i))/.05;
+%     omega6(i) = (a6(i+1)-a6(i))/.05;
+% end
+% 
+% figure(3)
+% plot(abs(omega1(1:100)),T1(1:100),abs(omega2(1:100)),T2(1:100),abs(omega3(1:100)),T3(1:100),abs(omega4(1:100)),T4(1:100),...
+%     abs(omega5(1:100)),T5(1:100),abs(omega6(1:100)),T6(1:100))
 
 figure(4)
 

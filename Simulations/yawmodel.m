@@ -44,7 +44,7 @@ hp=s^2/(s^2+2*s+4);
 [num_ay,den_ay] = ss2tf(A,B,C2,D2);
 delta_to_r(k) = tf(num_r,den_r);
 delta_to_ay(k) = tf(num_ay,den_ay);
-<<<<<<< HEAD
+
 % subplot(1,2,1)
 %hold on
 % bode(delta_to_r(k)*hp,plotStyle{k})
@@ -52,7 +52,7 @@ delta_to_ay(k) = tf(num_ay,den_ay);
 % %hold on
 % bode(delta_to_ay(k)*hp,plotStyle{k})
 % legendInfo{k} = ['U = ' num2str(U)];
-=======
+
 
 hp_linearay=s^2/(s^2+10*s+150)/4;
 lp_axtilt=1300/(s^2+100*s+1300)/4/9.81;
@@ -74,7 +74,7 @@ title('delta->yaw commanded')
 % %hold on
 % bode(delta_to_ay(k)*hp,plotStyle{k})
  legendInfo{k} = ['U = ' num2str(U)];
->>>>>>> fc32c50cf4ddfd03550b5b2224f30caa165af18f
+
 
 
 
