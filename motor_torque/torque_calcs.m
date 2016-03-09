@@ -58,10 +58,10 @@ angle_z = interp1(time1, angle(:,3), simtime);
 %angle_y= angle_y(~isnan(angle_y));
 
 %angle_des = [angle_x(3:end)+axtilt, angle_y(3:end)+aytilt, angle_z(6:end)]; %% had to do stupid things to trim vectors, should fix this later %%
-angle_des = [angle_x+axtilt, angle_y+aytilt, zeros(size(angle_z))]; %% had to do stupid things to trim vectors, should fix this later %%
+angle_des = [angle_x+axtilt, angle_y+aytilt, anglez]; %% had to do stupid things to trim vectors, should fix this later %%
 %MEGAN-- WE NEED TO FIX THE ANGLE Z. We can't ask for angle z directly...
 %needs to be high pass filtered!!! Grab this from Dallis's branch and paste
-%into your simulink??
+%into your simulink??   FIXED
 
 %% Calculate linear velocity, acceleration and angular velocity, acceleration    
 vel_desX(:,1) = [0; diff(motion_des(:,1))./diff(simtime)];      % split into XYZ to make sure diff works in the right direction
