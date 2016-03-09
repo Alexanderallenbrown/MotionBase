@@ -61,6 +61,69 @@ angle_des = [angle_x+axtilt, angle_y+aytilt, zeros(size(angle_z))]; %% had to do
 %MEGAN-- WE NEED TO FIX THE ANGLE Z. We can't ask for angle z directly...
 %needs to be high pass filtered!!! Grab this from Dallis's branch and paste
 %into your simulink??
+
+%% Calculate linear velocity, acceleration and angular velocity, acceleration    
+vel_desX(:,1) = [0; diff(motion_des(:,1))./diff(simtime)];      % split into XYZ to make sure diff works in the right direction
+vel_desY(:,2) = [0; diff(motion_des(:,2))./diff(simtime)];
+vel_desZ(:,3) = [0; diff(motion_des(:,3))./diff(simtime)];
+
+acc_desX(:,1) = [0; diff(vel_desX)./diff(simtime)];
+acc_desY(:,2) = [0; diff(vel_desY(:,2))./diff(simtime)];
+acc_desZ(:,3) = [0; diff(vel_desZ(:,3))./diff(simtime)];
+
+omega_desX(:,1) = [0; diff(angle_des(:,1))./diff(simtime)];
+omega_desY(:,2) = [0; diff(angle_des(:,2))./diff(simtime)];
+omega_desZ(:,3) = [0; diff(angle_des(:,3))./diff(simtime)];
+
+alpha_desX(:,1) = [0; diff(omega_desX)./diff(simtime)];
+alpha_desY(:,2) = [0; diff(omega_desY(:,2))./diff(simtime)];
+alpha_desZ(:,3) = [0; diff(omega_desZ(:,3))./diff(simtime)];
+    
+vel_des = [vel_desX, vel_desY(:,2), vel_desZ(:,3)];   % compose into nice matrices
+acc_des = [acc_desX, acc_desY(:,2), acc_desZ(:,3)];
+omega_des = [omega_desX, omega_desY(:,2), omega_desZ(:,3)];
+alpha_des = [alpha_desX, alpha_desY(:,2), alpha_desZ(:,3)];
+
+figure()
+subplot(2,2,1)
+hold on
+plot(simtime,vel_desX)
+plot(simtime,vel_desY)
+plot(simtime,vel_desY)
+xlabel 'time'
+ylabel 'desired velocity'
+legend('X', 'Y', 'Z')
+hold off
+subplot(2,2,2)
+hold on
+plot(simtime,acc_desX)
+plot(simtime,acc_desY)
+plot(simtime,acc_desZ)
+xlabel 'time'
+ylabel 'desired acceleration'
+legend('X', 'Y', 'Z')
+hold off
+subplot(2,2,3)
+hold on
+plot(simtime,omega_desX)
+plot(simtime,omega_desY)
+plot(simtime,omega_desZ)
+xlabel 'time'
+ylabel 'desired angular velocity'
+legend('X', 'Y', 'Z')
+hold off
+subplot(2,2,4)
+hold on
+plot(simtime,alpha_desX)
+plot(simtime,alpha_desY)
+plot(simtime,alpha_desZ)
+xlabel 'time' 
+ylabel 'desired angular acceleration'
+legend('X', 'Y', 'Z')
+hold off
+
+pause
+
 %% Run loop to determine platform position, motor arm angles, motor torques
 % notation:
 %       P = connection point between connecting rod and platform
@@ -79,12 +142,6 @@ x = zeros(6,1);
 y = zeros(6,1);
 z = zeros(6,1);
 error = zeros(6,1);
-w_x = zeros(6,1);
-w_y = zeros(6,1);
-w_z = zeros(6,1);       % angular velocity of motor arms
-alpha_x = zeros(6,1);
-alpha_y = zeros(6,1);
-alpha_z = zeros(6,1);       % angular acc of motor arms
 T = zeros(6,1);
 T_qo = zeros(6,3);
 Rpq_x = zeros(6,1);
@@ -97,12 +154,6 @@ T_qo_x = zeros(6,1);
 T_qo_y = zeros(6,1);
 T_qo_z = zeros(6,1);
 torque = [];
-angVel_x = [];
-angVel_y = [];
-angVel_z = [];
-angAcc_x = [];
-angAcc_y = [];
-angAcc_z = [];
 om = [];
 
 %plot the desired angles
@@ -133,7 +184,7 @@ for i=1:length(motion_des)    % motion index
     [R_po, motors, platform_points, motorangles, R_pc] = platformposition(motion_des(i,:),angle_des(i,:), r_base, r_platform, z0_platform);
     
     cla()
-    % plot it!
+    % compose stuff for plotting, change this later
     hold on
     grid on
     platformX = [platform_points(1,1),platform_points(2,1),platform_points(3,1),platform_points(1,1)];
@@ -142,36 +193,6 @@ for i=1:length(motion_des)    % motion index
     baseX = [motors(1,1),motors(2,1),motors(3,1),motors(4,1),motors(5,1),motors(6,1),motors(1,1)];
     baseY = [motors(1,2),motors(2,2),motors(3,2),motors(4,2),motors(5,2),motors(6,2),motors(1,2)];
     baseZ = [motors(1,3),motors(2,3),motors(3,3),motors(4,3),motors(5,3),motors(6,3),motors(1,3)];
-    
-    if i>1
-        w_x=(angle_x(i)-angle_x(i-1))/0.05;
-        w_y=(angle_y(i)-angle_y(i-1))/0.05;
-        w_z=0;
-    else
-        w_x=0;
-        w_y=0;
-        w_z=0;
-    end
-    
-    angVel_x = [angVel_x,w_x]; % write old variables
-    angVel_y = [angVel_y,w_y];
-    angVel_z = [angVel_z,w_z];
-    
-    if i>2
-        alpha_x=(angVel_x(i-1)-angVel_x(i-2))/0.05;
-        alpha_y=(angVel_y(i-1)-angVel_y(i-2))/0.05;
-        alpha_z=0;
-    else
-        alpha_x=0;
-        alpha_y=0;
-        alpha_z=0;
-    end
-    
-    angAcc_x = [angAcc_x,alpha_x]; % write old variables
-    angAcc_y = [angAcc_y,alpha_y];
-    angAcc_z = [angAcc_z,alpha_z];
-    
-    alpha = [alpha_x, alpha_y, alpha_z]/180*pi; %%%%%%%%%%%%%%
     
     % find angles for motor arms using fminsearch
     for j = 1:6             % leg index
@@ -190,12 +211,12 @@ for i=1:length(motion_des)    % motion index
     end
     
     R_pq = [Rpq_x, Rpq_y, Rpq_z];       % reassemble
-    R_qo = [Rqo_x, Rqo_y, Rqo_z]; 
+    R_qo = [Rqo_x, Rqo_y, Rqo_z];
     R_pg = platform_points;%calculate global location of points P. just call it the right thing... not used at the moment.
     
     % find force, torque on each leg
     for k = 1:6
-        [F_pq] = forceplatform(m, J, R_pq(1,:), R_pq(2,:), R_pq(3,:), R_pq(4,:), R_pq(5,:), R_pq(6,:), R_pc(1,:), R_pc(2,:), R_pc(3,:), motion_des(i,:), alpha);
+        [F_pq] = forceplatform(m, J, R_pq(1,:), R_pq(2,:), R_pq(3,:), R_pq(4,:), R_pq(5,:), R_pq(6,:), R_pc(1,:), R_pc(2,:), R_pc(3,:), acc_des(i,:), alpha_des(i,:));
         
         for m = 1:6
             T_qo = cross(R_qo(m,:), -F_pq(m,:));
@@ -205,17 +226,17 @@ for i=1:length(motion_des)    % motion index
         end
         
         T_qo = [T_qo_x, T_qo_y, T_qo_z];    % reassemble
-      T(k) = norm(T_qo);
-      %store this in the matrix...
-      Motor_Torques(i,k) = norm(T_qo);%eventually delete the line above. TODO dot product.
+        T(k) = norm(T_qo);
+        %store this in the matrix...
+        Motor_Torques(i,k) = norm(T_qo);%eventually delete the line above. TODO dot product.
         
-%         e_motorX = cos(motorangles');
-%         e_motorY = sin(motorangles');
-%         e_motorZ = zeros(1,6);
-%         e_motor = [e_motorX, e_motorY, e_motorZ]; %%%this needs fixing
-%         T(k) = dot(e_motor(k,:), T_qo(k,:));
+        %         e_motorX = cos(motorangles');
+        %         e_motorY = sin(motorangles');
+        %         e_motorZ = zeros(1,6);
+        %         e_motor = [e_motorX, e_motorY, e_motorZ]; %%%this needs fixing
+        %         T(k) = dot(e_motor(k,:), T_qo(k,:));
     end
-
+    
     torque = [torque; T];
     
     % just for plotting
@@ -272,10 +293,7 @@ for i=1:length(motion_des)    % motion index
     plot3(baseX, baseY, baseZ)
     view(-205,45)
     pause(0.01)
-
-%     h_old = h;
-%     delete(h_old);
-%     drawnow
+    
 end
 hold off
 
