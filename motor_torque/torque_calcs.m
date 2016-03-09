@@ -124,6 +124,15 @@ hold off
 
 pause
 
+% figure()
+% hold on
+% plot(time1,accel)
+% plot(simtime,acc_des)
+% hold off
+% xlabel 'time'
+% ylabel 'accel'
+% legend()
+
 %% Run loop to determine platform position, motor arm angles, motor torques
 % notation:
 %       P = connection point between connecting rod and platform
@@ -153,8 +162,6 @@ Rqo_z = zeros(6,1);
 T_qo_x = zeros(6,1);
 T_qo_y = zeros(6,1);
 T_qo_z = zeros(6,1);
-torque = [];
-om = [];
 
 %plot the desired angles
 figure()
@@ -218,11 +225,11 @@ for i=1:length(motion_des)    % motion index
     for k = 1:6
         [F_pq] = forceplatform(m, J, R_pq(1,:), R_pq(2,:), R_pq(3,:), R_pq(4,:), R_pq(5,:), R_pq(6,:), R_pc(1,:), R_pc(2,:), R_pc(3,:), acc_des(i,:), alpha_des(i,:));
         
-        for m = 1:6
-            T_qo = cross(R_qo(m,:), -F_pq(m,:));
-            T_qo_x(m) = T_qo(1);     % had to disassemble R_pq so that it would write to j
-            T_qo_y(m) = T_qo(2);
-            T_qo_z(m) = T_qo(3);
+        for index_m = 1:6
+            T_qo = cross(R_qo(index_m,:), -F_pq(index_m,:));
+            T_qo_x(index_m) = T_qo(1);     % had to disassemble R_pq so that it would write to j
+            T_qo_y(index_m) = T_qo(2);
+            T_qo_z(index_m) = T_qo(3);
         end
         
         T_qo = [T_qo_x, T_qo_y, T_qo_z];    % reassemble
@@ -236,80 +243,22 @@ for i=1:length(motion_des)    % motion index
         %         e_motor = [e_motorX, e_motorY, e_motorZ]; %%%this needs fixing
         %         T(k) = dot(e_motor(k,:), T_qo(k,:));
     end
-    
-    torque = [torque; T];
-    
-    % just for plotting
-    motorarm1X = [motors(1,1), R_qo(1,1)+motors(1,1)];
-    motorarm2X = [motors(2,1), R_qo(2,1)+motors(2,1)];
-    motorarm3X = [motors(3,1), R_qo(3,1)+motors(3,1)];
-    motorarm4X = [motors(4,1), R_qo(4,1)+motors(4,1)];
-    motorarm5X = [motors(5,1), R_qo(5,1)+motors(5,1)];
-    motorarm6X = [motors(6,1), R_qo(6,1)+motors(6,1)];
-    
-    motorarm1Y = [motors(1,2), R_qo(1,2)+motors(1,2)];
-    motorarm2Y = [motors(2,2), R_qo(2,2)+motors(2,2)];
-    motorarm3Y = [motors(3,2), R_qo(3,2)+motors(3,2)];
-    motorarm4Y = [motors(4,2), R_qo(4,2)+motors(4,2)];
-    motorarm5Y = [motors(5,2), R_qo(5,2)+motors(5,2)];
-    motorarm6Y = [motors(6,2), R_qo(6,2)+motors(6,2)];
-    
-    motorarm1Z = [motors(1,3), R_qo(1,3)+motors(1,3)];
-    motorarm2Z = [motors(2,3), R_qo(2,3)+motors(2,3)];
-    motorarm3Z = [motors(3,3), R_qo(3,3)+motors(3,3)];
-    motorarm4Z = [motors(4,3), R_qo(4,3)+motors(4,3)];
-    motorarm5Z = [motors(5,3), R_qo(5,3)+motors(5,3)];
-    motorarm6Z = [motors(6,3), R_qo(6,3)+motors(6,3)];
-    
-    motorarm1X = [motors(1,1), R_qo(1,1)+motors(1,1)];
-    motorarm2X = [motors(2,1), R_qo(2,1)+motors(2,1)];
-    motorarm3X = [motors(3,1), R_qo(3,1)+motors(3,1)];
-    motorarm4X = [motors(4,1), R_qo(4,1)+motors(4,1)];
-    motorarm5X = [motors(5,1), R_qo(5,1)+motors(5,1)];
-    motorarm6X = [motors(6,1), R_qo(6,1)+motors(6,1)];
-    
-    motorarm1Y = [motors(1,2), R_qo(1,2)+motors(1,2)];
-    motorarm2Y = [motors(2,2), R_qo(2,2)+motors(2,2)];
-    motorarm3Y = [motors(3,2), R_qo(3,2)+motors(3,2)];
-    motorarm4Y = [motors(4,2), R_qo(4,2)+motors(4,2)];
-    motorarm5Y = [motors(5,2), R_qo(5,2)+motors(5,2)];
-    motorarm6Y = [motors(6,2), R_qo(6,2)+motors(6,2)];
-    
-    motorarm1Z = [motors(1,3), R_qo(1,3)+motors(1,3)];
-    motorarm2Z = [motors(2,3), R_qo(2,3)+motors(2,3)];
-    motorarm3Z = [motors(3,3), R_qo(3,3)+motors(3,3)];
-    motorarm4Z = [motors(4,3), R_qo(4,3)+motors(4,3)];
-    motorarm5Z = [motors(5,3), R_qo(5,3)+motors(5,3)];
-    motorarm6Z = [motors(6,3), R_qo(6,3)+motors(6,3)];
-    
-    
-    plot3(motorarm1X, motorarm1Y, motorarm1Z);
-    plot3(motorarm2X, motorarm2Y, motorarm2Z);
-    plot3(motorarm3X, motorarm3Y, motorarm3Z);
-    plot3(motorarm4X, motorarm4Y, motorarm4Z);
-    plot3(motorarm5X, motorarm5Y, motorarm5Z);
-    plot3(motorarm6X, motorarm6Y, motorarm6Z);
-    plot3(platformX, platformY, platformZ);
-    plot3(baseX, baseY, baseZ)
-    view(-205,45)
-    pause(0.01)
-    
+
 end
 hold off
 
-% calculate angular velocity
-omega = zeros(size(torque));
+%% calculate angular velocity
+omega = zeros(size(Motor_Torques));
 
 for n = 1:6
     opt_new = opt(:,n);               % split angle matrix into columns
-    for i=1:length(motion_des)        % motion index
+    for i=1:length(opt_new)        % motion index
         if i>1
-            omega(i)= (opt(i)-opt(i-1))/.05;
+            omega(i,n)= (opt_new(i)-opt_new(i-1))/(simtime(i)-simtime(i-1));
         else
-            omega(i) = 0;
+            omega(i,n) = 0;
         end
     end
-    om = [om; omega];                 % save old vars
 end
 
 %plot motor angles
@@ -322,13 +271,18 @@ legend('motor 1','motor 2','motor 3','motor 4','motor 5','motor 6','motor limits
 xlabel('Time (s)')
 ylabel('motor arm angle requested (rad)')
 
-figure()
-plot(abs(om(1:13734)),torque)
-xlim([0, 2])
-ylim([0, 1000])
-xlabel 'omega'
-ylabel 'torque'
+% filter data
+om = medfilt1(omega,13);
+torque = medfilt1(Motor_Torques,13);
 
+figure()
+hold on
+plot(abs(om),torque, '.')
+xlim([0, 3])
+ylim([0, 400])
+xlabel 'Omega (rad/s)'
+ylabel 'Torque (N-m)'
+hold off
 
 
 
