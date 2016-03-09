@@ -1,5 +1,5 @@
 close all
-clear all
+clear
 clc
 
 %% Define dimensions
@@ -145,7 +145,7 @@ R_qo = zeros(6,3);
 F_pq = zeros(6,3);
 Torque = zeros(6,3);
 motor_angle = zeros(6,3);
-initial = 0;        %   -->  what is this??
+initial = 0;
 opt = zeros(6,1);
 x = zeros(6,1);
 y = zeros(6,1);
@@ -164,7 +164,7 @@ T_qo_y = zeros(6,1);
 T_qo_z = zeros(6,1);
 Motor_Torques = zeros(length(simtime),6);
 Motor_angular_vels = zeros(length(simtime),6);
-Motor_angular_accels = zeros(length(simtime),6);%todo store this way
+Motor_angular_accels = zeros(length(simtime),6);
 
 %plot the desired angles
 figure()
@@ -181,22 +181,12 @@ legend('x','y','z')
 
 pause
 
-
 for i=1:length(motion_des)    % motion index
     % solve for platform position and "leg" length, pause to see plot
     % (maybe)
     [R_po, motors, platform_points, motorangles, R_pc] = platformposition(motion_des(i,:),angle_des(i,:), r_base, r_platform, z0_platform);
     
-    cla()
-    % compose stuff for plotting, change this later
-    hold on
-    grid on
-    platformX = [platform_points(1,1),platform_points(2,1),platform_points(3,1),platform_points(1,1)];
-    platformY = [platform_points(1,2),platform_points(2,2),platform_points(3,2),platform_points(1,2)];
-    platformZ = [platform_points(1,3),platform_points(2,3),platform_points(3,3),platform_points(1,3)];
-    baseX = [motors(1,1),motors(2,1),motors(3,1),motors(4,1),motors(5,1),motors(6,1),motors(1,1)];
-    baseY = [motors(1,2),motors(2,2),motors(3,2),motors(4,2),motors(5,2),motors(6,2),motors(1,2)];
-    baseZ = [motors(1,3),motors(2,3),motors(3,3),motors(4,3),motors(5,3),motors(6,3),motors(1,3)];
+
     
     % find angles for motor arms using fminsearch
     for j = 1:6             % leg index
@@ -216,7 +206,7 @@ for i=1:length(motion_des)    % motion index
     
     R_pq = [Rpq_x, Rpq_y, Rpq_z];       % reassemble
     R_qo = [Rqo_x, Rqo_y, Rqo_z];
-    R_pg = platform_points;%calculate global location of points P. just call it the right thing... not used at the moment.
+    R_pg = platform_points; % global location of points P. just call it the right thing... not used at the moment.
     
     % find force, torque on each leg
     for k = 1:6
@@ -240,7 +230,82 @@ for i=1:length(motion_des)    % motion index
         %         e_motor = [e_motorX, e_motorY, e_motorZ]; %%%this needs fixing
         %         T(k) = dot(e_motor(k,:), T_qo(k,:));
     end
+    
+    
+        % just for plotting
+            cla()
 
+    hold on
+    grid on
+    platformX = [platform_points(1,1),platform_points(2,1),platform_points(3,1),platform_points(1,1)];
+    platformY = [platform_points(1,2),platform_points(2,2),platform_points(3,2),platform_points(1,2)];
+    platformZ = [platform_points(1,3),platform_points(2,3),platform_points(3,3),platform_points(1,3)];
+    baseX = [motors(1,1),motors(2,1),motors(3,1),motors(4,1),motors(5,1),motors(6,1),motors(1,1)];
+    baseY = [motors(1,2),motors(2,2),motors(3,2),motors(4,2),motors(5,2),motors(6,2),motors(1,2)];
+    baseZ = [motors(1,3),motors(2,3),motors(3,3),motors(4,3),motors(5,3),motors(6,3),motors(1,3)];
+        
+    motorarm1X = [motors(1,1), R_qo(1,1)+motors(1,1)];
+    motorarm2X = [motors(2,1), R_qo(2,1)+motors(2,1)];
+    motorarm3X = [motors(3,1), R_qo(3,1)+motors(3,1)];
+    motorarm4X = [motors(4,1), R_qo(4,1)+motors(4,1)];
+    motorarm5X = [motors(5,1), R_qo(5,1)+motors(5,1)];
+    motorarm6X = [motors(6,1), R_qo(6,1)+motors(6,1)];
+    
+    motorarm1Y = [motors(1,2), R_qo(1,2)+motors(1,2)];
+    motorarm2Y = [motors(2,2), R_qo(2,2)+motors(2,2)];
+    motorarm3Y = [motors(3,2), R_qo(3,2)+motors(3,2)];
+    motorarm4Y = [motors(4,2), R_qo(4,2)+motors(4,2)];
+    motorarm5Y = [motors(5,2), R_qo(5,2)+motors(5,2)];
+    motorarm6Y = [motors(6,2), R_qo(6,2)+motors(6,2)];
+    
+    motorarm1Z = [motors(1,3), R_qo(1,3)+motors(1,3)];
+    motorarm2Z = [motors(2,3), R_qo(2,3)+motors(2,3)];
+    motorarm3Z = [motors(3,3), R_qo(3,3)+motors(3,3)];
+    motorarm4Z = [motors(4,3), R_qo(4,3)+motors(4,3)];
+    motorarm5Z = [motors(5,3), R_qo(5,3)+motors(5,3)];
+    motorarm6Z = [motors(6,3), R_qo(6,3)+motors(6,3)];
+    % R_pg(1,1)-(R_qo(1,1)+motors(1,1))];
+    conrod1X = [R_pg(1,1), R_pg(1,1)-R_pq(1,1)];
+    conrod2X = [R_pg(1,1), R_pg(1,1)-R_pq(2,1)];
+    conrod3X = [R_pg(2,1), R_pg(2,1)-R_pq(3,1)];
+    conrod4X = [R_pg(2,1), R_pg(2,1)-R_pq(4,1)];
+    conrod5X = [R_pg(3,1), R_pg(3,1)-R_pq(5,1)];
+    conrod6X = [R_pg(3,1), R_pg(3,1)-R_pq(6,1)];
+  
+    conrod1Y = [R_pg(1,2), R_pg(1,2)-R_pq(1,2)];
+    conrod2Y = [R_pg(1,2), R_pg(1,2)-R_pq(2,2)];
+    conrod3Y = [R_pg(2,2), R_pg(2,2)-R_pq(3,2)];
+    conrod4Y = [R_pg(2,2), R_pg(2,2)-R_pq(4,2)];
+    conrod5Y = [R_pg(3,2), R_pg(3,2)-R_pq(5,2)];
+    conrod6Y = [R_pg(3,2), R_pg(3,2)-R_pq(6,2)];
+    
+    conrod1Z = [R_pg(1,3), R_pg(1,3)-R_pq(1,3)];
+    conrod2Z = [R_pg(1,3), R_pg(1,3)-R_pq(2,3)];
+    conrod3Z = [R_pg(2,3), R_pg(2,3)-R_pq(3,3)];
+    conrod4Z = [R_pg(2,3), R_pg(2,3)-R_pq(4,3)];
+    conrod5Z = [R_pg(3,3), R_pg(3,3)-R_pq(5,3)];
+    conrod6Z = [R_pg(3,3), R_pg(3,3)-R_pq(6,3)];
+    
+    plot3(motorarm1X, motorarm1Y, motorarm1Z, 'LineWidth', 4);
+    plot3(motorarm2X, motorarm2Y, motorarm2Z, 'LineWidth', 4);
+    plot3(motorarm3X, motorarm3Y, motorarm3Z, 'LineWidth', 4);
+    plot3(motorarm4X, motorarm4Y, motorarm4Z, 'LineWidth', 4);
+    plot3(motorarm5X, motorarm5Y, motorarm5Z, 'LineWidth', 4);
+    plot3(motorarm6X, motorarm6Y, motorarm6Z, 'LineWidth', 4);
+    plot3(conrod1X, conrod1Y, conrod1Z, 'LineWidth', 4);
+    plot3(conrod2X, conrod2Y, conrod2Z, 'LineWidth', 4);
+    plot3(conrod3X, conrod3Y, conrod3Z, 'LineWidth', 4);
+    plot3(conrod4X, conrod4Y, conrod4Z, 'LineWidth', 4);
+    plot3(conrod5X, conrod5Y, conrod5Z, 'LineWidth', 4);
+    plot3(conrod6X, conrod6Y, conrod6Z, 'LineWidth', 4);
+    patch(platformX, platformY, platformZ, 'b');
+    patch(baseX, baseY, baseZ, 'r')
+    view(-205,45)
+    pause(0.01)
+    zlim([-0.5 1.5])
+    xlim([-0.75 0.5])
+    ylim([-0.75 0.5])
+    
 end
 hold off
 
