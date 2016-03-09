@@ -145,7 +145,7 @@ R_qo = zeros(6,3);
 F_pq = zeros(6,3);
 Torque = zeros(6,3);
 motor_angle = zeros(6,3);
-initial = 0;        %   -->  what is this??
+initial = 0;
 opt = zeros(6,1);
 x = zeros(6,1);
 y = zeros(6,1);
@@ -162,6 +162,9 @@ Rqo_z = zeros(6,1);
 T_qo_x = zeros(6,1);
 T_qo_y = zeros(6,1);
 T_qo_z = zeros(6,1);
+Motor_Torques = zeros(length(simtime),6);
+Motor_angular_vels = zeros(length(simtime),6);
+Motor_angular_accels = zeros(length(simtime),6);
 
 %plot the desired angles
 figure()
@@ -177,13 +180,6 @@ ylabel('Desired motion')
 legend('x','y','z')
 
 pause
-
-
-%create a matrix to store torques for each motor
-Motor_Torques = zeros(length(simtime),6);%done
-Motor_angular_vels = zeros(length(simtime),6);%todo store this way
-Motor_angular_accels = zeros(length(simtime),6);%todo store this way
-
 
 for i=1:length(motion_des)    % motion index
     % solve for platform position and "leg" length, pause to see plot
@@ -261,7 +257,7 @@ for n = 1:6
     end
 end
 
-%plot motor angles
+%% plot motor angles
 figure()
 plot(simtime,opt(:,1),simtime,opt(:,2),simtime,opt(:,3),simtime,opt(:,4),simtime,opt(:,5),simtime,opt(:,6))
 hold on
@@ -271,7 +267,9 @@ legend('motor 1','motor 2','motor 3','motor 4','motor 5','motor 6','motor limits
 xlabel('Time (s)')
 ylabel('motor arm angle requested (rad)')
 
-% filter data
+%% finally plot the torque-omega curve!!
+
+% filter data a little bit
 om = medfilt1(omega,13);
 torque = medfilt1(Motor_Torques,13);
 

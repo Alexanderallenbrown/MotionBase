@@ -162,7 +162,9 @@ Rqo_z = zeros(6,1);
 T_qo_x = zeros(6,1);
 T_qo_y = zeros(6,1);
 T_qo_z = zeros(6,1);
-torque = [];
+Motor_Torques = zeros(length(simtime),6);
+Motor_angular_vels = zeros(length(simtime),6);
+Motor_angular_accels = zeros(length(simtime),6);%todo store this way
 
 %plot the desired angles
 figure()
@@ -178,12 +180,6 @@ ylabel('Desired motion')
 legend('x','y','z')
 
 pause
-
-
-%create a matrix to store torques for each motor
-Motor_Torques = zeros(length(simtime),6);%done
-Motor_angular_vels = zeros(length(simtime),6);%todo store this way
-Motor_angular_accels = zeros(length(simtime),6);%todo store this way
 
 
 for i=1:length(motion_des)    % motion index
@@ -249,22 +245,20 @@ end
 hold off
 
 %% calculate angular velocity
-% omega = zeros(2289,6);
-om = [];
+omega = zeros(size(Motor_Torques));
 
 for n = 1:6
     opt_new = opt(:,n);               % split angle matrix into columns
     for i=1:length(opt_new)        % motion index
         if i>1
-            omega(i,n)= (opt_new(i)-opt_new(i-1))/(simtime(i)-simtime(i-1))
+            omega(i,n)= (opt_new(i)-opt_new(i-1))/(simtime(i)-simtime(i-1));
         else
             omega(i,n) = 0;
         end
     end
 end
 
-
-%plot motor angles
+%% plot motor angles
 figure()
 plot(simtime,opt(:,1),simtime,opt(:,2),simtime,opt(:,3),simtime,opt(:,4),simtime,opt(:,5),simtime,opt(:,6))
 hold on
@@ -274,13 +268,19 @@ legend('motor 1','motor 2','motor 3','motor 4','motor 5','motor 6','motor limits
 xlabel('Time (s)')
 ylabel('motor arm angle requested (rad)')
 
+%% finally plot the torque-omega curve!!
+
+% filter data a little bit
+om = medfilt1(omega,13);
+torque = medfilt1(Motor_Torques,13);
+
 figure()
 hold on
-plot(omega,Motor_Torques)
-xlim([0, 2])
-ylim([0, 500])
-xlabel 'omega'
-ylabel 'torque'
+plot(abs(om),torque, '.')
+xlim([0, 3])
+ylim([0, 400])
+xlabel 'Omega (rad/s)'
+ylabel 'Torque (N-m)'
 hold off
 
 
