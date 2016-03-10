@@ -34,6 +34,7 @@ accel=[acc_x, acc_y, acc_z+9.81];%added g to z to offset gravity. This is meh...
 signal_x=[time1,accel(:,1)];
 signal_y=[time1,accel(:,2)];
 signal_z=[time1,accel(:,3)];
+signal_yaw = [time1,angle_z];
 
 % figure()
 % subplot(3,1,1)
@@ -341,7 +342,7 @@ figure()
 plot(simtime,opt(:,1),simtime,opt(:,2),simtime,opt(:,3),simtime,opt(:,4),simtime,opt(:,5),simtime,opt(:,6))
 hold on
 plot([min(simtime) max(simtime)],[0,0],'r','LineWidth',4)
-plot([min(simtime) max(simtime)],[pi/4,pi/4],'r','LineWidth',4)
+plot([min(simtime) max(simtime)],[pi/2,pi/2],'r','LineWidth',4)
 legend('motor 1','motor 2','motor 3','motor 4','motor 5','motor 6','motor limits')
 xlabel('Time (s)')
 ylabel('motor arm angle requested (rad)')
