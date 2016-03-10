@@ -46,6 +46,8 @@ signal_z=[time1,accel(:,3)];
 % plot(signal_z(:,1),signal_z(:,2))
 % xlabel('Time (s)')
 % ylabel('az')
+% 
+% pause 
 
 %% Run simulink motion cueing algorithm
 %   --> output is axtilt, aytilt, xdesired, ydesired, zdesired
