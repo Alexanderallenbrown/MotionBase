@@ -91,6 +91,7 @@ acc_des = [acc_desX, acc_desY(:,2), acc_desZ(:,3)];
 omega_des = [omega_desX, omega_desY(:,2), omega_desZ(:,3)];
 alpha_des = [alpha_desX, alpha_desY(:,2), alpha_desZ(:,3)];
 
+%% Plot desired velocities, accelerations, both angular and linear
 % figure()
 % subplot(2,2,1)
 % hold on
@@ -131,6 +132,7 @@ alpha_des = [alpha_desX, alpha_desY(:,2), alpha_desZ(:,3)];
 % 
 % pause
 
+%% Plot desired acc vs. acc data
 % figure()
 % hold on
 % plot(time1,accel)
@@ -139,6 +141,21 @@ alpha_des = [alpha_desX, alpha_desY(:,2), alpha_desZ(:,3)];
 % xlabel 'time'
 % ylabel 'accel'
 % legend()
+
+%% Plot the desired angles, motions
+% figure()
+% plot(simtime,angle_des(:,1),simtime,angle_des(:,2),simtime,angle_des(:,3))
+% xlabel('Time (s)')
+% ylabel('Desired angles')
+% legend('x','y','z')
+% 
+% figure()
+% plot(simtime,motion_des(:,1),simtime,motion_des(:,2),simtime,motion_des(:,3))
+% xlabel('Time (s)')
+% ylabel('Desired motion')
+% legend('x','y','z')
+% 
+% pause
 
 %% Run loop to determine platform position, motor arm angles, motor torques
 % notation:
@@ -150,8 +167,6 @@ R_po = zeros(6,3);
 R_pq = zeros(6,3);
 R_qo = zeros(6,3);
 F_pq = zeros(6,3);
-Torque = zeros(6,3);
-motor_angle = zeros(6,3);
 initial = 0;
 opt = zeros(6,1);
 x = zeros(6,1);
@@ -170,23 +185,6 @@ T_qo_x = zeros(6,1);
 T_qo_y = zeros(6,1);
 T_qo_z = zeros(6,1);
 Motor_Torques = zeros(length(simtime),6);
-Motor_angular_vels = zeros(length(simtime),6);
-Motor_angular_accels = zeros(length(simtime),6);
-
-% %plot the desired angles
-% figure()
-% plot(simtime,angle_des(:,1),simtime,angle_des(:,2),simtime,angle_des(:,3))
-% xlabel('Time (s)')
-% ylabel('Desired angles')
-% legend('x','y','z')
-% 
-% figure()
-% plot(simtime,motion_des(:,1),simtime,motion_des(:,2),simtime,motion_des(:,3))
-% xlabel('Time (s)')
-% ylabel('Desired motion')
-% legend('x','y','z')
-% 
-% pause
 
 for i=1:length(motion_des)    % motion index
     % solve for platform position and "leg" length, pause to see plot
@@ -225,15 +223,12 @@ for i=1:length(motion_des)    % motion index
         end
         
         T_qo = [T_qo_x, T_qo_y, T_qo_z];    % reassemble
-        T(k) = norm(T_qo);
-        %store this in the matrix...
-        Motor_Torques(i,k) = norm(T_qo);%eventually delete the line above. TODO dot product.
-        
-        %         e_motorX = cos(motorangles');
-        %         e_motorY = sin(motorangles');
-        %         e_motorZ = zeros(1,6);
-        %         e_motor = [e_motorX, e_motorY, e_motorZ]; %%%this needs fixing
-        %         T(k) = dot(e_motor(k,:), T_qo(k,:));
+                
+        e_motorX = cos(motorangles');
+        e_motorY = sin(motorangles');
+        e_motorZ = zeros(size(e_motorX));
+        e_motor = [e_motorX, e_motorY, e_motorZ];   % unit vectors for motors
+        Motor_Torques(i,k) = dot(e_motor(k,:), T_qo(k,:));      % calculate torque in the direction of the motor
     end
     
     
