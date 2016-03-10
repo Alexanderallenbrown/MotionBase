@@ -18,9 +18,12 @@ time1 = rawdata(:,2);
 % actual angle, called "MotionRoll/Pitch/Yaw" in data --> checked by
 %   inspection of plot_roundabout_data.m
 %   --> raw values in radians
-angle_x=rawdata(:,26);%CHECK THESE COLUMN ORDERS!!!
+angle_x=rawdata(:,26);  %CHECK THESE COLUMN ORDERS!!!
 angle_y=rawdata(:,25);
 angle_z=rawdata(:,24);
+yaw_index = find(diff(angle_z) > 100*pi/180);  %find where rollover in yaw occurs
+yaw_adjust = angle_z(yaw_index:end) - 360*pi/180;   %adjust yaw after rollover by 360 degrees
+angle_z = [angle_z(1:yaw_index-1); yaw_adjust];
 angle=[angle_x, angle_y, angle_z];
 
 % linear acceleration, called "AccelerationX/Y/Z" in data
@@ -61,10 +64,10 @@ angle_z = interp1(time1, angle(:,3), simtime);
 %angle_y= angle_y(~isnan(angle_y));
 
 %angle_des = [angle_x(3:end)+axtilt, angle_y(3:end)+aytilt, angle_z(6:end)]; %% had to do stupid things to trim vectors, should fix this later %%
-angle_des = [angle_x+axtilt, angle_y+aytilt, anglez]; %% had to do stupid things to trim vectors, should fix this later %%
+angle_des = [angle_x+axtilt, angle_y+aytilt, anglez];   %% had to do stupid things to trim vectors, should fix this later -->FIXED
 %MEGAN-- WE NEED TO FIX THE ANGLE Z. We can't ask for angle z directly...
 %needs to be high pass filtered!!! Grab this from Dallis's branch and paste
-%into your simulink??   FIXED
+%into your simulink??   -->DONE
 
 %% Calculate linear velocity, acceleration and angular velocity, acceleration    
 vel_desX(:,1) = [0; diff(motion_des(:,1))./diff(simtime)];      % split into XYZ to make sure diff works in the right direction
@@ -190,8 +193,6 @@ for i=1:length(motion_des)    % motion index
     % (maybe)
     [R_po, motors, platform_points, motorangles, R_pc] = platformposition(motion_des(i,:),angle_des(i,:), r_base, r_platform, z0_platform);
     
-
-    
     % find angles for motor arms using fminsearch
     for j = 1:6             % leg index
         %find this motor angle
@@ -310,6 +311,7 @@ for i=1:length(motion_des)    % motion index
     xlim([-0.75 0.5])
     ylim([-0.75 0.5])
     
+%     % create .gif for publishing on wiki
 %     filename = 'simMotion2.gif';
 %     frame = getframe(1);
 %     im = frame2im(frame);
@@ -326,9 +328,9 @@ hold off
 %% calculate angular velocity
 omega = zeros(size(Motor_Torques));
 
-for n = 1:6
-    opt_new = opt(:,n);               % split angle matrix into columns
-    for i=1:length(opt_new)        % motion index
+for n = 1:6     % leg index
+    opt_new = opt(:,n);  % split angle matrix into columns
+    for i=1:length(opt_new)  % motion index
         if i>1
             omega(i,n)= (opt_new(i)-opt_new(i-1))/(simtime(i)-simtime(i-1));
         else
@@ -348,16 +350,14 @@ xlabel('Time (s)')
 ylabel('motor arm angle requested (rad)')
 
 %% finally plot the torque-omega curve!!
-
-% filter data a little bit
 om = medfilt1(omega,13);
-torque = medfilt1(Motor_Torques,13);
+torque = medfilt1(Motor_Torques,13);    % filter data a little bit
 
 figure()
 hold on
 plot(abs(om),torque, '.')
 xlim([0, 3])
-ylim([0, 400])
+ylim([0, 600])
 xlabel 'Omega (rad/s)'
 ylabel 'Torque (N-m)'
 hold off
