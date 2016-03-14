@@ -7,9 +7,11 @@ r_base = 0.402;             % radius of platform, in m
 r_platform = 0.265;         % radius of base, in m
 shortleg = 0.16;            % length of motor arm, in m
 longleg = 1;                % length of connecting rod, in m
-z0_platform = 1;            % rest height of platform
+z0_platform = 1.1;          % rest height of platform
 m = 340/2.2;                % mass of platform   (from Inventor model)
 J = [15.63, 35.35, 40.50];  % inertia, kg-m^2    (from Inventor model)
+hex_angles = [-pi/6:pi/3:9*pi/6]; % establish motor positions on base
+motor_yaws = [270, 90, 30, 210, 150, 330]*pi/180;
 
 %% Read in raw data
 rawdata=csvread('2015-01-24_11-49-26.csv');   % roundabout data file
@@ -184,9 +186,8 @@ T_qo_z = zeros(6,1);
 Motor_Torques = zeros(length(simtime),6);
 
 for i=1:length(motion_des)    % motion index
-    % solve for platform position and "leg" length, pause to see plot
-    % (maybe)
-    [R_po, motors, R_pg, motorangles, R_pc] = platformposition(motion_des(i,:),angle_des(i,:), r_base, r_platform, z0_platform);
+    % solve for platform position and R_po
+    [R_po, motors, R_pg, motorangles, R_pc] = platformposition(hex_angles, motion_des(i,:),angle_des(i,:), r_base, r_platform, z0_platform);
     
 %     % find angles for motor arms using fminsearch
 %     for j = 1:6             % leg index
@@ -208,37 +209,51 @@ for i=1:length(motion_des)    % motion index
     for j = 1:6     % leg index
         theta_max = pi/2;
         theta_min = 0;
-        tol = 0.01;
+        tol = 0.0001;
         error = 100000;
         theta = theta_min;
+        iter = 0;
+        maxiter = 20;
         
-        while abs(error) > tol
-            [error, Rpq_x, Rpq_y, Rpq_z] = findRpq(R_po(j,:), shortleg, longleg, motorangles(j), theta);
+        while (abs(error) > tol && iter<maxiter)
+            iter = iter+1;
+            [error, Rpq_x, Rpq_y, Rpq_z] = findRpq(R_po(j,:), shortleg, longleg, motor_yaws(j), theta);
             R_pq = [Rpq_x, Rpq_y, Rpq_z];
             
             if error < 0
-                theta_max = theta;
-            else
                 theta_min = theta;
+            else
+                theta_max = theta;
             end
             
             if abs(error) > tol
-                theta = (theta_max-theta_min)/2;
+                theta = theta_min + (theta_max-theta_min)/2;
+                if iter==20
+                    opt_theta(i,j) = theta;
+                    R_qo = R_po(j,:) - R_pq;
+                    Rpq_vecX(j,1) = R_pq(1);     % had to disassemble vectors
+                    Rpq_vecY(j,1) = R_pq(2);
+                    Rpq_vecZ(j,1) = R_pq(3);
+                    Rqo_vecX(j,1) = R_qo(1);
+                    Rqo_vecY(j,1) = R_qo(2);
+                    Rqo_vecZ(j,1) = R_qo(3);
+      
+                end
             else
-                opt_theta(j) = theta;
+                opt_theta(i,j) = theta;
                 R_qo = R_po(j,:) - R_pq;
-                Rpq_x(j) = R_pq(1);     % had to disassemble vectors
-                Rpq_y(j) = R_pq(2);
-                Rpq_z(j) = R_pq(3);
-                Rqo_x(j) = R_qo(1);
-                Rqo_y(j) = R_qo(2);
-                Rqo_z(j) = R_qo(3);
+                Rpq_vecX(j,1) = R_pq(1);     % had to disassemble to turn into vectors
+                Rpq_vecY(j,1) = R_pq(2);
+                Rpq_vecZ(j,1) = R_pq(3);
+                Rqo_vecX(j,1) = R_qo(1);
+                Rqo_vecY(j,1) = R_qo(2);
+                Rqo_vecZ(j,1) = R_qo(3);
             end
-        end      
+        end 
     end
     
-        R_pq = [Rpq_x', Rpq_y', Rpq_z'];       % reassemble
-        R_qo = [Rqo_x, Rqo_y, Rqo_z];
+        R_pq = [Rpq_vecX, Rpq_vecY, Rpq_vecZ];       % reassemble
+        R_qo = [Rqo_vecX, Rqo_vecY, Rqo_vecZ];
     
     % find force, torque on each leg
     for k = 1:6
@@ -253,87 +268,87 @@ for i=1:length(motion_des)    % motion index
         
         T_qo = [T_qo_x, T_qo_y, T_qo_z];    % reassemble
                 
-        e_motorX = cos(motorangles');
-        e_motorY = sin(motorangles');
+        e_motorX = cos(motor_yaws');
+        e_motorY = sin(motor_yaws');
         e_motorZ = zeros(size(e_motorX));
         e_motor = [e_motorX, e_motorY, e_motorZ];   % unit vectors for motors
         Motor_Torques(i,k) = dot(e_motor(k,:), T_qo(k,:));      % calculate torque in the direction of the motor
     end
     
     
-%         % just for plotting
-%             cla()
-% 
-%     hold on
-%     grid on
-%     platformX = [R_pg(1,1),R_pg(2,1),R_pg(3,1),R_pg(1,1)];
-%     platformY = [R_pg(1,2),R_pg(2,2),R_pg(3,2),R_pg(1,2)];
-%     platformZ = [R_pg(1,3),R_pg(2,3),R_pg(3,3),R_pg(1,3)];
-%     baseX = [motors(1,1),motors(2,1),motors(3,1),motors(4,1),motors(5,1),motors(6,1),motors(1,1)];
-%     baseY = [motors(1,2),motors(2,2),motors(3,2),motors(4,2),motors(5,2),motors(6,2),motors(1,2)];
-%     baseZ = [motors(1,3),motors(2,3),motors(3,3),motors(4,3),motors(5,3),motors(6,3),motors(1,3)];
-%         
-%     motorarm1X = [motors(1,1), R_qo(1,1)+motors(1,1)];
-%     motorarm2X = [motors(2,1), R_qo(2,1)+motors(2,1)];
-%     motorarm3X = [motors(3,1), R_qo(3,1)+motors(3,1)];
-%     motorarm4X = [motors(4,1), R_qo(4,1)+motors(4,1)];
-%     motorarm5X = [motors(5,1), R_qo(5,1)+motors(5,1)];
-%     motorarm6X = [motors(6,1), R_qo(6,1)+motors(6,1)];
-%     
-%     motorarm1Y = [motors(1,2), R_qo(1,2)+motors(1,2)];
-%     motorarm2Y = [motors(2,2), R_qo(2,2)+motors(2,2)];
-%     motorarm3Y = [motors(3,2), R_qo(3,2)+motors(3,2)];
-%     motorarm4Y = [motors(4,2), R_qo(4,2)+motors(4,2)];
-%     motorarm5Y = [motors(5,2), R_qo(5,2)+motors(5,2)];
-%     motorarm6Y = [motors(6,2), R_qo(6,2)+motors(6,2)];
-%     
-%     motorarm1Z = [motors(1,3), R_qo(1,3)+motors(1,3)];
-%     motorarm2Z = [motors(2,3), R_qo(2,3)+motors(2,3)];
-%     motorarm3Z = [motors(3,3), R_qo(3,3)+motors(3,3)];
-%     motorarm4Z = [motors(4,3), R_qo(4,3)+motors(4,3)];
-%     motorarm5Z = [motors(5,3), R_qo(5,3)+motors(5,3)];
-%     motorarm6Z = [motors(6,3), R_qo(6,3)+motors(6,3)];
-% 
-%     conrod1X = [R_pg(1,1), R_pg(1,1)-R_pq(1,1)];
-%     conrod2X = [R_pg(1,1), R_pg(1,1)-R_pq(2,1)];
-%     conrod3X = [R_pg(2,1), R_pg(2,1)-R_pq(3,1)];
-%     conrod4X = [R_pg(2,1), R_pg(2,1)-R_pq(4,1)];
-%     conrod5X = [R_pg(3,1), R_pg(3,1)-R_pq(5,1)];
-%     conrod6X = [R_pg(3,1), R_pg(3,1)-R_pq(6,1)];
-%   
-%     conrod1Y = [R_pg(1,2), R_pg(1,2)-R_pq(1,2)];
-%     conrod2Y = [R_pg(1,2), R_pg(1,2)-R_pq(2,2)];
-%     conrod3Y = [R_pg(2,2), R_pg(2,2)-R_pq(3,2)];
-%     conrod4Y = [R_pg(2,2), R_pg(2,2)-R_pq(4,2)];
-%     conrod5Y = [R_pg(3,2), R_pg(3,2)-R_pq(5,2)];
-%     conrod6Y = [R_pg(3,2), R_pg(3,2)-R_pq(6,2)];
-%     
-%     conrod1Z = [R_pg(1,3), R_pg(1,3)-R_pq(1,3)];
-%     conrod2Z = [R_pg(1,3), R_pg(1,3)-R_pq(2,3)];
-%     conrod3Z = [R_pg(2,3), R_pg(2,3)-R_pq(3,3)];
-%     conrod4Z = [R_pg(2,3), R_pg(2,3)-R_pq(4,3)];
-%     conrod5Z = [R_pg(3,3), R_pg(3,3)-R_pq(5,3)];
-%     conrod6Z = [R_pg(3,3), R_pg(3,3)-R_pq(6,3)];
-%     
-%     plot3(motorarm1X, motorarm1Y, motorarm1Z, 'LineWidth', 3);
-%     plot3(motorarm2X, motorarm2Y, motorarm2Z, 'LineWidth', 3);
-%     plot3(motorarm3X, motorarm3Y, motorarm3Z, 'LineWidth', 3);
-%     plot3(motorarm4X, motorarm4Y, motorarm4Z, 'LineWidth', 3);
-%     plot3(motorarm5X, motorarm5Y, motorarm5Z, 'LineWidth', 3);
-%     plot3(motorarm6X, motorarm6Y, motorarm6Z, 'LineWidth', 3);
-%     plot3(conrod1X, conrod1Y, conrod1Z, 'LineWidth', 3);
-%     plot3(conrod2X, conrod2Y, conrod2Z, 'LineWidth', 3);
-%     plot3(conrod3X, conrod3Y, conrod3Z, 'LineWidth', 3);
-%     plot3(conrod4X, conrod4Y, conrod4Z, 'LineWidth', 3);
-%     plot3(conrod5X, conrod5Y, conrod5Z, 'LineWidth', 3);
-%     plot3(conrod6X, conrod6Y, conrod6Z, 'LineWidth', 3);
-%     patch(platformX, platformY, platformZ, 'b');
-%     patch(baseX, baseY, baseZ, 'r')
-%     view(-205,45)
-%     pause(0.00001)
-%     zlim([-0.5 1.5])
-%     xlim([-0.75 0.5])
-%     ylim([-0.75 0.5])
+        % just for plotting
+            cla()
+
+    hold on
+    grid on
+    platformX = [R_pg(1,1),R_pg(2,1),R_pg(3,1),R_pg(1,1)];
+    platformY = [R_pg(1,2),R_pg(2,2),R_pg(3,2),R_pg(1,2)];
+    platformZ = [R_pg(1,3),R_pg(2,3),R_pg(3,3),R_pg(1,3)];
+    baseX = [motors(1,1),motors(2,1),motors(3,1),motors(4,1),motors(5,1),motors(6,1),motors(1,1)];
+    baseY = [motors(1,2),motors(2,2),motors(3,2),motors(4,2),motors(5,2),motors(6,2),motors(1,2)];
+    baseZ = [motors(1,3),motors(2,3),motors(3,3),motors(4,3),motors(5,3),motors(6,3),motors(1,3)];
+        
+    motorarm1X = [motors(1,1), R_qo(1,1)+motors(1,1)];
+    motorarm2X = [motors(2,1), R_qo(2,1)+motors(2,1)];
+    motorarm3X = [motors(3,1), R_qo(3,1)+motors(3,1)];
+    motorarm4X = [motors(4,1), R_qo(4,1)+motors(4,1)];
+    motorarm5X = [motors(5,1), R_qo(5,1)+motors(5,1)];
+    motorarm6X = [motors(6,1), R_qo(6,1)+motors(6,1)];
+    
+    motorarm1Y = [motors(1,2), R_qo(1,2)+motors(1,2)];
+    motorarm2Y = [motors(2,2), R_qo(2,2)+motors(2,2)];
+    motorarm3Y = [motors(3,2), R_qo(3,2)+motors(3,2)];
+    motorarm4Y = [motors(4,2), R_qo(4,2)+motors(4,2)];
+    motorarm5Y = [motors(5,2), R_qo(5,2)+motors(5,2)];
+    motorarm6Y = [motors(6,2), R_qo(6,2)+motors(6,2)];
+    
+    motorarm1Z = [motors(1,3), R_qo(1,3)+motors(1,3)];
+    motorarm2Z = [motors(2,3), R_qo(2,3)+motors(2,3)];
+    motorarm3Z = [motors(3,3), R_qo(3,3)+motors(3,3)];
+    motorarm4Z = [motors(4,3), R_qo(4,3)+motors(4,3)];
+    motorarm5Z = [motors(5,3), R_qo(5,3)+motors(5,3)];
+    motorarm6Z = [motors(6,3), R_qo(6,3)+motors(6,3)];
+
+    conrod1X = [R_pg(1,1), R_pg(1,1)-R_pq(1,1)];
+    conrod2X = [R_pg(1,1), R_pg(1,1)-R_pq(2,1)];
+    conrod3X = [R_pg(2,1), R_pg(2,1)-R_pq(3,1)];
+    conrod4X = [R_pg(2,1), R_pg(2,1)-R_pq(4,1)];
+    conrod5X = [R_pg(3,1), R_pg(3,1)-R_pq(5,1)];
+    conrod6X = [R_pg(3,1), R_pg(3,1)-R_pq(6,1)];
+  
+    conrod1Y = [R_pg(1,2), R_pg(1,2)-R_pq(1,2)];
+    conrod2Y = [R_pg(1,2), R_pg(1,2)-R_pq(2,2)];
+    conrod3Y = [R_pg(2,2), R_pg(2,2)-R_pq(3,2)];
+    conrod4Y = [R_pg(2,2), R_pg(2,2)-R_pq(4,2)];
+    conrod5Y = [R_pg(3,2), R_pg(3,2)-R_pq(5,2)];
+    conrod6Y = [R_pg(3,2), R_pg(3,2)-R_pq(6,2)];
+    
+    conrod1Z = [R_pg(1,3), R_pg(1,3)-R_pq(1,3)];
+    conrod2Z = [R_pg(1,3), R_pg(1,3)-R_pq(2,3)];
+    conrod3Z = [R_pg(2,3), R_pg(2,3)-R_pq(3,3)];
+    conrod4Z = [R_pg(2,3), R_pg(2,3)-R_pq(4,3)];
+    conrod5Z = [R_pg(3,3), R_pg(3,3)-R_pq(5,3)];
+    conrod6Z = [R_pg(3,3), R_pg(3,3)-R_pq(6,3)];
+    
+    plot3(motorarm1X, motorarm1Y, motorarm1Z, 'LineWidth', 3);
+    plot3(motorarm2X, motorarm2Y, motorarm2Z, 'LineWidth', 3);
+    plot3(motorarm3X, motorarm3Y, motorarm3Z, 'LineWidth', 3);
+    plot3(motorarm4X, motorarm4Y, motorarm4Z, 'LineWidth', 3);
+    plot3(motorarm5X, motorarm5Y, motorarm5Z, 'LineWidth', 3);
+    plot3(motorarm6X, motorarm6Y, motorarm6Z, 'LineWidth', 3);
+    plot3(conrod1X, conrod1Y, conrod1Z, 'LineWidth', 3);
+    plot3(conrod2X, conrod2Y, conrod2Z, 'LineWidth', 3);
+    plot3(conrod3X, conrod3Y, conrod3Z, 'LineWidth', 3);
+    plot3(conrod4X, conrod4Y, conrod4Z, 'LineWidth', 3);
+    plot3(conrod5X, conrod5Y, conrod5Z, 'LineWidth', 3);
+    plot3(conrod6X, conrod6Y, conrod6Z, 'LineWidth', 3);
+    patch(platformX, platformY, platformZ, 'b');
+    patch(baseX, baseY, baseZ, 'r')
+    view(-205,45)
+    pause(0.00001)
+    zlim([-0.5 1.5])
+    xlim([-0.75 0.5])
+    ylim([-0.75 0.5])
     
 %     % create .gif for publishing on wiki
 %     filename = 'simMotion2.gif';
@@ -374,8 +389,8 @@ xlabel('Time (s)')
 ylabel('motor arm angle requested (rad)')
 
 %% finally plot the torque-omega curve!!
-om = medfilt1(omega,13);
-torque = medfilt1(Motor_Torques,13);    % filter data a little bit
+om = medfilt1(omega,3);
+torque = medfilt1(Motor_Torques,3);    % filter data a little bit
 
 figure()
 hold on
