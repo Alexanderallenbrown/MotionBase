@@ -27,5 +27,6 @@ int mag = abs(val2*255/512);
    analogWrite(9,mag);
    analogWrite(10,255);
  }
+ delay(2);
 }
 
