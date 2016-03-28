@@ -1,4 +1,4 @@
-function [Length, Base, Platform, hex_angles, R_pc] = platformposition(motion_desired, angle_desired, r_base, r_platform, initial_platform_height)
+function [Length, Base, Platform, hex_angles, R_pc] = platformposition(hex_angles, motion_desired, angle_desired, r_base, r_platform, initial_platform_height)
 %traj(xdesired(i),ydesired(i),1+zdesired(i),anglex(i)+axtilt(i),angley(i)+aytilt(i),anglez(i)); 
 % Computes distance from motor shaft to connection point on top platform
 %       Inputs:     motion_desired   vector(x,y,z) of the desired lateral motion
@@ -8,8 +8,6 @@ function [Length, Base, Platform, hex_angles, R_pc] = platformposition(motion_de
 %                   Base             xyz location of base points
 %                   Platform         xyz location of platform points
 
-% Establish the points of the hexagonal base and triangular platform
-hex_angles = [-pi/6:pi/3:9*pi/6];
 tri_angles = [0,2*pi/3,4*pi/3];
 
 Bx = r_base.*cos(hex_angles);
