@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta charset="utf-8">
+
+	<title>Speed-Dreams stats</title>
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.js"></script>	
+	<!--<script src="http://code.highcharts.com/highcharts.js"></script>-->
+	<script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script type="text/javascript" src="http://code.highcharts.com/modules/data.js"></script>
+
+	<script src="./telemetry_files/speed-dreams.js"></script>
+
+	<style>
+		html, body{
+		    max-width: 100%;
+			overflow-x: hidden;	
+		}
+		body{
+			background-color: black;
+			padding-top: 230px;
+		}
+		#chartFilter{
+			position:fixed;
+			right:-145px;
+			top:0px;
+			background-color: #ffffff;
+		}
+		#chartFilter div{
+			font-size:3em;
+			font-weight:bold;
+			float: left;
+			color:orange;
+			margin-left:-2.5em;
+			background-color:white;
+		}
+		#chartFilter:hover{
+			right:0px;
+			top:0px;
+			background-color: #ffffff;
+		}
+		#map{
+			position:fixed;
+			left:0px;
+			top:0px;
+			z-index:100;
+			background-color: rgba(255, 255, 255, 0.5)}
+		}
+	</style>
+</head>
+<body>
+	<canvas id="map" width="400" height="220"></canvas>
+	<div id="chart"></div>
+	<div id="chartFilter"><div>Filter</div></div>
+<script>
+
+var canvas = document.getElementById('map');
+var ctx = canvas.getContext('2d');
+var lastDrawnPoint={x:0,y:0}
+
+function generateFilterBox(){
+	var box = document.getElementById('chartFilter');
+	var axisList = getAxisList();
+	axisList.forEach(function (ax){
+		//console.log(ax.name);
+		var cb = document.createElement('input');
+		cb.type = 'checkbox';
+		cb.name = ax.name;
+		cb.value = ax.id;
+		cb.checked = true;
+		var label = document.createElement('label');
+		label.innerHTML = ax.name;
+		box.appendChild(document.createElement('br'));
+		box.appendChild(cb);
+		box.appendChild(label);
+		
+		//add event listener
+		cb.addEventListener('change', showHideAx);
+	});
+}
+function showHideAx(event){
+    var chart =  $('#chart').highcharts();
+	ax = chart.yAxis[event.target.value];
+	ax.update({
+		visible:!ax.visible
+	})
+	console.log(chart.series.length);
+	for (var i=0; i< chart.series.length; i++){
+		var serie = chart.series[i];
+		console.log(serie.yAxis);
+		if(serie.yAxis==ax){
+			serie.update({
+				visible:!serie.visible
+			})
+		}
+	}
+
+	//chart.redraw();
+}
+
+function getAxisList(){
+	var axisList = [];
+    var chart =  $('#chart').highcharts();
+	for (var i=0; i< chart.yAxis.length; i++){
+		var ax = chart.yAxis[i];
+		if(ax.hasOwnProperty('axisTitle')){
+			axisList.push({
+				name:ax.axisTitle.textStr,
+				id: i,
+			});
+		}
+	}
+	return axisList;
+}
+
+function drawPointOnMap(x,y,color){
+	lastDrawnPoint={
+		x:x,
+		y:y
+	}
+	var x = x/4;
+	var y = y/4;
+	ctx.fillStyle=color;
+	ctx.fillRect(x,y,6,6);	
+}
+
+	
+function parseProertyName(str){
+	var str = str.replace(/"/g,'')
+	if(str.search('-')>0){
+		str=str.split('-');
+		var out={
+			groupName:str[0],
+			name:str[1]
+		}
+	}else{
+		var out={
+			groupName:str,
+			name:str
+		}		
+	
+	}
+	return out;
+}
+function getSerieIdByName(series, name){
+	//console.log(series, name)
+	for(var i=0; i < series.length; i++){
+		if(series[i].hasOwnProperty('name')){
+			//console.log(series[i].name,name);
+			if(series[i].name==name){
+				return i;
+			}
+		}
+	}
+}
+
+function getYValue(chartObj, seriesIndex, xValue) {
+	//console.log('click');
+    var yValue = null;
+    //console.log(chartObj, seriesIndex,chartObj.series[seriesIndex]);
+    var points = chartObj.series[seriesIndex].points;
+    for (var i = 0; i < points.length; i++) {
+        if (points[i].x >= xValue) break;
+        yValue = points[i].y;
+    }
+    return yValue;
+}
+	
+function findAxID(group){
+	//console.log('======',group, groups);
+
+	for(var i=0; i < groups.length; i++){
+		if(groups[i]==group){
+			//console.log('axis found', i);
+			return i;
+		}
+		//console.log('check for', groups[i]);
+	}
+	//console.log('no proper group found!');
+}
+	
+
+var groups = [];	
+$(function () {
+
+	$.ajax({url:'telemetry.txt',
+		mimeType:'text/plain; charset=x-user-defined',
+		success:function(mydata){
+			var properties = mydata.split("\r\n")[2].split(",");
+
+			for (var i=0; i<properties.length; i++){
+				var groupName = parseProertyName(properties[i]).groupName;
+				if(groups.indexOf(groupName) < 0){
+					groups.push(groupName);
+				}
+			}
+			
+			var yAxisOption=[];
+			for(var i=0; i < groups.length; i++){
+				var group = groups[i];
+				axisOptions = 	{
+					title: {
+						text: group,
+						align: 'middle',
+						offset: 0,
+						rotation: 0,
+						y: -1,
+						x: -80
+					},
+					labels:{
+						align: 'center',					
+					},
+					//tickAmount:10,
+					offset: 0,
+					opposite: false,
+					top: 100/groups.length*i+'%',
+					height: 100/groups.length+'%',
+				}
+
+				yAxisOption.push(axisOptions);
+			}
+			
+			$('#chart').highcharts('StockChart', {
+				height:'800px',
+				data: {
+					csv: mydata,
+					complete: function (options) {
+
+						var groups=new Array();
+						
+						for(var i=0; i < options.series.length; i++){
+							if(options.series[i].hasOwnProperty('name')){
+								var groupName= parseProertyName(options.series[i].name).groupName;
+								options.series[i].yAxis = findAxID(groupName);
+							}
+						}
+						
+						//generate map chart
+						var mapData = options.series.filter(
+							function (serie){
+								if(serie.hasOwnProperty('name')){
+									return serie.name.includes('Position');
+								}
+								return false;
+							}
+						)
+
+						for(var i=0; i<mapData[0].data.length; i++){
+							//console.log()
+							drawPointOnMap(
+								x=mapData[0].data[i][1],
+								y=mapData[1].data[i][1],
+								color= "#FFFFFF"
+							)
+						}
+						
+					}
+				},
+				title: {
+					text: 'Telemetry'
+				},
+				tooltip: {
+					shared:false,
+					enabled: true,
+					animation: false,
+					crosshairs: true,
+					/*
+					formatter: function () {
+						var s = '<b>' + this.x + '</b>';
+						$.each(this.points, function () {
+							if (this.series.name != 'Water') {
+								s += '<br/>' + this.series.name + ': ' + this.y + 'm';
+							}                       
+						});
+						return s;
+					},
+					*/
+
+				},
+				yAxis: yAxisOption,
+				
+				plotOptions: {
+					series: {
+						point: {
+							events: {
+								mouseOver: function(evt) {
+
+									var xAxisIndex = 0;
+									var seriesIndex = getSerieIdByName(this.series.chart.series,'"Position-x"');
+									var positionX= getYValue(/*this*/this.series.chart, seriesIndex, this.x/*evt.xAxis[xAxisIndex].value*/);
+
+									var seriesIndex = getSerieIdByName(this.series.chart.series,'"Position-y"');
+									var positionY= getYValue(/*this*/this.series.chart, seriesIndex, this.x/*evt.xAxis[xAxisIndex].value*/);
+
+									//clear the last drawn point
+									drawPointOnMap(
+										x=lastDrawnPoint.x,
+										y=lastDrawnPoint.y,
+										color= "white"
+									)
+									
+									//draw the new one
+									drawPointOnMap(
+										x=positionX,
+										y=positionY,
+										color= "red"
+									)
+								}
+								
+							},
+						},
+					}
+				},
+			});
+			var chart =  $('#chart').highcharts();
+			chart.setSize(
+				document.body.offsetWidth - 20,
+				document.body.offsetHeight - 20,
+				false
+			);
+			chart.setSize(
+				1200,
+				2000,
+				false
+			);
+			Highcharts.setOptions(Highcharts.theme);
+			generateFilterBox();
+		}
+	})    
+});
+
+</script>
+</body></html>
