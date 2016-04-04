@@ -34,7 +34,7 @@ void loop()
  
   interrupts(); 
   
-  float posfloat = unCount*2*PI/(2000.0); //our encoder position in radians
+  float posfloat = unCount*2*PI/(8000.0); //our encoder position in radians
   //val is desired angle
   //0-1023 = 0-pi
   val = analogRead(analogInPin); //raw reference position value.
@@ -44,7 +44,7 @@ void loop()
   
   float float_error = ref_command_float-posfloat;//this is our current error value!!
   
-  float kp = 255.0/(PI/4.0);//some guess for KP.........
+  float kp = 100.0/(PI/4.0);//some guess for KP.........
   
   float float_U = kp*float_error;
   
@@ -59,17 +59,24 @@ void loop()
   val2 = int(float_U);
   mag = abs(val2);
 
-  if(val2<0){
-    digitalWrite(analogOutPin2,LOW);
-    analogWrite(analogOutPin1,mag);
-    digitalWrite(analogOutPin3,HIGH);
-  }
-  else{
-    digitalWrite(analogOutPin3,LOW);
-    analogWrite(analogOutPin1,mag);
-    digitalWrite(analogOutPin2,HIGH);
-  }
-  
+  if(val2<-20){
+   digitalWrite(analogOutPin2,LOW);
+   analogWrite(analogOutPin1,mag);
+   digitalWrite(analogOutPin3,HIGH);
+ }
+ else if(val2>20){
+   digitalWrite(analogOutPin3,LOW);
+   analogWrite(analogOutPin1,mag);
+   digitalWrite(analogOutPin2,HIGH);
+ }
+ 
+ else{
+   digitalWrite(analogOutPin3,LOW);
+   analogWrite(analogOutPin1,0);
+   digitalWrite(analogOutPin2,LOW);
+ }
+ 
+ 
   Serial.print(ref_command_float);
   Serial.print("\t");
   Serial.print(posfloat);

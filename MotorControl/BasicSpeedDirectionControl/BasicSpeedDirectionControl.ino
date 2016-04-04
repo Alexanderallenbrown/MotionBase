@@ -25,16 +25,23 @@ else{
   mag = mag;
 }
   
- if(val2<0){
+ if(val2<-20){
    digitalWrite(analogOutPin2,LOW);
    analogWrite(analogOutPin1,mag);
    digitalWrite(analogOutPin3,HIGH);
  }
- else{
+ else if(val2>20){
    digitalWrite(analogOutPin3,LOW);
    analogWrite(analogOutPin1,mag);
    digitalWrite(analogOutPin2,HIGH);
  }
+ 
+ else{
+   digitalWrite(analogOutPin3,LOW);
+   analogWrite(analogOutPin1,0);
+   digitalWrite(analogOutPin2,LOW);
+ }
+ 
  Serial.println(val);
  Serial.println(mag);
  
