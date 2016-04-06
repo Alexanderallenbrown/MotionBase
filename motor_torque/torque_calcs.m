@@ -62,14 +62,7 @@ motion_des = [xdesired, ydesired, zdesired];
 angle_x = interp1(time1, angle(:,1), simtime);
 angle_y = interp1(time1, angle(:,2), simtime);
 angle_z = interp1(time1, angle(:,3), simtime);
-%angle_x= angle_x(~isnan(angle_x));
-%angle_y= angle_y(~isnan(angle_y));
-
-%angle_des = [angle_x(3:end)+axtilt, angle_y(3:end)+aytilt, angle_z(6:end)]; %% had to do stupid things to trim vectors, should fix this later %%
 angle_des = [angle_x+axtilt, angle_y+aytilt, anglez];   %% had to do stupid things to trim vectors, should fix this later -->FIXED
-%MEGAN-- WE NEED TO FIX THE ANGLE Z. We can't ask for angle z directly...
-%needs to be high pass filtered!!! Grab this from Dallis's branch and paste
-%into your simulink??   -->DONE
 
 %% Calculate linear velocity, acceleration and angular velocity, acceleration    
 vel_desX(:,1) = [0; diff(motion_des(:,1))./diff(simtime)];      % split into XYZ to make sure diff works in the right direction
@@ -188,24 +181,8 @@ Motor_Torques = zeros(length(simtime),6);
 for i=1:length(motion_des)    % motion index
     % solve for platform position and R_po
     [R_po, motors, R_pg, motorangles, R_pc] = platformposition(hex_angles, motion_des(i,:),angle_des(i,:), r_base, r_platform, z0_platform);
-    
-%     % find angles for motor arms using fminsearch
-%     for j = 1:6             % leg index
-%         %find this motor angle
-%         angle = @ (parm) findpq_leg(R_po(j,:), shortleg, longleg, motorangles(j), parm);
-%         [opt(i,j)] = fminsearch(angle, initial);
-%         [error, x, y, z] = angle(opt(i,j));
-%         R_pq = [x, y, z];
-%         R_qo = R_po(j,:) - R_pq;
-%         Rpq_x(j) = R_pq(1);     % had to disassemble R_pq so that it would write to j
-%         Rpq_y(j) = R_pq(2);
-%         Rpq_z(j) = R_pq(3);
-%         Rqo_x(j) = R_qo(1);
-%         Rqo_y(j) = R_qo(2);
-%         Rqo_z(j) = R_qo(3);
-%     end
 
-    % angle bisection method  --> TAKES FOREVER WHAT IS HAPPENING HERE??
+    % angle bisection method
     for j = 1:6     % leg index
         theta_max = pi/2;
         theta_min = 0;
@@ -350,16 +327,16 @@ for i=1:length(motion_des)    % motion index
     xlim([-0.75 0.5])
     ylim([-0.75 0.5])
     
-%     % create .gif for publishing on wiki
-%     filename = 'simMotion2.gif';
-%     frame = getframe(1);
-%     im = frame2im(frame);
-%     [imind,cm] = rgb2ind(im,256);
-%     if i == 1;
-%         imwrite(imind,cm,filename,'gif', 'Loopcount',inf);
-%     else
-%         imwrite(imind,cm,filename,'gif','WriteMode','append');
-%     end
+    % create .gif
+    filename = 'simMotion.gif';
+    frame = getframe(1);
+    im = frame2im(frame);
+    [imind,cm] = rgb2ind(im,256);
+    if i == 1;
+        imwrite(imind,cm,filename,'gif', 'Loopcount',inf);
+    else
+        imwrite(imind,cm,filename,'gif','WriteMode','append');
+    end
     
 end
 hold off
@@ -395,8 +372,8 @@ torque = medfilt1(Motor_Torques,3);    % filter data a little bit
 figure()
 hold on
 plot(abs(om),torque, '.')
-xlim([0, 3])
-ylim([0, 600])
+xlim([0, 2])
+ylim([0, 150])
 xlabel 'Omega (rad/s)'
 ylabel 'Torque (N-m)'
 hold off
