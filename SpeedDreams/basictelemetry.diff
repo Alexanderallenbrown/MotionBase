@@ -1,0 +1,312 @@
+diff --git src/libs/robottools/rthumandriver.cpp src/libs/robottools/rthumandriver.cpp
+index 76d1b1d..2fbb14c 100644
+--- src/libs/robottools/rthumandriver.cpp
++++ src/libs/robottools/rthumandriver.cpp
+@@ -1611,6 +1611,62 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
+ #endif
+ #endif
+ 
++	extern GfTelemetry telemetry;
++	telemetry.start();//start a new "data row"
++	telemetry.log("Time-RaceTime",(float)s->currentTime);
++	telemetry.log("Time-LapTime", (float)car->_curLapTime);
++	
++	telemetry.log("SteerTq-steerTq",car->_steerTq);
++	//telemetry.log("FF-appliedForce",force);
++	
++	telemetry.log("Slip-Slip",slip);
++	
++	telemetry.log("SpeedX-sX", car->_speed_x);
++	telemetry.log("SpeedY-sY", car->_speed_y);
++	telemetry.log("SpeedZ-sZ", car->_speed_z);
++
++	telemetry.log("AccelX-aX", (float)car->_accel_x);
++	telemetry.log("AccelY-aY", (float)car->_accel_y);
++	telemetry.log("AccelZ-aZ", (float)car->_accel_z);
++
++	telemetry.log("Lap-Lap", (float)car->_laps);	
++	telemetry.log("DistFromStartLine-Dist", (float)HCtx[idx]->distToStart);
++
++	telemetry.log("Pitch-Pitch", car->_pitch);
++	telemetry.log("Roll-Roll", car->_roll);
++	telemetry.log("Yaw-Yaw", car->_yaw);
++	telemetry.log("Yawrate-Yawrate", car->_yaw_rate);
++	
++	telemetry.log("PitchD-Pitch", (float)RAD2DEG(car->_pitch));
++	telemetry.log("RollD-Roll", (float)RAD2DEG(car->_roll));
++	telemetry.log("YawD-Yaw", (float)RAD2DEG(car->_yaw));
++
++	telemetry.log("Command-Steer", (float)car->_steerCmd);
++	telemetry.log("TrottleBrake-Throttle", (float)car->_accelCmd);
++	telemetry.log("TrottleBrake-Brake", (float)car->_brakeCmd);
++
++	telemetry.log("Gear-Gear", (float)HCtx[idx]->gear);
++	telemetry.log("Speed-Speed", (float)car->_speed_x);
++	telemetry.log("EngineRPM-EngineRPM", (float)car->_enginerpm);
++
++	telemetry.log("Position-x", car->_pos_X);
++	telemetry.log("Position-y", car->_pos_Y);
++	telemetry.log("Position-z", car->_pos_Z);
++
++	telemetry.log("Damage-Damage", car->_dammage);
++	telemetry.log("Collision-Collision", car->priv.collision);
++	telemetry.log("Fuel-Fuel", car->_fuel);
++
++	telemetry.log("BrakeTemp-FR",car->_brakeTemp(0));
++	telemetry.log("BrakeTemp-FL",car->_brakeTemp(1));
++	telemetry.log("BrakeTemp-RR",car->_brakeTemp(2));
++	telemetry.log("BrakeTemp-RL",car->_brakeTemp(3));
++
++	telemetry.log("MU-FR",car->priv.wheel[0].effectiveMu);
++	telemetry.log("MU-FL",car->priv.wheel[1].effectiveMu);
++	telemetry.log("MU-RR",car->priv.wheel[2].effectiveMu);
++	telemetry.log("MU-RL",car->priv.wheel[3].effectiveMu);
++
+     HCtx[idx]->lap = car->_laps;
+ }//common_drive
+ 
+diff --git src/libs/tgf/tgf.cpp src/libs/tgf/tgf.cpp
+index 72c653d..20db8f4 100644
+--- src/libs/tgf/tgf.cpp
++++ src/libs/tgf/tgf.cpp
+@@ -29,6 +29,7 @@
+ #include <cerrno>
+ #include <cmath>
+ #include <cstring>
++#include <sstream>
+ 
+ #ifdef __MINGW32__
+ #include <fstream> // std::fstream
+@@ -1001,3 +1002,175 @@ GfSleep(double seconds)
+ {
+   SDL_Delay((Uint32)(seconds*1000)); // ms.
+ }
++
++
++//to string (from c++11)
++template <typename T>
++std::string to_string(T value)
++{
++	std::ostringstream os ;
++	os << value ;
++	return os.str() ;
++}
++
++
++GfTelemetry::GfTelemetry(){
++//	this->params_names.append("\"loop\"");	
++	this->lastDataLogTime = std::clock();
++	this->count = 0;
++	this->doLog=true;
++	this->headerWritten=false;
++	}
++GfTelemetry::~GfTelemetry(){
++	}
++void GfTelemetry::start(){
++	//GfOut("\n\n\n#############%i\n\n\n\n\n\n", this->params_values.size());
++	//write to file every 10kb
++	if(this->params_values.size() > 10000){
++		this->plot();
++	}
++	
++	//how much time is passed from the last run
++	std::clock_t curTime = std::clock();
++	float elapsedTime = (curTime - this->lastDataLogTime) / (float) CLOCKS_PER_SEC;
++
++	//GfOut("\n%f\n", elapsedTime);	
++this->data.clear();	
++	if (elapsedTime > 0.1){
++		//GfOut("\n%f\n", elapsedTime);		
++		this->lastDataLogTime = std::clock();
++		this->doLog=true;
++		this->count= this->count+1;
++		this->params_values.append("\r\n");
++//		this->params_values.append(to_string(count));
++
++	}else{
++		this->doLog=false;
++	}	
++	
++}
++void GfTelemetry::end(){
++	
++	}
++void GfTelemetry::log(std::string name, std::string value){
++	name.insert(0,"\"");
++	name.append("\"");
++	
++	if(this->doLog){
++		
++		std::map<std::string,std::string>::iterator it;
++		it = this->data.find(name);
++		
++		if (it == this->data.end()){
++			this->data[name] =  value;
++			std::size_t found = this->params_names.find(name,0);
++
++			if(found==std::string::npos){
++				this->params_names.append(name);
++				this->params_names.append(",");
++
++			}
++
++			this->params_values.append(value);
++			this->params_values.append(",");
++			
++		}
++	}	
++
++	return;
++}
++void GfTelemetry::log(std::string name, int value){
++	if(this->count==0){
++		return;
++	}
++	return this->log(name,to_string(value));
++}
++void GfTelemetry::log(std::string name, float value){
++	if(this->count==0){
++		return;
++	}
++	return this->log(name,to_string(value));
++}
++
++void GfTelemetry::plot(){
++	std::string output;
++
++	output.append("\r\n");
++	//output.append(this->params_names);
++	
++	if(!this->headerWritten){
++		output.append("\r\n");
++		output.append(this->params_names);
++		this->headerWritten=true;
++	}
++	
++	output.append(this->params_values);
++
++	std::string telemetryFile = GfLocalDir();
++	telemetryFile.append("telemetry.txt");
++	
++	FILE * pFile;
++	pFile = fopen (telemetryFile.c_str(), "a"); //"a"=append to file "w"=empty file and write to it
++	fwrite (output.data() , sizeof(char), output.length(), pFile);
++	fclose (pFile);
++
++	//empty the strings
++	this->params_values.clear();
++
++	return;
++}
++/*
++void GfTelemetry::createSqliteDb(){
++    int result;
++	std::string telemetryDb = GfLocalDir();
++	telemetryDb.append("telemetry.db");
++
++    result = sqlite3_open(telemetryDb, telemetryDb.c_str());
++    if (result) {
++      GfLogError("Unable to open Database: %s\n", sqlite3_errmsg(replayDB));
++      sqlite3_close(replayDB);
++      replayDB = NULL;
++    } else {
++      GfLogInfo("Replay Database Opened 0x8%8.8X\n\n\n\n", replayDB);
++
++      // speed up database by turning of synchronous behaviour, ie. don't wait for disk 
++      sqlite3_exec(replayDB, "PRAGMA synchronous = OFF", NULL, NULL, NULL);
++    }
++}
++void GfTelemetry::openSqliteDb(){
++	
++	}
++void GfTelemetry::closeSqliteDb(){
++   sqlite3_close(replayDB);
++}
++
++void GfTelemetry::createSqliteTable(){
++      char query[200];
++      int result;
++
++      sprintf(query, "CREATE TABLE IF NOT EXISTS data (timestamp, lap, datablob BLOB)", i);
++      result = sqlite3_exec(replayDB, query, 0, 0, 0);
++      if (result) {
++        printf("Unable to create table data: %s\n", sqlite3_errmsg(replayDB));
++      }
++	
++}
++void GfTelemetry::saveData(){
++	char query[200];
++	int result;
++
++	// Do everything in 1 transaction for speed
++	sqlite3_exec(replayDB, "BEGIN TRANSACTION", NULL, NULL, NULL);
++
++	sprintf(query, "INSERT INTO car%d (timestamp, lap, datablob) VALUES (%f, %d, ?)", nCarInd, 
++			pSource->s->currentTime, pSrcCar->_laps);
++
++    result = sqlite3_exec(replayDB, query, 0, 0, 0);
++
++	if (result) {
++		GfLogInfo("Unable to instert into table: %s\n", sqlite3_errmsg(replayDB));
++	}
++}
++*/
++
++GfTelemetry telemetry;
+diff --git src/libs/tgf/tgf.h src/libs/tgf/tgf.h
+index 53007e3..e188d1f 100644
+--- src/libs/tgf/tgf.h
++++ src/libs/tgf/tgf.h
+@@ -31,6 +31,8 @@
+ #endif
+ 
+ #include "osspec.h"
++#include <ctime>
++#include <map>
+ 
+ // DLL exported symbols declarator for Windows.
+ #ifdef WIN32
+@@ -997,6 +999,29 @@ TGF_API void GfFormFreeCommandNew(void *cmd);
+ // Maximun value of a key code (Has to be the least greater  2^N - 1 >= SDLK_LAST)
+ #define GF_MAX_KEYCODE	0x1FF
+ 
++TGF_API class GfTelemetry{
++		public:
++		void start();
++		void log (std::string name, std::string value);
++		void log (std::string name, int value);
++		void log (std::string name, float value);
++		void plot();
++		std::clock_t lastDataLogTime;
++		int count;
++		bool doLog;
++		bool headerWritten;
++		std::map<std::string,std::string> data;
++		
++		void end();
++		std::string params_names;
++		std::string params_values;
++		//constructor
++		GfTelemetry();
++	
++		//destructor
++		~GfTelemetry();	
++};
++
+ 
+ #endif /* __TGF__H__ */
+ 
+diff --git src/main/main.cpp src/main/main.cpp
+index 50bb661..794f60e 100644
+--- src/main/main.cpp
++++ src/main/main.cpp
+@@ -257,6 +257,9 @@ main(int argc, char *argv[])
+ 	// Done with the app instance.
+ 	const std::string strAppName(pApp->name());
+ 	delete pApp;
++	
++	extern GfTelemetry telemetry;
++	telemetry.plot();
+ 
+  	// That's all (but trace what we are doing).
+ 	if (piUserItf && piRaceEngine)

@@ -1,0 +1,222 @@
+html {
+	margin: 0px;
+	padding:0px;
+	background:
+	/*
+	radial-gradient(black 15%, transparent 16%) 0 0,
+	radial-gradient(black 15%, transparent 16%) 8px 8px,
+	radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 0 1px,
+	radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 8px 9px;
+	*/
+	background-color:#282828;
+	background-size:16px 16px;
+}
+body {
+	margin: 0px;
+	padding:0px;
+	font-family:"Source Sans Pro"
+}
+/* ########################################
+ * MAIN MENU
+###########################################*/
+
+.mainMenu{
+	list-style: none;
+	right:0px;
+	top:0px;
+	margin: 0px;
+	padding:0.2em;
+	width:99%;
+	background: linear-gradient(to bottom, #eeeeee 0%,#cccccc 100%);
+	border-top: 2px solid #8E8E8E;
+	border-bottom: 2px solid #8E8E8E;
+	border-left:0px;
+	border-right:0px;	
+}
+.mainMenu li{
+	/*font-weight: bold;*/
+	font-size: 1.8em;
+    display: inline;
+	text-shadow: grey 0 0 3px;
+}
+.mainMenu li a{
+	color:#656565;
+	text-decoration: none;
+	padding-left:1em;
+	padding-right:1em;
+}
+.mainMenu li a:hover{
+	text-shadow: #909090 0 0 3px;
+	border-bottom:2px solid #656565;
+}
+
+/* ########################################
+ * VERTICAL MENU
+###########################################*/
+
+.verticalMenu{
+
+}
+
+.verticalMenu a{
+	text-decoration: none;	
+	/*border: 1px solid grey;*/
+	/*border-radius:1em;*/
+	display:block;
+	border-right:1px solid grey;
+	padding:0.3em;
+}
+.verticalMenu a:before{
+		content: "> ";
+		color:#BBBBBB;
+}
+
+.verticalMenu a:hover{
+	color: black;
+	background-color: #e1e1e1;
+
+}
+.verticalMenu .selected, .verticalMenu .selected:hover{
+	color: white;
+	background-color: grey;
+
+}
+
+/* ########################################
+ * GENERIC TABLE
+###########################################*/
+table{
+	background-color:white;
+	border: 2px solid #8E8E8E;
+	border-radius:0.2em;
+	font-size:1.2em;
+	margin:1em;
+}
+tr:nth-child(even) {
+	background-color: #eeeeee;
+}
+table th{
+	color:#656565;
+	background: linear-gradient(to bottom, #eeeeee 0%,#cccccc 100%);
+}
+table td{
+	padding:0.3em;
+	vertical-align:top;
+}
+table a{
+	color:#656565;
+}
+/* ########################################
+ * GENERIC TABLE
+###########################################*/
+.fullPage{
+	width:96%;
+}
+
+/* ########################################
+ * MISC
+###########################################*/
+.error{
+	color:white;
+	font-size:1em;
+	font-weight:bold;
+	background: red;
+	padding:0.5em;
+
+}
+.error:before{
+		content: "Errors occurred:\A ";
+		color:black;	
+}
+.warning{
+	color:white;
+	font-size:1em;
+	font-weight:bold;
+	background: orange;
+	padding:0.5em;
+
+}
+.warning:before{
+		content: "Warning:\A ";
+		color:black;	
+}
+.success{
+	color:white;
+	font-size:1em;
+	font-weight:bold;
+	background: green;
+	padding:0.5em;
+}
+.success:before{
+		content: "Success!\A";
+		color:black;	
+}
+
+/* ########################################
+ * FORMS
+###########################################*/
+form{
+
+	background-color:white;
+	border: 2px solid #8E8E8E;
+	border-radius:0.2em;
+	font-size:1.2em;
+	margin:1em;
+	padding:2.5em;
+
+}
+input{
+  box-shadow:inset 0 0 15px 5px #DADADA;
+	background-color: white);
+	font-size:1.2em;
+	color: #8E8E8E;
+	border-radius:0.2em;
+	border:1px solid #ADADAD;
+	margin:0.2em;
+	padding:0.4em;
+/*border-color:#3093e5;*/
+}
+select{
+	font-size:1.2em;
+
+}
+label{
+	width:15em;
+    display: block;
+}
+input[type=submit]{
+	font-size:2em;
+	font-weight:bold;
+	color:white;
+	background: linear-gradient(to bottom, #3298f2 0%,#3093e5 24%,#0a77d5 50%,#288de0 79%,#3096e5 100%); /* W3C */
+	box-shadow:0 0 15px 5px #DADADA;
+	border: 2px solid #3093e5;
+}
+input[type=submit]:hover{
+	background: linear-gradient(to bottom, #73b5ef 0%,#61a8e2 24%,#3b8fd3 50%,#6aa9dd 79%,#85bae2 100%); /* W3C */
+}
+input:required:invalid, input:focus:invalid {
+	border-color:red;
+}
+/* ########################################
+ * FORMS
+###########################################*/
+h1{
+	background: linear-gradient(to bottom, #eeeeee 0%,#cccccc 100%);
+	padding:0.5em;
+}
+.carPreview{
+	padding:0.3em;
+	background-color:white;
+	box-shadow:0 0 15px 5px #DADADA;
+	transform: rotate(-7deg);
+}
+sup{
+font-size:0.4em;
+}
+
+.wi{
+color:black;
+font-size:1em;
+}
+
