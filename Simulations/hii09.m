@@ -16,6 +16,10 @@ az=rawdata(:,13);
 signalax=[time1,ax];
 signalay=[time1,ay];
 signalaz=[time1,az];
+% added roll pitch yaw, 2/16/16
+SignalRoll = [time1,anglex]; 
+SignalPitch = [time1,angley];
+SignalYaw = [time1,anglez];
 
 %run simulink
 sim('demostration.slx');
@@ -25,10 +29,18 @@ time=simtime;
 shortleg=0.16;
 longleg=1;
 
+<<<<<<< HEAD
 
 %L1 is the vector that records the length of leg1
 
 
+=======
+%<<<<<<< HEAD
+%L1 is the vector that records the length of leg1
+%=======
+% the length of the imaginary legs connecting point P to point O
+%>>>>>>> 7d63f8bbbc886981d473b8914aaa42252d216686
+>>>>>>> 8357cfdb54149583b9d3f2d84ef4c05d80b8c855
 L1=[];
 L2=[];
 L3=[];
@@ -36,9 +48,17 @@ L4=[];
 L5=[];
 L6=[];
 
+<<<<<<< HEAD
 
 %a1 is the vector that record the angle of shortleg1
 
+=======
+%<<<<<<< HEAD
+%a1 is the vector that record the angle of shortleg1
+%=======
+%these are the local motor angles for each of the motors.
+%>>>>>>> 7d63f8bbbc886981d473b8914aaa42252d216686
+>>>>>>> 8357cfdb54149583b9d3f2d84ef4c05d80b8c855
 a1=[];
 a2=[];
 a3=[];
@@ -48,6 +68,11 @@ a6=[];
 
 %x y z 
 
+<<<<<<< HEAD
+=======
+%position of the points Q
+
+>>>>>>> 8357cfdb54149583b9d3f2d84ef4c05d80b8c855
 x1=[];
 y1=[];
 z1=[];
