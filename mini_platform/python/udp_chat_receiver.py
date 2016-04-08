@@ -19,6 +19,11 @@ while 1:
     try:
         message, address = s.recvfrom(8192) # Buffer size is 8192. Change as needed.
         if message:
-            print address, "> ", message
+            #print address, "> ", message
+            message_split = message.split(',')            
+            message_float1 = float(message_split[0])
+            message_float2 = float(message_split[1])
+            float_array = array([message_float1,message_float2])
+            print float_array
     except:
         pass
