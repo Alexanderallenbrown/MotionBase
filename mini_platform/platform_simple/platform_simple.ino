@@ -18,9 +18,6 @@
 
 #include <Servo.h>
 #include <Wire.h>
-#include <LCD.h>
-#include <LiquidCrystal_I2C.h>
-#include <IRremote.h>
 
 
 //MIN and MAX PWM pulse sizes, they can be found in servo documentation
