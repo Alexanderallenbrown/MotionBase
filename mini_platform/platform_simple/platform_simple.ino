@@ -35,8 +35,8 @@
 #define deg30 pi/6
 
 //these are the absolute limits of motion that we will allow.
-float pos_limit = 0.025;
-float ang_limit = 0.1;
+float pos_limit = 0.05;
+float ang_limit = 0.3;
 
 unsigned long time;
 
@@ -119,6 +119,12 @@ void loop()
 {
   //read a list of 6 floats from the serial port (python/MATLAB) representing the desired positions [x,y,z,r,p,y] with x,y,z in mm and r,p,y in rad.
   //looks for a newline character, and the rest of the numbers are separated by commas.
+  
+  //let's kill any buffered serial data
+//  while(Serial.available()>128){
+//    byte junk = Serial.read();
+//  }
+  
   while(Serial.available()>0){
 
     float px = Serial.parseFloat();
