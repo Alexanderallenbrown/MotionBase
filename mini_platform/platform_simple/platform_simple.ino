@@ -34,6 +34,10 @@
 #define deg2rad 180/pi
 #define deg30 pi/6
 
+//these are the absolute limits of motion that we will allow.
+float pos_limit = 0.025;
+float ang_limit = 0.1;
+
 unsigned long time;
 
 //Array of servo objects
@@ -123,6 +127,27 @@ void loop()
     float pr = Serial.parseFloat();
     float pp = Serial.parseFloat();
     float pa = Serial.parseFloat();
+    
+    if (abs(px)>pos_limit){
+      px = pos_limit*sgn(px);
+    }
+    if (abs(py)>pos_limit){
+      py = pos_limit*sgn(py);
+    }
+    if (abs(pz)>pos_limit){
+      pz = pos_limit*sgn(pz);
+    }
+    if (abs(pr)>ang_limit){
+      pr = ang_limit*sgn(pr);
+    }
+    if (abs(pp)>ang_limit){
+      pp = ang_limit*sgn(pp);
+    }
+    if (abs(pa)>ang_limit){
+      pa = ang_limit*sgn(pa);
+    }
+      
+    
     if(Serial.read()=='\n'){
      //arr[6] = {px,py,pz,pr,pp,pa};//set the values for the platform 
      arr[0] = px;
@@ -267,9 +292,9 @@ void retPos(){
    for(int i=0;i<6;i++){
        long val;
        if(i<3){
-           val=(long)(arr[i]*100*25.4);
+           val=(long)(arr[i]);
        }else{
-           val=(long)(arr[i]*100*deg2rad);
+           val=(long)(arr[i]);
        }
        Serial.write(val);
        Serial.write((val>>8));
@@ -277,4 +302,11 @@ void retPos(){
        Serial.write((val>>24));
        Serial.flush();
    }
+}
+
+
+static inline int8_t sgn(float val) {
+ if (val < 0) return -1;
+ if (val==0) return 0;
+ return 1;
 }
