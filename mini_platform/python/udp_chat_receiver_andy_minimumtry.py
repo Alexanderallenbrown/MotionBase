@@ -10,16 +10,16 @@ import serial
 
 
 ser = serial.Serial(
-    port='/dev/ttyUSB1',
+    port='/dev/ttyUSB0',
     baudrate=115200)
  
 host = 'localhost' #does not have to be
-port = 8102 # some default
+port = 8000 # some default
 
 f=open('yaw.txt','wb')
 # f.write(str(1)+'\r\n')
 
-N = 1200
+N = 120000
 x_desired = zeros(N)
 ax_raw = zeros(N)
 y_desired = zeros(N)
@@ -122,7 +122,7 @@ while 1:
         anglez_filtered[index]=-den5[1]*anglez_filtered[index-1]-den5[2]*anglez_filtered[index-2]+num5[0]*anglezraw+num5[1]*anglez_raw[index-1]+num5[2]*anglez_raw[index-2]
         #anglez_filtered[index]=1.928*anglez_filtered[index-1]-0.9324*anglez_filtered[index-2]+anglezraw-1.998*anglez_raw[index-1]+0.997*anglez_raw[index-2]
       else: 
-        y_desired[index]=0
+        y_desired[]=0
         x_desired[index]=0
         z_desired[index]=0
         ay_tilt[index]=0 
@@ -146,7 +146,7 @@ while 1:
      
       print command      
       #if ser.isOpen():
-      print len(command)-1
+      #print len(command)-1
       for ind in range(0,len(command)-1):
         # print ind
         ser.write(format(command[ind],'0.2f'))

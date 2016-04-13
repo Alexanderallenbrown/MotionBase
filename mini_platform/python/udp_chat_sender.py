@@ -5,7 +5,7 @@ import time
 from numpy import *
  
 host = 'localhost'
-port = 8102#some value
+port = 8000#some value
  
 send_address = (host, port) # Set the address to send to
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)    # Create Datagram Socket (UDP)
@@ -17,8 +17,10 @@ s.setblocking(False) # Set socket to non-blocking mode
 starttime = time.time()#in seconds... big number
  
 while 1:
-    curr_time = time.time()-starttime
-    my_datagram = sin(curr_time)
-    print "sending: "+str(my_datagram)+","+str(my_datagram+1)
-    s.sendto(str(my_datagram)+","+str(my_datagram+1), send_address)#send the data
-    time.sleep(0.1)#wait for .1 seconds
+    #curr_time = time.time()-starttime
+    #my_datagram = sin(curr_time)
+    on=0.3
+    off=0
+    print "sending: "+str(off)+","+str(off)
+    s.sendto(str(off)+","+str(off)+","+str(off)+","+str(off)+","+str(off)+","+str(on), send_address)#send the data
+    time.sleep(0.001)#wait for .1 seconds
