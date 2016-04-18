@@ -35,8 +35,8 @@
 #define deg30 pi/6
 
 //these are the absolute limits of motion that we will allow.
-float pos_limit = 0.05;
-float ang_limit = 0.3;
+float pos_limit = 1;
+float ang_limit = 0.2;
 
 unsigned long time;
 
@@ -100,6 +100,7 @@ theta_angle=(pi/3-theta_p)/2, theta_r = radians(8),
 static float M[3][3], rxp[3][6], T[3], H[3] = {0,0,z_home};
 
 void setup(){
+  
 //attachment of servos to PWM digital pins of arduino
    servo[0].attach(3, MIN, MAX);
    servo[1].attach(5, MIN, MAX);
@@ -109,6 +110,7 @@ void setup(){
    servo[5].attach(11, MIN, MAX);
 //begin of serial communication
    Serial.begin(115200);
+   Serial.println("welcome to the motion platform");
 //putting into base position
    setPos(arr);
 }
@@ -135,13 +137,13 @@ void loop()
     float pa = Serial.parseFloat();
     
     if (abs(px)>pos_limit){
-      px = pos_limit*sgn(px);
+      px = pos_limit*sgn(px)*100;
     }
     if (abs(py)>pos_limit){
-      py = pos_limit*sgn(py);
+      py = pos_limit*sgn(py)*100;
     }
     if (abs(pz)>pos_limit){
-      pz = pos_limit*sgn(pz);
+      pz = pos_limit*sgn(pz)*100;
     }
     if (abs(pr)>ang_limit){
       pr = ang_limit*sgn(pr);
@@ -294,21 +296,21 @@ unsigned char setPos(float pe[]){
 }
 
 
-void retPos(){
-   for(int i=0;i<6;i++){
-       long val;
-       if(i<3){
-           val=(long)(arr[i]);
-       }else{
-           val=(long)(arr[i]);
-       }
-       Serial.write(val);
-       Serial.write((val>>8));
-       Serial.write((val>>16));
-       Serial.write((val>>24));
-       Serial.flush();
-   }
-}
+//void retPos(){
+//   for(int i=0;i<6;i++){
+//       long val;
+//       if(i<3){
+//           val=(long)(arr[i]);
+//       }else{
+//           val=(long)(arr[i]);
+//       }
+//       Serial.write(val);
+//       Serial.write((val>>8));
+//       Serial.write((val>>16));
+//       Serial.write((val>>24));
+//       Serial.flush();
+//   }
+//}
 
 
 static inline int8_t sgn(float val) {

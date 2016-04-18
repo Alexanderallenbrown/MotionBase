@@ -19,8 +19,8 @@ starttime = time.time()#in seconds... big number
 while 1:
     #curr_time = time.time()-starttime
     #my_datagram = sin(curr_time)
-    on=0.3
+    on=1
     off=0
     print "sending: "+str(off)+","+str(off)
-    s.sendto(str(off)+","+str(off)+","+str(off)+","+str(off)+","+str(off)+","+str(on), send_address)#send the data
+    s.sendto(str(off)+","+str(on)+","+str(off)+","+str(off)+","+str(off)+","+str(off), send_address)#send the data
     time.sleep(0.001)#wait for .1 seconds
