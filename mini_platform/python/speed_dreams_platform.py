@@ -194,6 +194,7 @@ while 1:
     lastsendtime = tnow
     for ind in range(0,len(command)-1):
       # print ind
+      ser.write('!')
       ser.write(format(command[ind],'0.2f'))
       ser.write(',')
     ser.write(str(command[-1]))

@@ -127,7 +127,7 @@ void loop()
 //    byte junk = Serial.read();
 //  }
   
-  while(Serial.available()>0){
+  while(Serial.available()>30){
 
     float px = Serial.parseFloat();
     float py = Serial.parseFloat();
