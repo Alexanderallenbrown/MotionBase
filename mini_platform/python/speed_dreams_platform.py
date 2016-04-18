@@ -65,7 +65,7 @@ time.sleep(2.0)
 print "done"
 
 lastsendtime = time.time()
-arduino_delay = 0.1
+arduino_delay = 0.05
 
 lastfilttime = time.time()
 filter_delay = 0.01
@@ -146,11 +146,11 @@ while 1:
           ax_tilt[3]=-den2[1]*ax_tilt[2]-den2[2]*ax_tilt[1]+num2[1]*ay_raw[2]+num2[2]*ay_raw[1]
           if abs(ax_tilt[3])>1.0:
             ax_tilt[3] = sign(ax_tilt[3])
-          ax_tiltLP=-math.asin(ax_tilt[3])
+          ax_tiltLP=math.asin(ax_tilt[3])
           ay_tilt[3]=-den2[1]*ay_tilt[2]-den2[2]*ay_tilt[1]+num2[1]*ax_raw[2]+num2[2]*ax_raw[1]
           if abs(ay_tilt[3])>1.0:
             ay_tilt[3] = sign(ax_tilt[3])
-          ay_tiltLP=-math.asin(ay_tilt[3])
+          ay_tiltLP=math.asin(-ay_tilt[3])
           #anglex[3]=ax_tilt[3]+anglexraw
           #angley[3]=ay_tilt[3]+angleyraw
           anglex_filtered[3]=-den3[1]*anglex_filtered[2]-den3[2]*anglex_filtered[1]+num3[1]*anglex_raw[2]+num3[2]*anglex_raw[1]
