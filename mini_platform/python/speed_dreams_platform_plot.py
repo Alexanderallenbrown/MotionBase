@@ -19,6 +19,21 @@ port = 8000 # some default
 #f=open('yaw.txt','wb')
 # f.write(str(1)+'\r\n')
 
+#####create a figure for us to see our data on. MATLAB-like syntax.
+ion()
+fig,ax = subplots(1,1)
+ax.hold(True)
+fig.canvas.draw()
+plt1 = ax.plot(0,0,'r')[0]
+plt2 = ax.plot(0,0,'k')[0]
+buffsize = 2000  #might want to change this
+t = []
+plotXvals = []
+plotYvals = []
+plot_delay = 0.1 #seconds
+plotoldtime = time.time()
+######
+
 N = 4
 x_desired = zeros(N)
 ax_raw = zeros(N)
@@ -75,7 +90,7 @@ command = [0,0,0,0,0,0]
 while 1:
 
   try:
-        message, address = s.recvfrom(128) # Buffer size is 8192. Change as needed.
+        message, address = s.recvfrom(8192) # Buffer size is 8192. Change as needed.
         time.sleep(.001)
   except:
     #print "no message"
@@ -179,22 +194,51 @@ while 1:
         #tiltx_desired = arcsin(ax_tilt/9.81)+
         #command = [x_desired[-1],y_desired[-1],z_desired[-1],anglex[-1],angley[-1],anglez_filtered[-1]]
         command = [x_desired[-1],y_desired[-1],z_desired[-1],ax_tiltLP,ay_tiltLP,anglez_filtered[-1]]
-        print "command updated"
+        #print "command updated"
         #command = [x_desired[-1],y_desired[-1],z_desired[-1],arcsin(axraw/4),-arcsin(ayraw/4),anglez_filtered[-1]]
-
-        #print format(command[0],'0.2f')+","+format(command[1],'0.2f')+format(command[2],'0.2f')+","+format(command[3],'0.2f')+","+format(command[4],'0.2f')+","+format(command[5],'0.2f')
-        #if ser.isOpen():
-        #print len(command)-1
+        if len(t)<buffsize:
+          #this appends our newest values to our variables of interest.
+          t.append(time.time()-starttime)
+          plotXvals.append(axraw)
+          plotYvals.append(ayraw)
+          #print "appending"
+        else: #this means that the buffer needs to lose the oldest value, and gain the newest value.
+          #make t equal to the second oldest value to the second newest value
+          t = t[1:]
+          t.append(time.time())
+          #add the newest value on to the end, maintaining a vector of buffsize.
+          plotXvals = plotXvals[1:]
+          plotXvals.append(axraw)
+          plotYvals = plotYvals[1:]
+          plotYvals.append(ayraw)
+        #now, we only update plot every now and then.... so check how long it's been since we updated!
+        
     else:
         print "junk message received"
+
+  if (time.time()-plotoldtime>plot_delay and len(t)>=buffsize):#if enough time has passed
+          print "PLOTTING"
+          #set the old time. Maybe this isn't needed?
+          plotoldtime = time.time()
+          #set our X limits of the plot to only look at the last 5 seconds of data TODO make 5 a variable!!
+          ax.set_xlim(t[-1]-5,t[-1])
+          # ax.set_ylim(min(r)*1.2,max(r)*1.2)
+          ax.set_ylim(-1.3,1.3)
+          #this sets the line plt1 data to be our updated t and r vectors.
+          plt1.set_data(t,plotXvals)
+          #same as above.
+          plt2.set_data(t,plotYvals)
+          #the draw command is last, and tells matplotlib to update the figure!!
+          fig.canvas.draw()
+          pause(.0001)#must have a small pause here or nothing will work. Pause is a matplotlib.pyplot function.
 
   if tnow-lastsendtime>arduino_delay:
     print "sent: "+format(command[0],'0.2f')+","+format(command[1],'0.2f')+","+format(command[2],'0.2f')+","+format(command[3],'0.4f')+","+format(command[4],'0.4f')+","+format(command[5],'0.4f')
     
     lastsendtime = tnow
-    ser.write('!')
     for ind in range(0,len(command)-1):
       # print ind
+      ser.write('!')
       ser.write(format(command[ind],'0.2f'))
       ser.write(',')
     ser.write(str(command[-1]))
@@ -207,3 +251,6 @@ while 1:
     index=index+1
 
 #f.close()
+
+      
+                
