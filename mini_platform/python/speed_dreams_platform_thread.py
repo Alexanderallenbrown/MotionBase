@@ -9,13 +9,11 @@ import sys,traceback
 import serial
 from threading import Thread
 
-####
 
-
-###### filtering function
+###### filtering function, at ~500 Hz
 def filt():
 
-  global t, ax_raw, ay_raw, az_raw, anglex_raw, angley_raw, anglez_raw, buffsize, anglezraw
+  global t, ax_raw, ay_raw, az_raw, anglex_raw, angley_raw, anglez_raw, buffsize, anglezraw, dt
 
   # initialize position variables
   N = 4
@@ -24,6 +22,12 @@ def filt():
   z_desired = zeros(N)
   ax_tilt = zeros(N)
   ay_tilt = zeros(N)
+  ax_raw_small = zeros(N)
+  ay_raw_small = zeros(N)
+  az_raw_small = zeros(N)
+  anglex_raw_small = zeros(N)
+  angley_raw_small = zeros(N)
+  anglez_raw_small = zeros(N)
   anglex = 0
   angley = 0
   anglex_filtered=zeros(N)
@@ -39,7 +43,7 @@ def filt():
   starttime = time.time()
   oldtime = time.time()
   time.sleep(.01)
-  dt = 0.1
+  # dt = 0.005
   lastsendtime = time.time()
   arduino_delay = 0.05
   lastfilttime = time.time()
@@ -58,49 +62,55 @@ def filt():
 
   if (len(t)>=buffsize):
     
-    while 1:
-      # take 4 most recent values read from buffer
-      ax_raw_small = array(ax_raw[-4:-1])
-      ay_raw_small = array(ay_raw[-4:-1])
-      az_raw_small = array(az_raw[-4:-1])
-      anglex_raw_small = array(anglex_raw[-4:-1])
-      angley_raw_small = array(angley_raw[-4:-1])
-      anglez_raw_small = array(anglez_raw[-4:-1])
-
+    while 1:        ## >>> 500 Hz
+      # timetime = time.time()
+      # take most recent value read from buffer
+      # trecent = time.time()
+      ax_raw_small = append(ax_raw_small[1:],ax_raw[-1])
+      ay_raw_small = append(ay_raw_small[1:],ax_raw[-1])
+      az_raw_small = append(az_raw_small[1:],ax_raw[-1])
+      anglex_raw_small = append(anglex_raw_small[1:],anglex_raw[-1])
+      angley_raw_small = append(angley_raw_small[1:],angley_raw[-1])
+      anglez_raw_small = append(anglez_raw_small[1:],anglez_raw[-1])
 
       tnow = time.time()  # what time is it mr. fox??
-
-      if (tnow-lastfilttime)>filter_delay:
-
+      # tapp = tnow-trecent
+      # print tapp
+      if (tnow-lastfilttime)>filter_delay:              ## filters run at ~500 Hz
+        # tstartfilt = time.time()
         #determine time step
-        dt = tnow-oldtime
-        oldtime = tnow
+        # print dt[-1]
+        # dt = tnow-oldtime
+        # oldtime = tnow
 
         #ay to y_desired, and ax to x_desired
-        (num1,den1,dt1) = cont2discrete(([1.],[1,10,20]),dt)
+        (num1,den1,dt1) = cont2discrete(([10.],[1,10,20]),dt[-1])
 
         #ay to ax_tilt
-        (num2,den2,dt2) = cont2discrete(([-32500.],[1,100,1300]),dt)
+        (num2,den2,dt2) = cont2discrete(([-32500.],[1,100,1300]),dt[-1])
   
         #anglex to anglex_filtered
-        (num3,den3,dt3) = cont2discrete(([1,0],[1,2,4]),dt)
+        (num3,den3,dt3) = cont2discrete(([1,0],[1,2,4]),dt[-1])
 
         #az to z_desired
-        (num4,den4,dt4) = cont2discrete(([1.,0],[1,11,110,100]),dt)
+        (num4,den4,dt4) = cont2discrete(([10.,0],[1,11,110,100]),dt[-1])
 
         #anglez to anglez_filtered
-        (num5,den5,dt5) = cont2discrete(([1,0,0],[1,2,4]),dt)
+        (num5,den5,dt5) = cont2discrete(([1,0,0],[1,2,4]),dt[-1])
 
         num1,num2,num3,num4,num5 = num1[0],num2[0],num3[0],num4[0],num5[0]
 
         x_desired = append(x_desired[1:],0)
         y_desired = append(y_desired[1:],0)
         z_desired = append(z_desired[1:],0)
-        print ay_raw
 
         anglez_filtered = append(anglez_filtered[1:],0)
 
-        if index>1:
+        # timeendfilt = time.time()
+        # filtTime=timeendfilt-tstartfilt
+        # print filtTime
+        # timetime = time.time()
+        if index>1:             ## happens way fast
           y_desired[3]=-den1[1]*y_desired[2]-den1[2]*y_desired[1]+num1[1]*ay_raw_small[2]+num1[2]*ay_raw_small[1]
           x_desired[3]=-den1[1]*x_desired[2]-den1[2]*x_desired[1]+num1[1]*ax_raw_small[2]+num1[2]*ax_raw_small[1]
           ax_tilt[3]=-den2[1]*ax_tilt[2]-den2[2]*ax_tilt[1]+num2[1]*ay_raw_small[2]+num2[2]*ay_raw_small[1]
@@ -119,7 +129,7 @@ def filt():
 
           z_desired[3]=-den4[1]*z_desired[2]-den4[2]*z_desired[1]-den4[3]*z_desired[0]+num4[1]*az_raw_small[2]+num4[2]*az_raw_small[1]+num4[3]*az_raw_small[0]
           anglez_filtered[3]=-den5[1]*anglez_filtered[2]-den5[2]*anglez_filtered[1]+num5[0]*anglezraw+num5[1]*anglez_raw_small[2]+num5[2]*anglez_raw_small[1]
-        else: 
+        else:
           y_desired[3]=0
           x_desired[3]=0
           z_desired[3]=0
@@ -130,12 +140,13 @@ def filt():
           anglex_filtered[3]=0
           angley_filtered[3]=0
           anglez_filtered[3]=anglezraw
-        
-        command = [x_desired[-1],y_desired[-1],z_desired[-1],ax_tiltLP,ay_tiltLP,anglez_filtered[-1]]
 
-        if tnow-lastsendtime>arduino_delay:
-          print "sent: "+format(command[0],'0.2f')+","+format(command[1],'0.2f')+","+format(command[2],'0.2f')+","+format(command[3],'0.4f')+","+format(command[4],'0.4f')+","+format(command[5],'0.4f')
-    
+        command = [x_desired[-1],y_desired[-1],z_desired[-1],ax_tiltLP,ay_tiltLP,anglez_filtered[-1]]
+        # commandtime = time.time()
+        # tcomm = commandtime - timetime
+        # print tcomm
+        if tnow-lastsendtime>arduino_delay:     ### also happens super fast
+          # print "sent: "+format(command[0],'0.2f')+","+format(command[1],'0.2f')+","+format(command[2],'0.2f')+","+format(command[3],'0.4f')+","+format(command[4],'0.4f')+","+format(command[5],'0.4f')
           lastsendtime = tnow
           ser.write('!')
           for ind in range(0,len(command)-1):
@@ -144,16 +155,18 @@ def filt():
           ser.write(str(command[-1]))
           ser.write('\n')
 
-          index=index+1
+        index=index+1
+        # lasttime=time.time()
+        # endend=lasttime-timetime
+        # print endend
 
       
-########### function to read stuff from buffer and plot data
-def getdata():
+########### function to read stuff from SpeedDreams and plot data
+def getdata():    ### 1000 Hz (not including plot time)
   
-  global t, ax_raw, ay_raw, az_raw, anglex_raw, angley_raw, anglez_raw, anglezraw, buffsize
+  global t, ax_raw, ay_raw, az_raw, anglex_raw, angley_raw, anglez_raw, anglezraw, buffsize, dt
 
   # initialize stuff
-  starttime = time.time()
   axraw = 0
   ayraw = 0
   azraw = 0
@@ -166,6 +179,8 @@ def getdata():
   anglex_raw = []
   angley_raw = []
   anglez_raw = []
+  dt=[]
+  # dt_mean = []
 
   # create UDP socket to receive data
   host = 'localhost' #does not have to be
@@ -190,19 +205,27 @@ def getdata():
   t = []
   plotXvals = []
   plotYvals = []
+  plotZvals = []
   plot_delay = 0.1 #seconds
   plotoldtime = time.time()
 
   # now loop through to get data
   while 1:
-    time.sleep(.0005)
+    # startarttime = time.time()
+    starttime = time.time()
 
-    try:
+    try:              ## really fast, >>> 500 Hz
+      # startmessage = time.time()
       message, address = s.recvfrom(8192) # Buffer size. Change as needed.  
+      # endmessageTime = time.time()
+      # msgTime = endmessageTime-startmessage
+      # print msgTime
+      time.sleep(.0005)
     except:
       message = None
       
-    if message is not None:
+    if message is not None:           ## 1000 Hz and faster
+      # startmessagesplit = time.time()
       message_split = message.split(',')            
       axraw = float(message_split[0])
       ayraw = float(message_split[1])
@@ -216,12 +239,29 @@ def getdata():
       anglex_raw=append(anglex_raw,anglexraw)  
       angley_raw=append(angley_raw,angleyraw)  
       anglez_raw=append(anglez_raw,anglezraw) 
+
+      # endmessageSplitTime = time.time()
+      # msgSplitTime = endmessageSplitTime-startmessagesplit
+      # print msgSplitTime
+
+      #calculate dt
+      endtime = time.time()
+      diff = endtime - starttime
+      dt = append(dt,diff)
+      # dt_mean = np.mean(dt[-20:-1])
+      starttime = time.time()
+      # print dt_mean
       
+      # endtimetime= time.time()
+      # endendtimetime = endtimetime-startarttime
+      # print endendtimetime
+
       #for plotting
       if len(t)<buffsize:
         t.append(time.time()-starttime)
         plotXvals.append(axraw)
         plotYvals.append(ayraw)
+        # plotZvals.append(azraw)
       else: 
         t = t[1:]
         t.append(time.time())
@@ -229,6 +269,8 @@ def getdata():
         plotXvals.append(axraw)
         plotYvals = plotYvals[1:]
         plotYvals.append(ayraw)
+        # plotZvals = plotZvals[1:]
+        # plotZvals.append(azraw)
 
       if (time.time()-plotoldtime>plot_delay and len(t)>=buffsize):#if enough time has passed
         #set the old time
@@ -239,13 +281,18 @@ def getdata():
         #this sets the line plt1 data to be our updated t and r vectors.
         plt1.set_data(t,plotXvals)
         plt2.set_data(t,plotYvals)
+        # plt3.set_data(t,plotZvals)
         #the draw command is last, and tells matplotlib to update the figure!!
         fig.canvas.draw()
         pause(.0001)#must have a small pause here or nothing will work. Pause is a matplotlib.pyplot function.
 
-    else:
-        pass
 
+    else:
+      pass
+
+      
+
+  
 
 
 ####### execute the thread

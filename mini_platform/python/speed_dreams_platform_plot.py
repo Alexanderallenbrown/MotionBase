@@ -91,7 +91,7 @@ while 1:
 
   try:
         message, address = s.recvfrom(8192) # Buffer size is 8192. Change as needed.
-        time.sleep(.001)
+        time.sleep(.0001)
   except:
     #print "no message"
     message = None
@@ -102,17 +102,17 @@ while 1:
     oldtime = tnow
     #print dt
     #ay to y_desired, and ax to x_desired
-    (num1,den1,dt1) = cont2discrete(([1.],[1,10,20]),dt)
+    (num1,den1,dt1) = cont2discrete(([10.],[1,10,20]),dt)
     #print num1,den1
     #ay to ax_tilt
-    (num2,den2,dt2) = cont2discrete(([-130000.],[1,100,1300]),dt)
+    (num2,den2,dt2) = cont2discrete(([-32500.],[1,100,1300]),dt)
     #print num2,den2
     #anglex to anglex_filtered
     (num3,den3,dt3) = cont2discrete(([1,0],[1,2,4]),dt)
     #print num3,den3
 
     #az to z_desired
-    (num4,den4,dt4) = cont2discrete(([1.,0],[1,11,110,100]),dt)
+    (num4,den4,dt4) = cont2discrete(([10.,0],[1,11,110,100]),dt)
     #anglez to anglez_filtered
     (num5,den5,dt5) = cont2discrete(([1,0,0],[1,2,4]),dt)
 
@@ -217,7 +217,6 @@ while 1:
         print "junk message received"
 
   if (time.time()-plotoldtime>plot_delay and len(t)>=buffsize):#if enough time has passed
-          print "PLOTTING"
           #set the old time. Maybe this isn't needed?
           plotoldtime = time.time()
           #set our X limits of the plot to only look at the last 5 seconds of data TODO make 5 a variable!!
