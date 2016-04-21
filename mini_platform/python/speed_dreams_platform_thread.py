@@ -13,7 +13,7 @@ from threading import Thread
 ###### filtering function, at ~500 Hz
 def filt():
 
-  global t, ax_raw, ay_raw, az_raw, anglex_raw, angley_raw, anglez_raw, buffsize, anglezraw, dt
+  global t, ax_raw, ay_raw, az_raw, anglex_raw, angley_raw, anglez_raw, buffsize, anglezraw#, dt
 
   # initialize position variables
   N = 4
@@ -45,13 +45,13 @@ def filt():
   time.sleep(.01)
   # dt = 0.005
   lastsendtime = time.time()
-  arduino_delay = 0.05
+  arduino_delay = 0.1
   lastfilttime = time.time()
   filter_delay = 0.01
 
   # Set up socket to send data
   ser = serial.Serial(
-      port='/dev/ttyUSB0',
+      port='/dev/ttyUSB1',
       baudrate=115200) # checked this, not cause of delay
   print "initializing"
   ser.close()
@@ -59,10 +59,13 @@ def filt():
   ser.open()
   time.sleep(2.0)
   print "done"
-
-  if (len(t)>=buffsize):
+  print len(t)
+  while 1:        ## >>> 500 Hz
     
-    while 1:        ## >>> 500 Hz
+    tnow = time.time()  # what time is it mr. fox??
+    #print tnow
+    #print len(t)
+    if len(t)>=buffsize:
       # timetime = time.time()
       # take most recent value read from buffer
       # trecent = time.time()
@@ -72,15 +75,19 @@ def filt():
       anglex_raw_small = append(anglex_raw_small[1:],anglex_raw[-1])
       angley_raw_small = append(angley_raw_small[1:],angley_raw[-1])
       anglez_raw_small = append(anglez_raw_small[1:],anglez_raw[-1])
-
-      tnow = time.time()  # what time is it mr. fox??
+      
       # tapp = tnow-trecent
       # print tapp
+      #print tnow-lastfilttime
       if (tnow-lastfilttime)>filter_delay:              ## filters run at ~500 Hz
+        
         # tstartfilt = time.time()
         #determine time step
         # print dt[-1]
-        # dt = tnow-oldtime
+        dt = array([tnow-lastfilttime])
+        #print dt
+        lastfilttime = tnow #have to reset this!! otherwise we don't keep track of this properly.
+        
         # oldtime = tnow
 
         #ay to y_desired, and ax to x_desired
@@ -140,22 +147,26 @@ def filt():
           anglex_filtered[3]=0
           angley_filtered[3]=0
           anglez_filtered[3]=anglezraw
-
+        #how many times have we tried to filteR?
+        index=index+1
+        #what is our command?
         command = [x_desired[-1],y_desired[-1],z_desired[-1],ax_tiltLP,ay_tiltLP,anglez_filtered[-1]]
         # commandtime = time.time()
         # tcomm = commandtime - timetime
         # print tcomm
-        if tnow-lastsendtime>arduino_delay:     ### also happens super fast
-          # print "sent: "+format(command[0],'0.2f')+","+format(command[1],'0.2f')+","+format(command[2],'0.2f')+","+format(command[3],'0.4f')+","+format(command[4],'0.4f')+","+format(command[5],'0.4f')
-          lastsendtime = tnow
-          ser.write('!')
-          for ind in range(0,len(command)-1):
-            ser.write(format(command[ind],'0.2f'))
-            ser.write(',')
-          ser.write(str(command[-1]))
-          ser.write('\n')
 
-        index=index+1
+      if tnow-lastsendtime>arduino_delay:     ### also happens super fast
+        # print "sent: "+format(command[0],'0.2f')+","+format(command[1],'0.2f')+","+format(command[2],'0.2f')+","+format(command[3],'0.4f')+","+format(command[4],'0.4f')+","+format(command[5],'0.4f')
+        lastsendtime = tnow
+        ser.write('!')
+        for ind in range(0,len(command)-1):
+          ser.write(format(command[ind],'0.2f'))
+          ser.write(',')
+        ser.write(str(command[-1]))
+        ser.write('\n')
+    else:
+      time.sleep(.1)
+        
         # lasttime=time.time()
         # endend=lasttime-timetime
         # print endend
@@ -226,7 +237,7 @@ def getdata():    ### 1000 Hz (not including plot time)
     #try flushing extra crap out of the socket
     FlushListen(s)
     time.sleep(.0005)
-    
+
     try:              ## really fast, >>> 500 Hz
       # startmessage = time.time()
       message, address = s.recvfrom(8192) # Buffer size. Change as needed.  
