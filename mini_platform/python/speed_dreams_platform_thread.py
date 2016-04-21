@@ -160,6 +160,15 @@ def filt():
         # endend=lasttime-timetime
         # print endend
 
+
+#this is a quick function to get rid of packets that have stacked up on us.
+def FlushListen(sock):
+  while 1:
+    try:
+      junkbytes=sock.recv(1024)
+    except:
+      break
+
       
 ########### function to read stuff from SpeedDreams and plot data
 def getdata():    ### 1000 Hz (not including plot time)
@@ -214,13 +223,17 @@ def getdata():    ### 1000 Hz (not including plot time)
     # startarttime = time.time()
     starttime = time.time()
 
+    #try flushing extra crap out of the socket
+    FlushListen(s)
+    time.sleep(.0005)
+    
     try:              ## really fast, >>> 500 Hz
       # startmessage = time.time()
       message, address = s.recvfrom(8192) # Buffer size. Change as needed.  
       # endmessageTime = time.time()
       # msgTime = endmessageTime-startmessage
       # print msgTime
-      time.sleep(.0005)
+      
     except:
       message = None
       
