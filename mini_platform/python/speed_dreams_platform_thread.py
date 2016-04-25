@@ -51,7 +51,7 @@ def filt():
 
   # Set up socket to send data
   ser = serial.Serial(
-      port='/dev/ttyUSB1',
+      port='/dev/ttyUSB2',
       baudrate=115200) # checked this, not cause of delay
   print "initializing"
   ser.close()
