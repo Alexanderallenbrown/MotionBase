@@ -4,9 +4,6 @@ from matplotlib.pyplot import *
 
 
 #let's make a variable to keep track of current and old inputs.
-
-
-
 u_meas = zeros(3)
 y_meas = zeros(3)
 
