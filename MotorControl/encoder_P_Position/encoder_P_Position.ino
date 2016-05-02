@@ -6,9 +6,9 @@ volatile long unCountShared;
 //A0 reads in angle
 //0-5V = 0-pi
 const int analogInPin=A0;
-const int analogOutPin1=4;
-const int analogOutPin2=5;
-const int analogOutPin3=6;
+const int analogOutPin1=11;
+const int analogOutPin2=9;
+const int analogOutPin3=10;
 
 int val = 0; 
 int val2 = 0;
@@ -20,6 +20,8 @@ void setup()
   //attach the interrupts
   attachInterrupt(0, channelA,CHANGE);
   attachInterrupt(1, channelB,CHANGE);
+  pinMode(analogOutPin2,OUTPUT);
+  pinMode(analogOutPin3,OUTPUT)
 }
 void loop()
 {
@@ -59,15 +61,16 @@ void loop()
   val2 = int(float_U);
   mag = abs(val2);
 
-  if(val2<-20){
-   digitalWrite(analogOutPin2,LOW);
-   analogWrite(analogOutPin1,mag);
-   digitalWrite(analogOutPin3,HIGH);
- }
- else if(val2>20){
-   digitalWrite(analogOutPin3,LOW);
-   analogWrite(analogOutPin1,mag);
+  if(val2>20){
+    Serial.print("!!!!!!!!!!!!");
    digitalWrite(analogOutPin2,HIGH);
+   analogWrite(analogOutPin1,mag);
+   digitalWrite(analogOutPin3,LOW);
+ }
+ else if(val2<-20){
+   digitalWrite(analogOutPin3,HIGH);
+   analogWrite(analogOutPin1,mag);
+   digitalWrite(analogOutPin2,LOW);
  }
  
  else{
@@ -79,7 +82,7 @@ void loop()
  
   Serial.print(ref_command_float);
   Serial.print("\t");
-  Serial.print(posfloat);
+  Serial.print(unCount);
   Serial.print("\t");
   Serial.print(float_error);
   Serial.print("\t");
