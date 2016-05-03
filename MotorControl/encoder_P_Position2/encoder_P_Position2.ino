@@ -15,10 +15,18 @@ int val2 = 0;
 int mag = 0;
 //float servo_mult=0;
 float k_pot = (390-100)/(PI/2);
-int glob0 = 100;
+
 
 # define PWM_SOURCE 7
 static int zero[6]={1475,1470,1490,1480,1460,1490}; //Zero positions of servos, in this positions their arms are perfectly horizontal, in us
+
+static int globzeros[6] = {100,100,100,100,100,100};
+
+//put the motor number for this arduino here:
+int motornum = 1;
+
+int glob0 = globzeros[motornum-1];
+
 float servo_mult=1000.0/(PI);
 
 void setup()
