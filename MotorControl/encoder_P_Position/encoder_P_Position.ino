@@ -16,7 +16,7 @@ int val = 0;
 int val2 = 0;
 int mag = 0;
 
-static int globzeros[6] = {100,100,100,100,448,457};
+static int globzeros[6] = {100,414,500,499,448,457};
 
 //put the motor number for this arduino here:
 int motornum = 1;
