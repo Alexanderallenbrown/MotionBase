@@ -16,13 +16,23 @@ int val = 0;
 int val2 = 0;
 int mag = 0;
 
-static int globzeros[6] = {140,414,500,499,448,457};
-static float motorsigns[6] = {1.0,1.0,1.0,-1.0,1.0,-1.0};
+static int globzeros[6] = {140,414,700,499,448,457};
+static float motorsigns[6] = {1.0,-1.0,1.0,-1.0,1.0,-1.0};
+static int zero[6]={1475,1470,1490,1480,1460,1490}; //Zero positions of servos
 
 //put the motor number for this arduino here:
-int motornum = 6;
+int motornum = 3;
 
 int glob0 = globzeros[motornum-1];
+
+# define PWM_SOURCE 7
+float servo_mult=1000.0/(PI);
+
+float ref_command_float = 0;
+int rawpos;
+float posfloat;
+
+boolean jogmode=false;
 
 void setup()
 {
@@ -32,6 +42,8 @@ void setup()
   //attachInterrupt(1, channelB,CHANGE);
   pinMode(analogOutPin2,OUTPUT);
   pinMode(analogOutPin3,OUTPUT);
+  //attachInterrupt(0, channelA,CHANGE);
+  //attachInterrupt(1, channelB,CHANGE);
 //  int tot = 0;
 //  for (int k=0; k<100; k++){
 //    tot += analogRead(1);
@@ -62,17 +74,36 @@ void loop()
   //noInterrupts(); // turn interrupts off quickly while we take local copies of the shared variables
 
   //unCount = unCountShared;
+  if (jogmode==false){
+   // static long unCount;
+        	
+   // noInterrupts(); // turn interrupts off quickly while we take local copies of the shared variables
+
+    //unCount = unCountShared;
  
-  //interrupts(); 
-  int rawpos = analogRead(1);
-  //float posfloat = unCount*2*PI/(8000.0); //our encoder position in radians
-  float posfloat = motorsigns[motornum-1]*(rawpos - glob0)/k_pot;
-  //val is desired angle
-  //0-1023 = 0-pi
-  val = analogRead(analogInPin); //raw reference position value.
-  val=val-512; //this number should be scaled to go from -PI to PI
+    //interrupts(); 
   
-  float ref_command_float = val*PI/512.0;//this should be the reference position in radians.
+    //float posfloat = unCount*2*PI/(8000.0); //our encoder position in radians
+    posfloat = (analogRead(1) - glob0)/k_pot;
+    //val is desired angle
+    //0-1023 = 0-pi
+    //val = analogRead(analogInPin); //raw reference position value.
+    //val = val-512; //this number should be scaled to go from -PI to PI
+    val = pulseIn(PWM_SOURCE, HIGH, 20000);
+  
+    //float ref_command_float = val*PI/512.0;//this should be the reference position in radians.
+    ref_command_float = (val - zero[0])/servo_mult; //this should give the reference position, converted from microseconds to radians
+  }
+  
+  else{
+    //interrupts(); 
+    rawpos = analogRead(1);
+    posfloat = motorsigns[motornum-1]*(rawpos - glob0)/k_pot;
+    val = analogRead(analogInPin); //raw reference position value.
+    val=val-512; //this number should be scaled to go from -PI to PI
+  
+    ref_command_float = val*PI/512.0;//this should be the reference position in radians.
+  }
   
   if (ref_command_float>PI/2){
     ref_command_float = PI/2;

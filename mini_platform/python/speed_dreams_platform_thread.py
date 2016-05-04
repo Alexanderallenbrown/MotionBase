@@ -51,7 +51,7 @@ def filt():
 
   # Set up socket to send data
   ser = serial.Serial(
-      port='/dev/ttyUSB2',
+      port='/dev/ttyACM100',
       baudrate=115200) # checked this, not cause of delay
   print "initializing"
   ser.close()
@@ -109,7 +109,7 @@ def filt():
 
         x_desired = append(x_desired[1:],0)
         y_desired = append(y_desired[1:],0)
-        z_desired = append(z_desired[1:],0)
+        z_desired = append(z_desired[1:],0)+0.01#####TODO!!!! THIS IS A TEMP
 
         anglez_filtered = append(anglez_filtered[1:],0)
 

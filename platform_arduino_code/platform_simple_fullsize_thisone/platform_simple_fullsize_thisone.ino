@@ -45,17 +45,14 @@ Servo servo[6];
 //Zero positions of servos, in this positions their arms are perfectly horizontal, in us
 static int zero[6]={1475,1470,1490,1480,1460,1490};
 //In this array is stored requested position for platform - x,y,z,rot(x),rot(y),rot(z)
-static float arr[6]={0,0.0,0.0, radians(0),radians(0),radians(0)};
+static float arr[6]={0,0.0,0, radians(0),radians(0),radians(0)};
 //Actual degree of rotation of all servo arms, they start at 0 - horizontal, used to reduce
 //complexity of calculating new degree of rotation
 static float theta_a[6]={0.0,0.0,0.0, 0.0,0.0,0.0};
 //Array of current servo positions in us
 static int servo_pos[6];
-//rotation of servo arms in respect to axis x for the SMALL platform
-//const float beta[] = {pi/2,-pi/2,-pi/6, 5*pi/6,-5*pi/6,pi/6},
-//rotation of servo arms with respect to the X axis for the LARGE platform
+//rotation of servo arms in respect to axis x
 const float beta[] = {pi/2,-pi/2,-pi/6, 5*pi/6,-5*pi/6,pi/6},
-
 //maximum servo positions, 0 is horizontal position
 servo_min=radians(-80),servo_max=radians(80),
 //servo_mult - multiplier used for conversion radians->servo pulse in us
@@ -104,6 +101,8 @@ static float M[3][3], rxp[3][6], T[3], H[3] = {0,0,z_home};
 
 void setup(){
   
+  Serial.setTimeout(5); // testing for delay source
+  
 //attachment of servos to PWM digital pins of arduino
    servo[0].attach(3, MIN, MAX);
    servo[1].attach(5, MIN, MAX);
@@ -125,39 +124,40 @@ void loop()
   //read a list of 6 floats from the serial port (python/MATLAB) representing the desired positions [x,y,z,r,p,y] with x,y,z in mm and r,p,y in rad.
   //looks for a newline character, and the rest of the numbers are separated by commas.
   
-  //let's kill any buffered serial data
-//  while(Serial.available()>128){
-//    byte junk = Serial.read();
-//  }
+//let's kill any buffered serial data
+  while(Serial.available()>24){
+    byte junk = Serial.read();
+ }
   
-  while(Serial.available()>30){
-
-    float px = Serial.parseFloat();
-    float py = Serial.parseFloat();
-    float pz = Serial.parseFloat();
-    float pr = Serial.parseFloat();
-    float pp = Serial.parseFloat();
-    float pa = Serial.parseFloat();
+  while(Serial.available()>0){
     
-    if (abs(px)>pos_limit){
-      px = pos_limit*sgn(px)*100;
-    }
-    if (abs(py)>pos_limit){
-      py = pos_limit*sgn(py)*100;
-    }
-    if (abs(pz)>pos_limit){
-      pz = pos_limit*sgn(pz)*100;
-    }
-    if (abs(pr)>ang_limit){
-      pr = ang_limit*sgn(pr);
-    }
-    if (abs(pp)>ang_limit){
-      pp = ang_limit*sgn(pp);
-    }
-    if (abs(pa)>ang_limit){
-      pa = ang_limit*sgn(pa);
-    }
+    if(Serial.read()=='!'){
       
+      float px = Serial.parseFloat();
+      float py = Serial.parseFloat();
+      float pz = Serial.parseFloat();
+      float pr = Serial.parseFloat();
+      float pp = Serial.parseFloat();
+      float pa = Serial.parseFloat();
+    
+      if (abs(px)>pos_limit){
+        px = pos_limit*sgn(px)*100;
+      }
+      if (abs(py)>pos_limit){
+        py = pos_limit*sgn(py)*100;
+      }
+      if (abs(pz)>pos_limit){
+        pz = pos_limit*sgn(pz)*100;
+      }
+      if (abs(pr)>ang_limit){
+        pr = ang_limit*sgn(pr);
+      }
+      if (abs(pp)>ang_limit){
+        pp = ang_limit*sgn(pp);
+      }
+      if (abs(pa)>ang_limit){
+        pa = ang_limit*sgn(pa);
+      }
     
     if(Serial.read()=='\n'){
      //arr[6] = {px,py,pz,pr,pp,pa};//set the values for the platform 
@@ -186,9 +186,10 @@ void loop()
      //write to the base
      //Serial.write(setPos(arr));
      //Serial.flush();
-     setPos(arr);  
-  }
-    
+     setPos(arr); 
+  
+    }
+    }
   }
 delay(1);
 
@@ -281,7 +282,9 @@ unsigned char setPos(float pe[]){
         getrxp();
         theta_a[i]=getAlpha(&i);
         if(i==INV1||i==INV2||i==INV3){
-            servo_pos[i] = constrain(zero[i] - (theta_a[i])*servo_mult, MIN,MAX);
+        //if(1){  
+          ///NOTICE!!!! TODO THIS IS WHACKY. USED TO HAVE MINUS SIGN IN IF STATEMENT
+          servo_pos[i] = constrain(zero[i] + (theta_a[i])*servo_mult, MIN,MAX);
         }
         else{
             servo_pos[i] = constrain(zero[i] + (theta_a[i])*servo_mult, MIN,MAX);
@@ -294,6 +297,8 @@ unsigned char setPos(float pe[]){
             errorcount++;
         }
         servo[i].writeMicroseconds(servo_pos[i]);
+        //Serial.print(servo_pos[0]); //print to monitor for hardware in-loop test
+        //Serial.print("\n");
     }
     return errorcount;
 }
