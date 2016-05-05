@@ -1,0 +1,3 @@
+ffmpeg -y  -t 6 -i IMG_4765.mov -vf fps=30,scale=500:-1:flags=lanczos,palettegen palette.png
+
+ffmpeg  -t 6 -i IMG_4765.mov -i palette.png -filter_complex "fps=30,scale=500:-1:flags=lanczos[x];[x][1:v]paletteuse" output.gif
