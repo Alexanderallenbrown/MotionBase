@@ -6,13 +6,22 @@ volatile long unCountShared;
 //A0 reads in angle
 //0-5V = 0-pi
 const int analogInPin=A0;
-const int analogOutPin1=4;
-const int analogOutPin2=5;
-const int analogOutPin3=6;
+const int analogOutPin1=11;
+const int analogOutPin2=9;
+const int analogOutPin3=10;
+
+float k_pot = (390-100)/(2*PI);
 
 int val = 0; 
 int val2 = 0;
 int mag = 0;
+
+static int globzeros[6] = {100,414,500,499,448,457};
+
+//put the motor number for this arduino here:
+int motornum = 1;
+
+int glob0 = globzeros[motornum-1];
 
 void setup()
 {
@@ -20,7 +29,28 @@ void setup()
   //attach the interrupts
   attachInterrupt(0, channelA,CHANGE);
   attachInterrupt(1, channelB,CHANGE);
+  pinMode(analogOutPin2,OUTPUT);
+  pinMode(analogOutPin3,OUTPUT);
+//  int tot = 0;
+//  for (int k=0; k<100; k++){
+//    tot += analogRead(1);
+//    delay(1);
+//  }
+//  int globV = tot/100;
+  int globV = analogRead(1);
+  Serial.print(globV);
+  Serial.print('\t');
+  int glob0 = 100;
+  float k_pot = (390-100)/(2*PI);
+  float globPos = (globV - glob0)/k_pot;
+  Serial.print(globPos);
+  Serial.print('\t');
+  unCountShared = long( globPos*8000/(2*PI) );
+  Serial.print(unCountShared);
+  Serial.print('\t');
+  delay(1000);
 }
+
 void loop()
 {
   // create local variables to hold a local copies of the channel inputs
@@ -32,9 +62,10 @@ void loop()
 
   unCount = unCountShared;
  
-  interrupts(); 
+  //interrupts(); 
   
-  float posfloat = unCount*2*PI/(8000.0); //our encoder position in radians
+  //float posfloat = unCount*2*PI/(8000.0); //our encoder position in radians
+  float posfloat = (analogRead(1) - glob0)/k_pot;
   //val is desired angle
   //0-1023 = 0-pi
   val = analogRead(analogInPin); //raw reference position value.
@@ -59,15 +90,16 @@ void loop()
   val2 = int(float_U);
   mag = abs(val2);
 
-  if(val2<-20){
-   digitalWrite(analogOutPin2,LOW);
-   analogWrite(analogOutPin1,mag);
+  if(val2>20){
+    //Serial.print("!!!!!!!!!!!!");
    digitalWrite(analogOutPin3,HIGH);
- }
- else if(val2>20){
-   digitalWrite(analogOutPin3,LOW);
    analogWrite(analogOutPin1,mag);
+   digitalWrite(analogOutPin2,LOW);
+ }
+ else if(val2<-20){
    digitalWrite(analogOutPin2,HIGH);
+   analogWrite(analogOutPin1,mag);
+   digitalWrite(analogOutPin3,LOW);
  }
  
  else{
@@ -76,10 +108,11 @@ void loop()
    digitalWrite(analogOutPin2,LOW);
  }
  
- 
+  Serial.print(analogRead(1));
+  Serial.print("\t");
   Serial.print(ref_command_float);
   Serial.print("\t");
-  Serial.print(posfloat);
+  Serial.print(unCount);
   Serial.print("\t");
   Serial.print(float_error);
   Serial.print("\t");

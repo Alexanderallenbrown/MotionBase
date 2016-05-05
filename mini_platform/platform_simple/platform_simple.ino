@@ -34,6 +34,10 @@
 #define deg2rad 180/pi
 #define deg30 pi/6
 
+//these are the absolute limits of motion that we will allow.
+float pos_limit = 1;
+float ang_limit = 0.2;
+
 unsigned long time;
 
 //Array of servo objects
@@ -96,6 +100,7 @@ theta_angle=(pi/3-theta_p)/2, theta_r = radians(8),
 static float M[3][3], rxp[3][6], T[3], H[3] = {0,0,z_home};
 
 void setup(){
+  
 //attachment of servos to PWM digital pins of arduino
    servo[0].attach(3, MIN, MAX);
    servo[1].attach(5, MIN, MAX);
@@ -105,6 +110,7 @@ void setup(){
    servo[5].attach(11, MIN, MAX);
 //begin of serial communication
    Serial.begin(115200);
+   Serial.println("welcome to the motion platform");
 //putting into base position
    setPos(arr);
 }
@@ -115,7 +121,13 @@ void loop()
 {
   //read a list of 6 floats from the serial port (python/MATLAB) representing the desired positions [x,y,z,r,p,y] with x,y,z in mm and r,p,y in rad.
   //looks for a newline character, and the rest of the numbers are separated by commas.
-  while(Serial.available()>0){
+  
+  //let's kill any buffered serial data
+//  while(Serial.available()>128){
+//    byte junk = Serial.read();
+//  }
+  
+  while(Serial.available()>30){
 
     float px = Serial.parseFloat();
     float py = Serial.parseFloat();
@@ -123,6 +135,27 @@ void loop()
     float pr = Serial.parseFloat();
     float pp = Serial.parseFloat();
     float pa = Serial.parseFloat();
+    
+    if (abs(px)>pos_limit){
+      px = pos_limit*sgn(px)*100;
+    }
+    if (abs(py)>pos_limit){
+      py = pos_limit*sgn(py)*100;
+    }
+    if (abs(pz)>pos_limit){
+      pz = pos_limit*sgn(pz)*100;
+    }
+    if (abs(pr)>ang_limit){
+      pr = ang_limit*sgn(pr);
+    }
+    if (abs(pp)>ang_limit){
+      pp = ang_limit*sgn(pp);
+    }
+    if (abs(pa)>ang_limit){
+      pa = ang_limit*sgn(pa);
+    }
+      
+    
     if(Serial.read()=='\n'){
      //arr[6] = {px,py,pz,pr,pp,pa};//set the values for the platform 
      arr[0] = px;
@@ -263,18 +296,25 @@ unsigned char setPos(float pe[]){
 }
 
 
-void retPos(){
-   for(int i=0;i<6;i++){
-       long val;
-       if(i<3){
-           val=(long)(arr[i]*100*25.4);
-       }else{
-           val=(long)(arr[i]*100*deg2rad);
-       }
-       Serial.write(val);
-       Serial.write((val>>8));
-       Serial.write((val>>16));
-       Serial.write((val>>24));
-       Serial.flush();
-   }
+//void retPos(){
+//   for(int i=0;i<6;i++){
+//       long val;
+//       if(i<3){
+//           val=(long)(arr[i]);
+//       }else{
+//           val=(long)(arr[i]);
+//       }
+//       Serial.write(val);
+//       Serial.write((val>>8));
+//       Serial.write((val>>16));
+//       Serial.write((val>>24));
+//       Serial.flush();
+//   }
+//}
+
+
+static inline int8_t sgn(float val) {
+ if (val < 0) return -1;
+ if (val==0) return 0;
+ return 1;
 }

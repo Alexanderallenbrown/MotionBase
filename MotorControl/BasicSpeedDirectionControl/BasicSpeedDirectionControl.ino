@@ -1,7 +1,7 @@
 const int analogInPin=A0;
-const int analogOutPin1=9;
-const int analogOutPin2=10;
-const int analogOutPin3=11;
+const int analogOutPin1=11;
+const int analogOutPin2=9;
+const int analogOutPin3=10;
 
 int val = 0; 
 int val2 = 0;
@@ -10,7 +10,7 @@ int mag = 0;
 
 void setup(){
 
-Serial.begin(9600);
+Serial.begin(115200);
 }
 
 void loop(){
@@ -42,7 +42,8 @@ else{
    digitalWrite(analogOutPin2,LOW);
  }
  
- Serial.println(val);
+ Serial.print(val);
+ Serial.print("\t");
  Serial.println(mag);
  
  delay(2);
