@@ -32,9 +32,9 @@ while ser.isOpen():
     #ser.write(bytearray(command))
     x = 0
     y = 0
-    z = 0.5#0.25*(sin(omega*timenow)+1)+.25
+    z = 0.25*(sin(omega*timenow)+1)+.25
     r =0
-    p = 0.2*(sin(omega*timenow))
+    p = 0#.2*(sin(omega*timenow))
     a = 0#0.2*(sin(omega*timenow))
 
     command = [x,y,z,r,p,a]

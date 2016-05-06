@@ -109,7 +109,7 @@ def filt():
 
         x_desired = append(x_desired[1:],0)
         y_desired = append(y_desired[1:],0)
-        z_desired = append(z_desired[1:],0)+0.01#####TODO!!!! THIS IS A TEMP
+        z_desired = append(z_desired[1:],0)+0#####TODO!!!! THIS IS A TEMP
 
         anglez_filtered = append(anglez_filtered[1:],0)
 
@@ -150,7 +150,13 @@ def filt():
         #how many times have we tried to filteR?
         index=index+1
         #what is our command?
-        command = [x_desired[-1],y_desired[-1],z_desired[-1],ax_tiltLP,ay_tiltLP,anglez_filtered[-1]]
+
+        ##original
+        #command = [x_desired[-1],y_desired[-1],z_desired[-1],ax_tiltLP,ay_tiltLP,anglez_filtered[-1]]
+
+        ##attempt
+        command = [x_desired[-1]/100.0,y_desired[-1]/100.0,(z_desired[-1]/100.0)+.5,ax_tiltLP,ay_tiltLP,anglez_filtered[-1]]
+
         # commandtime = time.time()
         # tcomm = commandtime - timetime
         # print tcomm

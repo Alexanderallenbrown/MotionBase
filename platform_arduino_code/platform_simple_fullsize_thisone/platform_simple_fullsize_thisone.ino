@@ -52,22 +52,25 @@ static float theta_a[6]={0.0,0.0,0.0, 0.0,0.0,0.0};
 //Array of current servo positions in us
 static int servo_pos[6];
 //rotation of servo arms in respect to axis x
-const float beta[] = {pi/2,-pi/2,-pi/6, 5*pi/6,-5*pi/6,pi/6},
+//const float beta[] = {pi/2,-pi/2,-pi/6, 5*pi/6,-5*pi/6,pi/6},
+const float beta[] = {pi/6, pi/2, 5*pi/6, -5*pi/6, -pi/2, -pi/6},
 //maximum servo positions, 0 is horizontal position
 servo_min=radians(-80),servo_max=radians(80),
 //servo_mult - multiplier used for conversion radians->servo pulse in us
 //L1-effective length of servo arm, L2 - length of base and platform connecting arm
 //z_home - height of platform above base, 0 is height of servo arms
-servo_mult=400/(pi/4),L1 = 0.79,L2 = 4.66, z_home = 4.05;
+//servo_mult=400/(pi/4),L1 = 0.79,L2 = 4.66, z_home = 4.05;
+servo_mult=400/(pi/4),L1 = 6.25,L2 = 24.00, z_home = 28.00;
 //RD distance from center of platform to attachment points (arm attachment point)
-//RD distance from center of base to center of servo rotation points (servo axis)
+//PD distance from center of base to center of servo rotation points (servo axis)
 //theta_p-angle between two servo axis points, theta_r - between platform attachment points
 //theta_angle-helper variable
 //p[][]=x y values for servo rotation points
 //re[]{}=x y z values of platform attachment points positions
 //equations used for p and re will affect postion of X axis, they can be changed to achieve
 //specific X axis position
-const float RD = 2.42,PD =2.99,theta_p = radians(37.5),
+//const float RD = 2.42,PD =2.99,theta_p = radians(37.5),
+const float RD = 16.00,PD = 27.00,theta_p = radians(37.5),
 theta_angle=(pi/3-theta_p)/2, theta_r = radians(8),
       p[2][6]={
           {
@@ -139,6 +142,7 @@ void loop()
       float pr = Serial.parseFloat();
       float pp = Serial.parseFloat();
       float pa = Serial.parseFloat();
+      
     
       if (abs(px)>pos_limit){
         px = pos_limit*sgn(px)*100;
