@@ -14,7 +14,7 @@ ser = serial.Serial(
     # dsrdtr=False
 #)
 
-omega = (2*3.14)/5.0
+omega = (2*3.14)/2.0
 
 starttime = time.time()
 
@@ -30,12 +30,12 @@ while ser.isOpen():
     #command = [int(10*(sin(timenow/3.)+1)),int(10*(sin(timenow/3.)+1)),int(10*(sin(timenow/3.)+1)),int(10*(sin(timenow/3.)+1)),int(10*(sin(timenow/3.)+1)),int(10*(sin(timenow/3.)+1))]
     #ser.write('6')
     #ser.write(bytearray(command))
-    x = 0
+    x = 0#2*sin(omega*timenow)
     y = 0
-    z = 0.25*(sin(omega*timenow)+1)+.25
-    r =0
-    p = 0#.2*(sin(omega*timenow))
-    a = 0#0.2*(sin(omega*timenow))
+    z = 0#2*sin(omega*timenow)
+    r = 0
+    p = 2*(sin(omega*timenow))
+    a = 0#2*(sin(omega*timenow))
 
     command = [x,y,z,r,p,a]
     ser.write('!')

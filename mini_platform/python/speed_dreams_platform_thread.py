@@ -51,8 +51,8 @@ def filt():
 
   # Set up socket to send data
   ser = serial.Serial(
-      port='/dev/ttyACM100',
-      baudrate=115200) # checked this, not cause of delay
+      port='/dev/ttyACM100',   #USB0', 
+      baudrate=115200) 
   print "initializing"
   ser.close()
   time.sleep(2.0)
@@ -162,7 +162,7 @@ def filt():
         # print tcomm
 
       if tnow-lastsendtime>arduino_delay:     ### also happens super fast
-        # print "sent: "+format(command[0],'0.2f')+","+format(command[1],'0.2f')+","+format(command[2],'0.2f')+","+format(command[3],'0.4f')+","+format(command[4],'0.4f')+","+format(command[5],'0.4f')
+        print "sent: "+format(command[0],'0.2f')+","+format(command[1],'0.2f')+","+format(command[2],'0.2f')+","+format(command[3],'0.4f')+","+format(command[4],'0.4f')+","+format(command[5],'0.4f')
         lastsendtime = tnow
         ser.write('!')
         for ind in range(0,len(command)-1):
@@ -170,6 +170,8 @@ def filt():
           ser.write(',')
         ser.write(str(command[-1]))
         ser.write('\n')
+        #line = ser.readline()
+        #print "recieved: "+line
     else:
       time.sleep(.1)
         

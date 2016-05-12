@@ -35,11 +35,12 @@
 #define deg30 pi/6
 
 //these are the absolute limits of motion that we will allow.
-float pos_limit = 1;
+float pos_limit = 3;
 float ang_limit = 0.2;
 
 unsigned long time;
 
+//ALL DIMENSIONS IN THIS CODE ARE IN INCHES
 //Array of servo objects
 Servo servo[6];
 //Zero positions of servos, in this positions their arms are perfectly horizontal, in us
@@ -52,15 +53,15 @@ static float theta_a[6]={0.0,0.0,0.0, 0.0,0.0,0.0};
 //Array of current servo positions in us
 static int servo_pos[6];
 //rotation of servo arms in respect to axis x
-//const float beta[] = {pi/2,-pi/2,-pi/6, 5*pi/6,-5*pi/6,pi/6},
-const float beta[] = {pi/6, pi/2, 5*pi/6, -5*pi/6, -pi/2, -pi/6},
+const float beta[] = {pi/2,-pi/2,-pi/6, 5*pi/6,-5*pi/6,pi/6},
+//const float beta[] = {pi/6, pi/2, 5*pi/6, -5*pi/6, -pi/2, -pi/6},
 //maximum servo positions, 0 is horizontal position
 servo_min=radians(-80),servo_max=radians(80),
 //servo_mult - multiplier used for conversion radians->servo pulse in us
 //L1-effective length of servo arm, L2 - length of base and platform connecting arm
 //z_home - height of platform above base, 0 is height of servo arms
 //servo_mult=400/(pi/4),L1 = 0.79,L2 = 4.66, z_home = 4.05;
-servo_mult=400/(pi/4),L1 = 6.25,L2 = 24.00, z_home = 28.00;
+servo_mult=400/(pi/4),L1 = 6.25,L2 = 24.00, z_home = 20.00;
 //RD distance from center of platform to attachment points (arm attachment point)
 //PD distance from center of base to center of servo rotation points (servo axis)
 //theta_p-angle between two servo axis points, theta_r - between platform attachment points
@@ -187,8 +188,9 @@ void loop()
      Serial.print(",");
      Serial.print(pa);
      Serial.println();
+     
      //write to the base
-     //Serial.write(setPos(arr));
+     Serial.write("hello,");
      //Serial.flush();
      setPos(arr); 
   
