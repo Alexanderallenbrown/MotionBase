@@ -74,12 +74,12 @@ theta_angle=(pi/3-theta_p)/2, theta_r = radians(8),
             -PD*cos(deg30-theta_angle),-PD*cos(deg30-theta_angle),
             PD*sin(theta_angle),PD*cos(deg30+theta_angle),
             PD*cos(deg30+theta_angle),PD*sin(theta_angle)
-         },
+         }, // x values
          {
             -PD*sin(deg30-theta_angle),PD*sin(deg30-theta_angle),
             PD*cos(theta_angle),PD*sin(deg30+theta_angle),
             -PD*sin(deg30+theta_angle),-PD*cos(theta_angle)
-         }
+         } // y values
       },
       re[3][6] = {
           {
@@ -123,71 +123,73 @@ void loop()
   //looks for a newline character, and the rest of the numbers are separated by commas.
   
   //let's kill any buffered serial data
-//  while(Serial.available()>128){
-//    byte junk = Serial.read();
-//  }
+  while(Serial.available()>256){
+    byte junk = Serial.read();
+  }
   
-  while(Serial.available()>30){
-
-    float px = Serial.parseFloat();
-    float py = Serial.parseFloat();
-    float pz = Serial.parseFloat();
-    float pr = Serial.parseFloat();
-    float pp = Serial.parseFloat();
-    float pa = Serial.parseFloat();
+  while(Serial.available()>0){
     
-    if (abs(px)>pos_limit){
-      px = pos_limit*sgn(px)*100;
-    }
-    if (abs(py)>pos_limit){
-      py = pos_limit*sgn(py)*100;
-    }
-    if (abs(pz)>pos_limit){
-      pz = pos_limit*sgn(pz)*100;
-    }
-    if (abs(pr)>ang_limit){
-      pr = ang_limit*sgn(pr);
-    }
-    if (abs(pp)>ang_limit){
-      pp = ang_limit*sgn(pp);
-    }
-    if (abs(pa)>ang_limit){
-      pa = ang_limit*sgn(pa);
-    }
+    if(Serial.read()=='!'){
+
+      float px = Serial.parseFloat();
+      float py = Serial.parseFloat();
+      float pz = Serial.parseFloat();
+      float pr = Serial.parseFloat();
+      float pp = Serial.parseFloat();
+      float pa = Serial.parseFloat();
+      
+      if (abs(px)>pos_limit){
+        px = pos_limit*sgn(px)*100;
+      }
+      if (abs(py)>pos_limit){
+        py = pos_limit*sgn(py)*100;
+      }
+      if (abs(pz)>pos_limit){
+        pz = pos_limit*sgn(pz)*100;
+      }
+      if (abs(pr)>ang_limit){
+        pr = ang_limit*sgn(pr);
+      }
+      if (abs(pp)>ang_limit){
+        pp = ang_limit*sgn(pp);
+      }
+      if (abs(pa)>ang_limit){
+        pa = ang_limit*sgn(pa);
+      }
       
     
-    if(Serial.read()=='\n'){
-     //arr[6] = {px,py,pz,pr,pp,pa};//set the values for the platform 
-     arr[0] = px;
-     arr[1] = py;
-     arr[2] = pz;
-     arr[3] = pr;
-     arr[4] = pp;
-     arr[5] = pa;
-     
-     //print back to the monitor
-     Serial.print(millis());
-     Serial.print(",");
-     Serial.print(px);
-     Serial.print(",");
-     Serial.print(py);
-     Serial.print(",");
-     Serial.print(pz);
-     Serial.print(",");
-     Serial.print(pr);
-     Serial.print(",");
-     Serial.print(pp);
-     Serial.print(",");
-     Serial.print(pa);
-     Serial.println();
-     //write to the base
-     //Serial.write(setPos(arr));
-     //Serial.flush();
-     setPos(arr);  
+      if(Serial.read()=='\n'){
+       //arr[6] = {px,py,pz,pr,pp,pa};//set the values for the platform 
+       arr[0] = px;
+       arr[1] = py;
+       arr[2] = pz;
+       arr[3] = pr;
+       arr[4] = pp;
+       arr[5] = pa;
+       
+       //print back to the monitor
+       Serial.print(millis());
+       Serial.print(",");
+       Serial.print(px);
+       Serial.print(",");
+       Serial.print(py);
+       Serial.print(",");
+       Serial.print(pz);
+       Serial.print(",");
+       Serial.print(pr);
+       Serial.print(",");
+       Serial.print(pp);
+       Serial.print(",");
+       Serial.print(pa);
+       Serial.println();
+       //write to the base
+       //Serial.write(setPos(arr));
+       Serial.flush();
+       setPos(arr);  
+      }
+    }
   }
-    
-  }
-delay(1);
+delay(10);
 
 }
 

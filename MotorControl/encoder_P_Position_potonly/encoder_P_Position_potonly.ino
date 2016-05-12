@@ -12,6 +12,8 @@ const int analogOutPin3=10;
 
 float k_pot = (320.0)/(PI/2);
 
+int deadBand = 50;
+
 int val = 0; 
 int val2 = 0;
 int mag = 0;
@@ -20,8 +22,10 @@ static int globzeros[6] = {140,414,700,499,448,457};
 static float motorsigns[6] = {1.0,-1.0,1.0,-1.0,1.0,-1.0};
 static int zero[6]={1475,1470,1490,1480,1460,1490}; //Zero positions of servos
 
+// ONLY USE ARDUINO 2:1.0.5 WITH THIS CODE DO NOT USE OLD VERSION
+
 //put the motor number for this arduino here:
-int motornum = 3;
+int motornum = 1;
 
 int glob0 = globzeros[motornum-1];
 
@@ -84,7 +88,8 @@ void loop()
     //interrupts(); 
   
     //float posfloat = unCount*2*PI/(8000.0); //our encoder position in radians
-    posfloat = (analogRead(1) - glob0)/k_pot;
+    rawpos = analogRead(1);
+    posfloat = motorsigns[motornum-1]*(rawpos - glob0)/k_pot;
     //val is desired angle
     //0-1023 = 0-pi
     //val = analogRead(analogInPin); //raw reference position value.
@@ -129,13 +134,13 @@ void loop()
   val2 = int(float_U);
   mag = abs(val2);
 
-  if(val2>20){
+  if(val2>deadBand){
     //Serial.print("!!!!!!!!!!!!");
    digitalWrite(analogOutPin3,HIGH);
    analogWrite(analogOutPin1,mag);
    digitalWrite(analogOutPin2,LOW);
  }
- else if(val2<-20){
+ else if(val2<-deadBand){
    digitalWrite(analogOutPin2,HIGH);
    analogWrite(analogOutPin1,mag);
    digitalWrite(analogOutPin3,LOW);

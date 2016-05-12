@@ -45,7 +45,7 @@ def filt():
   time.sleep(.01)
   # dt = 0.005
   lastsendtime = time.time()
-  arduino_delay = 0.1
+  arduino_delay = 0.01
   lastfilttime = time.time()
   filter_delay = 0.01
 

@@ -1,3 +1,5 @@
+// ONLY USE ARDUINO 1.0.6 WITH THIS CODE
+
 /* <Controlling code for Arduino Controlled Rotary Stewart Platform>
     Copyright (C) <2014>  <Tomas Korgo>
     
@@ -44,7 +46,7 @@ unsigned long time;
 //Array of servo objects
 Servo servo[6];
 //Zero positions of servos, in this positions their arms are perfectly horizontal, in us
-static int zero[6]={1475,1470,1490,1480,1460,1490};
+static int zero[6]={1470,1470,1470,1470,1470,1470};
 //In this array is stored requested position for platform - x,y,z,rot(x),rot(y),rot(z)
 static float arr[6]={0,0.0,0, radians(0),radians(0),radians(0)};
 //Actual degree of rotation of all servo arms, they start at 0 - horizontal, used to reduce
@@ -129,7 +131,7 @@ void loop()
   //looks for a newline character, and the rest of the numbers are separated by commas.
   
 //let's kill any buffered serial data
-  while(Serial.available()>24){
+  while(Serial.available()>256){
     byte junk = Serial.read();
  }
   
@@ -191,13 +193,13 @@ void loop()
      
      //write to the base
      Serial.write("hello,");
-     //Serial.flush();
+     Serial.flush();
      setPos(arr); 
   
     }
     }
   }
-delay(1);
+delay(10);
 
 }
 
