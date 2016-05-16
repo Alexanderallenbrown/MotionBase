@@ -71,25 +71,37 @@ const float RD = 2.42,PD =2.99,theta_p = radians(37.5),
 theta_angle=(pi/3-theta_p)/2, theta_r = radians(8),
       p[2][6]={
           {
-            -PD*cos(deg30-theta_angle),-PD*cos(deg30-theta_angle),
-            PD*sin(theta_angle),PD*cos(deg30+theta_angle),
-            PD*cos(deg30+theta_angle),PD*sin(theta_angle)
+            PD*sin(theta_angle),
+          PD*cos(deg30+theta_angle),
+            PD*cos(deg30+theta_angle),
+          PD*sin(theta_angle),
+          -PD*cos(deg30-theta_angle),
+           -PD*cos(deg30-theta_angle) 
          }, // x values
          {
-            -PD*sin(deg30-theta_angle),PD*sin(deg30-theta_angle),
-            PD*cos(theta_angle),PD*sin(deg30+theta_angle),
-            -PD*sin(deg30+theta_angle),-PD*cos(theta_angle)
+           PD*cos(theta_angle),
+           PD*sin(deg30+theta_angle),
+           -PD*sin(deg30+theta_angle),
+           -PD*cos(theta_angle),
+           -PD*sin(deg30-theta_angle),
+           PD*sin(deg30-theta_angle)
          } // y values
       },
       re[3][6] = {
           {
-              -RD*sin(deg30+theta_r/2),-RD*sin(deg30+theta_r/2),
-              -RD*sin(deg30-theta_r/2),RD*cos(theta_r/2),
-              RD*cos(theta_r/2),-RD*sin(deg30-theta_r/2),
+            -RD*sin(deg30-theta_r/2),
+            RD*cos(theta_r/2),
+            RD*cos(theta_r/2),
+            -RD*sin(deg30-theta_r/2),
+            -RD*sin(deg30+theta_r/2),
+            -RD*sin(deg30+theta_r/2)
           },{
-              -RD*cos(deg30+theta_r/2),RD*cos(deg30+theta_r/2),
-              RD*cos(deg30-theta_r/2),RD*sin(theta_r/2),
-              -RD*sin(theta_r/2),-RD*cos(deg30-theta_r/2),
+            RD*cos(deg30-theta_r/2),
+            RD*sin(theta_r/2),
+            -RD*sin(theta_r/2),
+            -RD*cos(deg30-theta_r/2),
+            -RD*cos(deg30+theta_r/2),
+            RD*cos(deg30+theta_r/2)      
           },{
               0,0,0,0,0,0
           }

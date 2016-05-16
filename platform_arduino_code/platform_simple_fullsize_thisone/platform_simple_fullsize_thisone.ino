@@ -75,6 +75,44 @@ servo_mult=400/(pi/4),L1 = 6.25,L2 = 24.00, z_home = 20.00;
 //const float RD = 2.42,PD =2.99,theta_p = radians(37.5),
 const float RD = 16.00,PD = 27.00,theta_p = radians(37.5),
 theta_angle=(pi/3-theta_p)/2, theta_r = radians(8),
+//      p[2][6]={
+//        {
+//            PD*sin(theta_angle),
+//          PD*cos(deg30+theta_angle),
+//            PD*cos(deg30+theta_angle),
+//          PD*sin(theta_angle),
+//          -PD*cos(deg30-theta_angle),
+//           -PD*cos(deg30-theta_angle) 
+//         }, // x values
+//         {
+//           PD*cos(theta_angle),
+//           PD*sin(deg30+theta_angle),
+//           -PD*sin(deg30+theta_angle),
+//           -PD*cos(theta_angle),
+//           -PD*sin(deg30-theta_angle),
+//           PD*sin(deg30-theta_angle)
+//         } // y values
+//      },
+//      re[3][6] = {
+//          {
+//              -RD*sin(deg30-theta_r/2),
+//              RD*cos(theta_r/2),
+//              RD*cos(theta_r/2),
+//              -RD*sin(deg30-theta_r/2),
+//              -RD*sin(deg30+theta_r/2),
+//              -RD*sin(deg30+theta_r/2)
+//          },{
+//              RD*cos(deg30-theta_r/2),
+//              RD*sin(theta_r/2),
+//              -RD*sin(theta_r/2),
+//              -RD*cos(deg30-theta_r/2),
+//              -RD*cos(deg30+theta_r/2),
+//              RD*cos(deg30+theta_r/2)      
+//          },{
+//              0,0,0,0,0,0
+//          }
+//};
+
       p[2][6]={
           {
             -PD*cos(deg30-theta_angle),-PD*cos(deg30-theta_angle),
@@ -100,6 +138,7 @@ theta_angle=(pi/3-theta_p)/2, theta_r = radians(8),
               0,0,0,0,0,0
           }
 };
+
 //arrays used for servo rotation calculation
 //H[]-center position of platform can be moved with respect to base, this is
 //translation vector representing this move
@@ -192,7 +231,7 @@ void loop()
      Serial.println();
      
      //write to the base
-     Serial.write("hello,");
+     //Serial.write("hello,");
      Serial.flush();
      setPos(arr); 
   

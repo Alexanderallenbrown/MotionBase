@@ -60,52 +60,56 @@ def filt():
   time.sleep(2.0)
   print "done"
   print len(t)
+
+  #ay to y_desired, and ax to x_desired
+  (num1,den1,dt1) = cont2discrete(([10.],[1,10,20]),filter_delay)
+
+  #ay to ax_tilt
+  (num2,den2,dt2) = cont2discrete(([-32500.],[1,100,1300]),filter_delay)
+
+  #anglex to anglex_filtered
+  (num3,den3,dt3) = cont2discrete(([1,0],[1,2,4]),filter_delay)
+
+  #az to z_desired
+  (num4,den4,dt4) = cont2discrete(([10.,0],[1,11,110,100]),filter_delay)
+
+  #anglez to anglez_filtered
+  (num5,den5,dt5) = cont2discrete(([1,0,0],[1,2,4]),filter_delay)
+
+  num1,num2,num3,num4,num5 = num1[0],num2[0],num3[0],num4[0],num5[0]
+
   while 1:        ## >>> 500 Hz
     
     tnow = time.time()  # what time is it mr. fox??
     #print tnow
     #print len(t)
     if len(t)>=buffsize:
-      # timetime = time.time()
-      # take most recent value read from buffer
-      # trecent = time.time()
-      ax_raw_small = append(ax_raw_small[1:],ax_raw[-1])
-      ay_raw_small = append(ay_raw_small[1:],ax_raw[-1])
-      az_raw_small = append(az_raw_small[1:],ax_raw[-1])
-      anglex_raw_small = append(anglex_raw_small[1:],anglex_raw[-1])
-      angley_raw_small = append(angley_raw_small[1:],angley_raw[-1])
-      anglez_raw_small = append(anglez_raw_small[1:],anglez_raw[-1])
+      
       
       # tapp = tnow-trecent
       # print tapp
       #print tnow-lastfilttime
       if (tnow-lastfilttime)>filter_delay:              ## filters run at ~500 Hz
+        # timetime = time.time()
+        # take most recent value read from buffer
+        # trecent = time.time()
+        ax_raw_small = append(ax_raw_small[1:],ax_raw[-1])
+        ay_raw_small = append(ay_raw_small[1:],ax_raw[-1])
+        az_raw_small = append(az_raw_small[1:],ax_raw[-1])
+        anglex_raw_small = append(anglex_raw_small[1:],anglex_raw[-1])
+        angley_raw_small = append(angley_raw_small[1:],angley_raw[-1])
+        anglez_raw_small = append(anglez_raw_small[1:],anglez_raw[-1])
         
         # tstartfilt = time.time()
         #determine time step
-        # print dt[-1]
+        # print filter_delay
         dt = array([tnow-lastfilttime])
         #print dt
         lastfilttime = tnow #have to reset this!! otherwise we don't keep track of this properly.
         
         # oldtime = tnow
 
-        #ay to y_desired, and ax to x_desired
-        (num1,den1,dt1) = cont2discrete(([10.],[1,10,20]),dt[-1])
-
-        #ay to ax_tilt
-        (num2,den2,dt2) = cont2discrete(([-32500.],[1,100,1300]),dt[-1])
-  
-        #anglex to anglex_filtered
-        (num3,den3,dt3) = cont2discrete(([1,0],[1,2,4]),dt[-1])
-
-        #az to z_desired
-        (num4,den4,dt4) = cont2discrete(([10.,0],[1,11,110,100]),dt[-1])
-
-        #anglez to anglez_filtered
-        (num5,den5,dt5) = cont2discrete(([1,0,0],[1,2,4]),dt[-1])
-
-        num1,num2,num3,num4,num5 = num1[0],num2[0],num3[0],num4[0],num5[0]
+        
 
         x_desired = append(x_desired[1:],0)
         y_desired = append(y_desired[1:],0)
@@ -162,7 +166,7 @@ def filt():
         # print tcomm
       #print "not frozen"
       if tnow-lastsendtime>arduino_delay:     ### also happens super fast
-        print 'sent'
+        print tnow
         #print "sent: "+format(command[0],'0.2f')+","+format(command[1],'0.2f')+","+format(command[2],'0.2f')+","+format(command[3],'0.4f')+","+format(command[4],'0.4f')+","+format(command[5],'0.4f')
         lastsendtime = tnow
         ser.write('!')
