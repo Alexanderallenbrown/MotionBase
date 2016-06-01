@@ -58,7 +58,7 @@ def filt():
   time.sleep(2.0)
   ser.open()
   time.sleep(2.0)
-  print "done"
+  print "done"  
   print len(t)
   while 1:        ## >>> 500 Hz
     

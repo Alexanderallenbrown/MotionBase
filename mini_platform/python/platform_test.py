@@ -4,7 +4,7 @@ import time
 from matplotlib.pyplot import *
 
 ser = serial.Serial(
-    port='/dev/ttyACM100',
+    port='/dev/ttyUSB0',
     baudrate=115200)
     # parity=serial.PARITY_NONE,
     # stopbits=serial.STOPBITS_ONE,
@@ -33,7 +33,7 @@ while ser.isOpen():
     x = 0#2*sin(omega*timenow)
     y = 0#2*sin(omega*timenow)
     z = 0#1.5*sin(omega*timenow)
-    r = 02*(sin(omega*timenow))
+    r = 0#2*(sin(omega*timenow))
     p = 0#2*(sin(omega*timenow))
     a = 0#2*(sin(omega*timenow))
 
