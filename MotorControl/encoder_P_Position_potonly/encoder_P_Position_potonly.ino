@@ -18,14 +18,18 @@ int val = 0;
 int val2 = 0;
 int mag = 0;
 
-static int globzeros[6] = {140,414,700,499,448,457};
+
+//these are the zeros for each motor....
+static int globzeros[6] = {175,440,710,499,459,427};
+
+
 static float motorsigns[6] = {1.0,-1.0,1.0,-1.0,1.0,-1.0};
 static int zero[6]={1475,1470,1490,1480,1460,1490}; //Zero positions of servos
 
 // ONLY USE ARDUINO 2:1.0.5 WITH THIS CODE DO NOT USE OLD VERSION
 
 //put the motor number for this arduino here:
-int motornum = 1;
+int motornum = 2;
 
 int glob0 = globzeros[motornum-1];
 

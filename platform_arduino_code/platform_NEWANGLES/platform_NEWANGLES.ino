@@ -55,7 +55,7 @@ static float theta_a[6]={0.0,0.0,0.0, 0.0,0.0,0.0};
 //Array of current servo positions in us
 static int servo_pos[6];
 //rotation of servo arms in respect to axis x
-const float beta[] = {pi/2,-pi/2,-pi/6, 5*pi/6,-5*pi/6,pi/6},
+const float beta[] = {pi,pi/6+pi/2,pi/6+pi/2+pi,pi/3+pi,pi/3,0},
 //const float beta[] = {pi/6, pi/2, 5*pi/6, -5*pi/6, -pi/2, -pi/6},
 //maximum servo positions, 0 is horizontal position
 servo_min=radians(-80),servo_max=radians(80),
