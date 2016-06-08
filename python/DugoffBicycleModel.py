@@ -256,7 +256,7 @@ class DugoffBicycleModel:
 if __name__=='__main__':
     """ This is the demo for the Dugoff bicycle model car"""
     
-    opt = 3 #change this (1 or 2) to look at open-loop vs. closed-loop stuff. 1 is open loop, 2 is closed loop
+    opt = 1 #change this (1 or 2) to look at open-loop vs. closed-loop stuff. 1 is open loop, 2 is closed loop
 
     if opt==3:
         car = DugoffBicycleModel(autopilot_gain=.02,dT=0.01)
