@@ -91,7 +91,7 @@ def filt():
         # oldtime = tnow
 
         #ay to y_desired, and ax to x_desired
-        (num1,den1,dt1) = cont2discrete(([10.],[1,10,20]),dt[-1])
+        (num1,den1,dt1) = cont2discrete(([10,0],[1,10,20]),dt[-1])
 
         #ay to ax_tilt
         (num2,den2,dt2) = cont2discrete(([-32500.],[1,100,1300]),dt[-1])
@@ -117,6 +117,7 @@ def filt():
         # filtTime=timeendfilt-tstartfilt
         # print filtTime
         # timetime = time.time()
+        #final values: x_desired, y_desired, z_desired, anglex, angley, anglez
         if index>1:             ## happens way fast
           y_desired[3]=-den1[1]*y_desired[2]-den1[2]*y_desired[1]+num1[1]*ay_raw_small[2]+num1[2]*ay_raw_small[1]
           x_desired[3]=-den1[1]*x_desired[2]-den1[2]*x_desired[1]+num1[1]*ax_raw_small[2]+num1[2]*ax_raw_small[1]
@@ -230,7 +231,7 @@ def getdata():    ### 1000 Hz (not including plot time)
   fig.canvas.draw()
   plt1 = ax.plot(0,0,'r')[0]
   plt2 = ax.plot(0,0,'k')[0]
-  buffsize = 2000  #might want to change this
+  buffsize = 500  #might want to change this
   t = []
   plotXvals = []
   plotYvals = []
