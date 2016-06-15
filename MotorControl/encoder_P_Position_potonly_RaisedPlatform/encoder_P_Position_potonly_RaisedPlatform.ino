@@ -20,7 +20,8 @@ int mag = 0;
 
 
 //these are the zeros for each motor....
-static int globzeros[6] = {508,499,507,499,524,517};
+static int globzeros[6] = {285,840,275,730,275,770};
+//static int globzeros[6] = {500,500,500,500,500,500};
 
 
 static float motorsigns[6] = {1.0,-1.0,1.0,-1.0,1.0,-1.0};
@@ -117,8 +118,8 @@ void loop()
   if (ref_command_float>PI/2){
     ref_command_float = PI/2;
   }
-  if (ref_command_float<0){
-    ref_command_float = 0;
+  if (ref_command_float<-PI/2){
+    ref_command_float = -PI/2;
   }
   
   float float_error = ref_command_float-posfloat;//this is our current error value!!

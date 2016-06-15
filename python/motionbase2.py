@@ -25,7 +25,7 @@ class MotionBase:
         self.motor_yaws = array([0,pi,pi/6+pi/2, pi/6+pi/2+pi,pi/3+pi,pi/3])
 
         #calculate the positions of the motor shafts. X forward, Y left, Z up.
-        self.base_motor_pos_angles = pi/180.*array([325,35,87,155,205,273])
+        self.base_motor_pos_angles = pi/180.*array([311,49,70.7,168.7,191.3,289.3])
         self.motor_X = self.baseradius*cos(self.base_motor_pos_angles)
         self.motor_Y = self.baseradius*sin(self.base_motor_pos_angles)
         self.motor_Z = zeros(6)
@@ -33,7 +33,7 @@ class MotionBase:
         self.motor_thetas = zeros(6)#array([5*pi/6,pi/6,5*pi/6,pi/6,5*pi/6,pi/6])#zeros(6)
 
         self.plotbot(0,0,0,0,0,0)
-        show()
+        #show()
 
         #call the findEnvelope() function to set all of the class-owned vars associated with the minimum and maximum movement dimensions
         print "initializing base..."
@@ -46,9 +46,9 @@ class MotionBase:
 
             Additionally, self.platform_z0 is reset to the mid height after this function is run. This function is called in __init__ so that these variables are available when the motionbase is initialized.
         """
-        numpoints = 50
+        numpoints = 300
         #probe z height at many different locations
-        z_vector = linspace(-1,1,numpoints)
+        z_vector = linspace(-.1,.1,numpoints)
         successes = zeros(len(z_vector))
         for ind in range(0,len(z_vector)):
             motor_thetas,success = self.findthetam(0,0,z_vector[ind],0,0,0,.001)
@@ -63,7 +63,7 @@ class MotionBase:
         self.zmax = valid_heights[-1]
 
         #yaw
-        yaw_vector = linspace(0,3.14,numpoints)#vector of yaw angles to test
+        yaw_vector = linspace(0,.3,numpoints)#vector of yaw angles to test
         successes = zeros(len(yaw_vector))
         for ind in range(0,len(yaw_vector)):
             motor_thetas,success = self.findthetam(0,0,0,0,0,yaw_vector[ind],.001)
@@ -74,7 +74,7 @@ class MotionBase:
         self.yawmin,self.yawmax= -valid_yaws[-1],valid_yaws[-1]
 
         #pitch
-        pitch_vector = linspace(0,3.14,numpoints)#vector of pitch angles to test
+        pitch_vector = linspace(0,.3,numpoints)#vector of pitch angles to test
         successes = zeros(len(pitch_vector))
         for ind in range(0,len(pitch_vector)):
             motor_thetas,success = self.findthetam(0,0,0,0,pitch_vector[ind],0,.001)
@@ -85,7 +85,7 @@ class MotionBase:
         self.pitchmin,self.pitchmax= -valid_pitchs[-1],valid_pitchs[-1]
 
         #roll
-        roll_vector = linspace(0,3.14,numpoints)#vector of roll angles to test
+        roll_vector = linspace(0,.3,numpoints)#vector of roll angles to test
         successes = zeros(len(roll_vector))
         for ind in range(0,len(roll_vector)):
             motor_thetas,success = self.findthetam(0,0,0,roll_vector[ind],0,0,.001)
@@ -250,11 +250,13 @@ class MotionBase:
         thetam = zeros(6)
         success = 1 #initialize to success
 
+        totalmin_theta = -80*pi/180
+        totalmax_theta = 80*pi/180
         for motor_ind in range(0,6):
             length_error = 1000
             iternum = 0
-            min_theta = 0
-            max_theta = pi/2
+            min_theta = totalmin_theta
+            max_theta = totalmax_theta
 
             while (abs(length_error)>tol and iternum<20) :
                 
@@ -271,10 +273,10 @@ class MotionBase:
                 if abs(length_error)>tol:
                     thetam[motor_ind]=min_theta+(max_theta-min_theta)/2
 
-                if max_theta<=0:
-                    max_theta=0
-                if min_theta>=pi/2:
-                    max_theta = pi/2
+                if max_theta<=totalmin_theta:
+                    max_theta=totalmin_theta
+                if min_theta>=totalmax_theta:
+                    max_theta = totalmax_theta
 
             #if iternum is greater than 19, then we have failed. we need to set success to 0.
             if iternum>=19:
@@ -286,10 +288,11 @@ class MotionBase:
 if __name__=='__main__':
 
     #z0,baseradius,platformradius,motorarm,conrod
-    base = MotionBase(24*.0254,25*.0254,16*.0254,6.25*.0254,24*.0254)
-        
+    base = MotionBase(16*.0254,25*.0254,16*.0254,6.25*.0254,23*.0254)
+    #print (base.zmax-base.zmin)/2
+    print (str(base.rollmax) + "," + str(base.pitchmax) + "," + str(base.yawmax))
     #thetas = findthetam(0,0,0,0,0,.1,0.01)
-    makemovie = True
+    makemovie = False
 
     if makemovie==True:
                 import matplotlib
@@ -307,37 +310,64 @@ if __name__=='__main__':
     xs = base.xmax*sin(pi*t)
     ys = base.ymax*sin(pi*t)
     zs = base.zmax*(sin(pi*t))
-    with writer.saving(base.fig,'output.mp4',6*len(t)):
+    if makemovie==True:
+        with writer.saving(base.fig,'output.mp4',6*len(t)):
+            for ind in range(0,len(t)):
+                    base.plotbot(0,0,0,rolls[ind],0,0)
+                    writer.grab_frame()
+                    pause(.01)
+            for ind in range(0,len(t)):
+                    base.plotbot(0,0,0,0,pitchs[ind],0)
+                    writer.grab_frame()
+                    pause(.01)
+            for ind in range(0,len(t)):
+                    base.plotbot(0,0,0,0,0,yaws[ind])
+                    writer.grab_frame()
+                    pause(.01)
+            for ind in range(0,len(t)):
+                    base.plotbot(xs[ind],0,0,0,0,0)
+                    writer.grab_frame()
+                    pause(.01)
+            for ind in range(0,len(t)):
+                    base.plotbot(0,ys[ind],0,0,0,0)
+                    writer.grab_frame()
+                    pause(.01)
+            for ind in range(0,len(t)):
+                    base.plotbot(0,0,zs[ind],0,0,0)
+                    writer.grab_frame()
+                    pause(.01)
+    else: 
+        import matplotlib
+        ion()
+        t = linspace(0,2,100)
+        rolls = base.rollmax*sin(pi*t)
+        pitchs = base.pitchmax*sin(pi*t)
+        yaws = base.yawmax*(sin(pi*t))
+        xs = base.xmax*sin(pi*t)
+        ys = base.ymax*sin(pi*t)
+        zs = base.zmax*(sin(pi*t))
+
         for ind in range(0,len(t)):
                 base.plotbot(0,0,0,rolls[ind],0,0)
-                writer.grab_frame()
-                pause(0.0001)
-                print t[ind]
+                pause(.01)
+                print ind
         for ind in range(0,len(t)):
                 base.plotbot(0,0,0,0,pitchs[ind],0)
-                writer.grab_frame()
-                pause(0.0001)
-                print t[ind]
+                pause(.01)
+                print ind
         for ind in range(0,len(t)):
                 base.plotbot(0,0,0,0,0,yaws[ind])
-                writer.grab_frame()
-                pause(0.0001)
-                print t[ind]
+                pause(.01)
+                print ind
         for ind in range(0,len(t)):
                 base.plotbot(xs[ind],0,0,0,0,0)
-                writer.grab_frame()
-                pause(0.0001)
-                print t[ind]
+                pause(.01)
+                print ind
         for ind in range(0,len(t)):
                 base.plotbot(0,ys[ind],0,0,0,0)
-                writer.grab_frame()
-                pause(0.0001)
-                print t[ind]
+                pause(.01)
+                print ind
         for ind in range(0,len(t)):
                 base.plotbot(0,0,zs[ind],0,0,0)
-                writer.grab_frame()
-                pause(0.0001)
-                print t[ind]
-
-
-    show()
+                pause(.01)
+                print ind

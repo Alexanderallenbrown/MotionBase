@@ -214,6 +214,22 @@ void loop()
      arr[4] = pp;
      arr[5] = pa;
      
+//     //print back to the monitor
+//     Serial.print(millis());
+//     Serial.print(",");
+//     Serial.print(px);
+//     Serial.print(",");
+//     Serial.print(py);
+//     Serial.print(",");
+//     Serial.print(pz);
+//     Serial.print(",");
+//     Serial.print(pr);
+//     Serial.print(",");
+//     Serial.print(pp);
+//     Serial.print(",");
+//     Serial.print(pa);
+//     Serial.println();
+     
      //print back to the monitor
      Serial.print(millis());
      Serial.print(",");
@@ -228,7 +244,7 @@ void loop()
      Serial.print(pp);
      Serial.print(",");
      Serial.print(pa);
-     Serial.println();
+     Serial.println();     
      
      //write to the base
      //Serial.write("hello,");

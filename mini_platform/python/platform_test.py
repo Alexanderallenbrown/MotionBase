@@ -31,11 +31,11 @@ while ser.isOpen():
     #ser.write('6')
     #ser.write(bytearray(command))
     x = 0*sin(omega*timenow)
-    y = 0#2*sin(omega*timenow)
-    z = 0#1.5*sin(omega*timenow)
-    r = 0*(sin(omega*timenow))
+    y = 0*sin(omega*timenow)
+    z = 0*sin(omega*timenow)
+    r = 0#.2*(sin(omega*timenow))
     p = 0#.2*(sin(omega*timenow))
-    a = 0#.2*(sin(omega*timenow))
+    a = 0#.1*(sin(omega*timenow))
 
     command = [x,y,z,r,p,a]
     ser.write('!')

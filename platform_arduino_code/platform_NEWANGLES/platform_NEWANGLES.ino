@@ -63,7 +63,7 @@ servo_min=radians(-80),servo_max=radians(80),
 //L1-effective length of servo arm, L2 - length of base and platform connecting arm
 //z_home - height of platform above base, 0 is height of servo arms
 //servo_mult=400/(pi/4),L1 = 0.79,L2 = 4.66, z_home = 4.05;
-servo_mult=400/(pi/4),L1 = 6.25,L2 = 24.00, z_home = 20.00;
+servo_mult=400/(pi/4),L1 = 6.25,L2 = 24.00, z_home = 21.00;
 //RD distance from center of platform to attachment points (arm attachment point)
 //PD distance from center of base to center of servo rotation points (servo axis)
 //theta_p-angle between two servo axis points, theta_r - between platform attachment points
@@ -73,15 +73,15 @@ servo_mult=400/(pi/4),L1 = 6.25,L2 = 24.00, z_home = 20.00;
 //equations used for p and re will affect postion of X axis, they can be changed to achieve
 //specific X axis position
 //const float RD = 2.42,PD =2.99,theta_p = radians(37.5),
-const float RD = 16.00,PD = 27.00,theta_p = radians(37.5),
+const float RD = 16.00,PD = 25.00,theta_p = radians(37.5),
 theta_angle=(pi/3-theta_p)/2, theta_r = radians(8),
 
       p[2][6]={
           {
-            PD*cos(radians(35.0)),PD*cos(radians(87.0)),PD*cos(radians(155.0)),PD*cos(radians(255.0)),PD*cos(radians(273.0)),PD*cos(radians(325.0))
+            PD*cos(radians(49.0)),PD*cos(radians(70.7)),PD*cos(radians(168.7)),PD*cos(radians(191.3)),PD*cos(radians(289.3)),PD*cos(radians(311.0))
          },
          {
-            PD*sin(radians(35.0)),PD*sin(radians(87.0)),PD*sin(radians(155.0)),PD*sin(radians(255.0)),PD*sin(radians(273.0)),PD*sin(radians(325.0))
+            PD*sin(radians(49.0)),PD*sin(radians(70.7)),PD*sin(radians(168.7)),PD*sin(radians(191.3)),PD*sin(radians(289.3)),PD*sin(radians(311.0))
          }
       },
       re[3][6] = {
@@ -127,7 +127,7 @@ void loop()
   //looks for a newline character, and the rest of the numbers are separated by commas.
   
 //let's kill any buffered serial data
-  while(Serial.available()>256){
+  while(Serial.available()>32){
     byte junk = Serial.read();
  }
   
@@ -142,15 +142,15 @@ void loop()
       float pp = Serial.parseFloat();
       float pa = Serial.parseFloat();
       
-    
+      //If given acceleration (linear/rotational) is greater than the max value, acts at max value.
       if (abs(px)>pos_limit){
-        px = pos_limit*sgn(px)*100;
+        px = pos_limit*sgn(px);
       }
       if (abs(py)>pos_limit){
-        py = pos_limit*sgn(py)*100;
+        py = pos_limit*sgn(py);
       }
       if (abs(pz)>pos_limit){
-        pz = pos_limit*sgn(pz)*100;
+        pz = pos_limit*sgn(pz);
       }
       if (abs(pr)>ang_limit){
         pr = ang_limit*sgn(pr);
@@ -171,26 +171,43 @@ void loop()
      arr[4] = pp;
      arr[5] = pa;
      
-     //print back to the monitor
-     Serial.print(millis());
-     Serial.print(",");
-     Serial.print(px);
-     Serial.print(",");
-     Serial.print(py);
-     Serial.print(",");
-     Serial.print(pz);
-     Serial.print(",");
-     Serial.print(pr);
-     Serial.print(",");
-     Serial.print(pp);
-     Serial.print(",");
-     Serial.print(pa);
-     Serial.println();
+//     //print back to the monitor
+//     Serial.print(millis());
+//     Serial.print(",");
+//     Serial.print(px);
+//     Serial.print(",");
+//     Serial.print(py);
+//     Serial.print(",");
+//     Serial.print(pz);
+//     Serial.print(",");
+//     Serial.print(pr);
+//     Serial.print(",");
+//     Serial.print(pp);
+//     Serial.print(",");
+//     Serial.print(pa);
+//     Serial.println();
      
      //write to the base
      //Serial.write("hello,");
      Serial.flush();
      setPos(arr); 
+     
+//     Serial.print(millis());
+     Serial.print(",");
+     Serial.print(theta_a[0]);
+     Serial.print(",");
+     Serial.print(theta_a[1]);
+     Serial.print(",");
+     Serial.print(theta_a[2]);
+     Serial.print(",");
+     Serial.print(theta_a[3]);
+     Serial.print(",");
+     Serial.print(theta_a[4]);
+     Serial.print(",");
+     Serial.print(theta_a[5]);
+     Serial.println();
+     
+
   
     }
     }

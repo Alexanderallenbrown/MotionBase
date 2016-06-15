@@ -279,7 +279,7 @@ if __name__=='__main__':
     base = MotionBase(1.0,0.5,0.5,0.3,1.0)
         
     #thetas = findthetam(0,0,0,0,0,.1,0.01)
-    makemovie = True
+    makemovie = False
 
     if makemovie==True:
                 import matplotlib
@@ -297,31 +297,58 @@ if __name__=='__main__':
     xs = base.xmax*sin(pi*t)
     ys = base.ymax*sin(pi*t)
     zs = base.zmax*(sin(pi*t))
-    with writer.saving(base.fig,'output.mp4',6*len(t)):
+    if makemovie==True:
+        with writer.saving(base.fig,'output.mp4',6*len(t)):
+            for ind in range(0,len(t)):
+                    base.plotbot(0,0,0,rolls[ind],0,0)
+                    writer.grab_frame()
+                    pause(.01)
+            for ind in range(0,len(t)):
+                    base.plotbot(0,0,0,0,pitchs[ind],0)
+                    writer.grab_frame()
+                    pause(.01)
+            for ind in range(0,len(t)):
+                    base.plotbot(0,0,0,0,0,yaws[ind])
+                    writer.grab_frame()
+                    pause(.01)
+            for ind in range(0,len(t)):
+                    base.plotbot(xs[ind],0,0,0,0,0)
+                    writer.grab_frame()
+                    pause(.01)
+            for ind in range(0,len(t)):
+                    base.plotbot(0,ys[ind],0,0,0,0)
+                    writer.grab_frame()
+                    pause(.01)
+            for ind in range(0,len(t)):
+                    base.plotbot(0,0,zs[ind],0,0,0)
+                    writer.grab_frame()
+                    pause(.01)
+    else: 
+        import matplotlib
+        ion()
+        t = linspace(0,2,100)
+        rolls = base.rollmax*sin(pi*t)
+        pitchs = base.pitchmax*sin(pi*t)
+        yaws = base.yawmax*(sin(pi*t))
+        xs = base.xmax*sin(pi*t)
+        ys = base.ymax*sin(pi*t)
+        zs = base.zmax*(sin(pi*t))
+
         for ind in range(0,len(t)):
                 base.plotbot(0,0,0,rolls[ind],0,0)
-                writer.grab_frame()
                 pause(.01)
         for ind in range(0,len(t)):
                 base.plotbot(0,0,0,0,pitchs[ind],0)
-                writer.grab_frame()
                 pause(.01)
         for ind in range(0,len(t)):
                 base.plotbot(0,0,0,0,0,yaws[ind])
-                writer.grab_frame()
                 pause(.01)
         for ind in range(0,len(t)):
                 base.plotbot(xs[ind],0,0,0,0,0)
-                writer.grab_frame()
                 pause(.01)
         for ind in range(0,len(t)):
                 base.plotbot(0,ys[ind],0,0,0,0)
-                writer.grab_frame()
                 pause(.01)
         for ind in range(0,len(t)):
                 base.plotbot(0,0,zs[ind],0,0,0)
-                writer.grab_frame()
                 pause(.01)
-
-
-    show()
