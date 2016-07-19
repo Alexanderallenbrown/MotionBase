@@ -2,6 +2,9 @@
 #define CHANNEL_A_PIN 2
 #define CHANNEL_B_PIN 3
 volatile long unCountShared;
+long unCount;
+float unCount_float;
+float initfloat;
 
 //A0 reads in angle
 //0-5V = 0-pi
@@ -10,9 +13,9 @@ const int analogOutPin1=11;
 const int analogOutPin2=9;
 const int analogOutPin3=10;
 
-float k_pot = (320.0)/(PI/2);
+float k_pot = (270.0)/(PI/2);
 
-int deadBand = 50;
+float deadBand = .031;
 
 int val = 0; 
 int val2 = 0;
@@ -20,17 +23,18 @@ int mag = 0;
 
 
 //these are the zeros for each motor....
-static int globzeros[6] = {285,840,275,730,275,770};
-//static int globzeros[6] = {500,500,500,500,500,500};
+//static int globzeros[6] = {285,840,275,730,275,770};
+//static int globzeros[6] = {525,540,500,500,535,500};
+static int globzeros[6] = {525,530,500,500,535,500};
 
 
 static float motorsigns[6] = {1.0,-1.0,1.0,-1.0,1.0,-1.0};
-static int zero[6]={1475,1470,1490,1480,1460,1490}; //Zero positions of servos
+static int zero[6]={1470,1470,1470,1470,1470,1470}; //Zero positions of servos
 
 // ONLY USE ARDUINO 2:1.0.5 WITH THIS CODE DO NOT USE OLD VERSION
 
 //put the motor number for this arduino here:
-int motornum = 6;
+int motornum = 2;
 
 int glob0 = globzeros[motornum-1];
 
@@ -39,38 +43,50 @@ float servo_mult=1000.0/(PI);
 
 float ref_command_float = 0;
 int rawpos;
-float posfloat;
+float posfloat = 0;
 
 boolean jogmode=false;
 
 void setup()
 {
+  pinMode(analogOutPin2,INPUT);
+  pinMode(analogOutPin3,INPUT);
+  pinMode(analogOutPin1,INPUT);
   Serial.begin(115200);
   //attach the interrupts
-  //attachInterrupt(0, channelA,CHANGE);
-  //attachInterrupt(1, channelB,CHANGE);
-  pinMode(analogOutPin2,OUTPUT);
-  pinMode(analogOutPin3,OUTPUT);
-  //attachInterrupt(0, channelA,CHANGE);
-  //attachInterrupt(1, channelB,CHANGE);
+  attachInterrupt(0, channelA,CHANGE);
+  attachInterrupt(1, channelB,CHANGE);
 //  int tot = 0;
 //  for (int k=0; k<100; k++){
 //    tot += analogRead(1);
 //    delay(1);
 //  }
 //  int globV = tot/100;
-  int globV = analogRead(1);
-  Serial.print(globV);
-  Serial.print('\t');
-  int glob0 = 100;
-  //float k_pot = (390.0-100.0)/(PI/4);
-  float globPos = (globV - glob0)/k_pot;
-  Serial.print(globPos);
-  Serial.print('\t');
-  unCountShared = long( globPos*8000/(2*PI) );
-  Serial.print(unCountShared);
-  Serial.print('\t');
-  delay(1000);
+//  int globV = analogRead(1);
+//  Serial.print(globV);
+//  Serial.print('\t');
+//  int glob0 = 100;
+//  //float k_pot = (390.0-100.0)/(PI/4);
+//  float globPos = (globV - glob0)/k_pot;
+//  Serial.print(globPos);
+//  Serial.print('\t');
+//  //unCountShared = long( globPos*8000/(2*PI) );
+//  //Serial.print(unCountShared);
+//  Serial.print('\t');
+//  delay(1000);
+float initsum = 0;
+
+for (int i = 0; i<100; i++)
+{
+  initsum = initsum + analogRead(1);
+}
+
+rawpos = initsum/100;
+initfloat = motorsigns[motornum-1]*(rawpos - glob0)/k_pot;
+
+pinMode(analogOutPin2,OUTPUT);
+pinMode(analogOutPin3,OUTPUT);
+pinMode(analogOutPin1,OUTPUT);
 }
 
 void loop()
@@ -86,11 +102,13 @@ void loop()
   if (jogmode==false){
    // static long unCount;
         	
-   // noInterrupts(); // turn interrupts off quickly while we take local copies of the shared variables
+    noInterrupts(); // turn interrupts off quickly while we take local copies of the shared variables
 
-    //unCount = unCountShared;
+    unCount = unCountShared;
  
-    //interrupts(); 
+    interrupts(); 
+    
+    unCount_float = motorsigns[motornum-1]*unCount*2*PI/8000.0 + initfloat;
   
     //float posfloat = unCount*2*PI/(8000.0); //our encoder position in radians
     rawpos = analogRead(1);
@@ -102,27 +120,38 @@ void loop()
     val = pulseIn(PWM_SOURCE, HIGH, 20000);
   
     //float ref_command_float = val*PI/512.0;//this should be the reference position in radians.
-    ref_command_float = (val - zero[0])/servo_mult; //this should give the reference position, converted from microseconds to radians
+    if (millis()>5000)
+    {
+      ref_command_float = (val - zero[0])/servo_mult; //this should give the reference position, converted from microseconds to radians
+    }
   }
   
   else{
     //interrupts(); 
+    noInterrupts(); // turn interrupts off quickly while we take local copies of the shared variables
+
+    unCount = unCountShared;
+ 
+    interrupts(); 
+    
+    unCount_float = motorsigns[motornum-1]*unCount*2*PI/8000.0 + initfloat;
     rawpos = analogRead(1);
     posfloat = motorsigns[motornum-1]*(rawpos - glob0)/k_pot;
     val = analogRead(analogInPin); //raw reference position value.
     val=val-512; //this number should be scaled to go from -PI to PI
   
-    ref_command_float = val*PI/512.0;//this should be the reference position in radians.
+    ref_command_float = val*PI/512.0-1.4;//this should be the reference position in radians.
   }
   
-  if (ref_command_float>PI/2){
-    ref_command_float = PI/2;
+  if (ref_command_float>1.4){
+    ref_command_float = 1.4;
   }
-  if (ref_command_float<-PI/2){
-    ref_command_float = -PI/2;
+  if (ref_command_float<-1.4){
+    ref_command_float = -1.4;
   }
   
-  float float_error = ref_command_float-posfloat;//this is our current error value!!
+  float float_error = ref_command_float-unCount_float;//this is our current error value!!
+  float encoder_error = ref_command_float-unCount_float;
   
   float kp = 255.0/(PI/6.0);//some guess for KP.........
   
@@ -139,13 +168,13 @@ void loop()
   val2 = int(float_U);
   mag = abs(val2);
 
-  if(val2>deadBand){
+  if(float_error>deadBand){
     //Serial.print("!!!!!!!!!!!!");
    digitalWrite(analogOutPin3,HIGH);
    analogWrite(analogOutPin1,mag);
    digitalWrite(analogOutPin2,LOW);
  }
- else if(val2<-deadBand){
+ else if(float_error<-deadBand){
    digitalWrite(analogOutPin2,HIGH);
    analogWrite(analogOutPin1,mag);
    digitalWrite(analogOutPin3,LOW);
@@ -159,11 +188,15 @@ void loop()
  
   Serial.print(posfloat);
   Serial.print("\t");
+  Serial.print(unCount_float);
+  Serial.print("\t");
+  Serial.print(float_error);
+  Serial.print("\t"); 
+  Serial.print(unCount);
+  Serial.print("\t");
   Serial.print(ref_command_float);
   Serial.print("\t");
   Serial.print(rawpos);
-  Serial.print("\t");
-  Serial.print(float_error);
   Serial.print("\t");
   Serial.print(float_U);
   Serial.print("\t");

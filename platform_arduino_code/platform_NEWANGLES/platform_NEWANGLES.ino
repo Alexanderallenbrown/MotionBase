@@ -63,7 +63,7 @@ servo_min=radians(-80),servo_max=radians(80),
 //L1-effective length of servo arm, L2 - length of base and platform connecting arm
 //z_home - height of platform above base, 0 is height of servo arms
 //servo_mult=400/(pi/4),L1 = 0.79,L2 = 4.66, z_home = 4.05;
-servo_mult=400/(pi/4),L1 = 6.25,L2 = 24.00, z_home = 21.00;
+servo_mult=400/(pi/4),L1 = 6.25,L2 = 24.00, z_home = 15.00;
 //RD distance from center of platform to attachment points (arm attachment point)
 //PD distance from center of base to center of servo rotation points (servo axis)
 //theta_p-angle between two servo axis points, theta_r - between platform attachment points

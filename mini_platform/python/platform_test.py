@@ -2,9 +2,9 @@ import serial
 from numpy import *
 import time
 from matplotlib.pyplot import *
-
+print "1"
 ser = serial.Serial(
-    port='/dev/ttyUSB0',
+    port='/dev/ttyUSB100',
     baudrate=115200)
     # parity=serial.PARITY_NONE,
     # stopbits=serial.STOPBITS_ONE,
@@ -13,17 +13,19 @@ ser = serial.Serial(
     # rtscts=False,
     # dsrdtr=False
 #)
-
+print "2"
 omega = (2*3.14)/2.0
-
+print "3"
 starttime = time.time()
 
 
 print "initializing"
-ser.close()
-time.sleep(2.0)
-ser.open()
-time.sleep(6.0)
+#ser.close()
+print "4"
+#time.sleep(2.0)
+#ser.open()
+print "5"
+#time.sleep(2.0)
 print "done"
 while ser.isOpen():
     timenow = time.time()-starttime
@@ -31,9 +33,9 @@ while ser.isOpen():
     #ser.write('6')
     #ser.write(bytearray(command))
     x = 0*sin(omega*timenow)
-    y = 0*sin(omega*timenow)
-    z = 0*sin(omega*timenow)
-    r = 0#.2*(sin(omega*timenow))
+    y = 0*sin(.5*omega*timenow)
+    z = 0#3*sin(omega*timenow)
+    r = 0#.1*(sin(omega*timenow))
     p = 0#.2*(sin(omega*timenow))
     a = 0#.1*(sin(omega*timenow))
 
