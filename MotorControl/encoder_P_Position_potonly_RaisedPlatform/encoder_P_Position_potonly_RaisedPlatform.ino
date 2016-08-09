@@ -34,7 +34,7 @@ static int zero[6]={1470,1470,1470,1470,1470,1470}; //Zero positions of servos
 // ONLY USE ARDUINO 2:1.0.5 WITH THIS CODE DO NOT USE OLD VERSION
 
 //put the motor number for this arduino here:
-int motornum = 2;
+int motornum = 1;
 
 int glob0 = globzeros[motornum-1];
 
@@ -151,7 +151,7 @@ void loop()
   }
   
   float float_error = ref_command_float-unCount_float;//this is our current error value!!
-  float encoder_error = ref_command_float-unCount_float;
+  //float encoder_error = ref_command_float-unCount_float;
   
   float kp = 255.0/(PI/6.0);//some guess for KP.........
   

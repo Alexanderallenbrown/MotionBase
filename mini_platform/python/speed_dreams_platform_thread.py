@@ -51,7 +51,7 @@ def filt():
 
   # Set up socket to send data
   ser = serial.Serial(
-      port='/dev/ttyUSB0', #ACM100',   #USB0', 
+      port='/dev/ttyUSB100', #ACM100',   #USB0', 
       baudrate=115200) 
   print "initializing"
   ser.close()
@@ -156,15 +156,36 @@ def filt():
         #command = [x_desired[-1],y_desired[-1],z_desired[-1],ax_tiltLP,ay_tiltLP,anglez_filtered[-1]]
 
         ##attempt
-        command = [x_desired[-1]/100.0,y_desired[-1]/100.0,(z_desired[-1]/100.0)+.5,ax_tiltLP,ay_tiltLP,anglez_filtered[-1]]
+        
+        #set a soft limit for the angle commands...
+        angle_softlim = 0.1
+
+        xdes_final = 0#x_desired[-1]/100.0
+        ydes_final = 0#y_desired[-1]/100.0
+        zdes_final = 0#z_desired[-1]/100.0
+        rdes_final = ax_tiltLP
+        if abs(rdes_final)>angle_softlim:
+          rdes_final = sign(rdes_final)*angle_softlim
+        pdes_final = ay_tiltLP
+        if abs(pdes_final)>angle_softlim:
+          pdes_final = sign(pdes_final)*angle_softlim
+        ades_final = anglez_filtered[-1]
+        if abs(ades_final)>angle_softlim:
+          ades_final = sign(ades_final)*angle_softlim
+        #rdes_final = 0
+        ades_final = 0 #TODO RELEASE THIS CONSTRAINT WHEN COMFORTABLE.
+        command = [xdes_final,ydes_final,zdes_final,rdes_final,pdes_final,ades_final]
+
+        #this worked before, but we just did some stuff above.
+        #command = [x_desired[-1]/100.0,y_desired[-1]/100.0,(z_desired[-1]/100.0)+.5,ax_tiltLP,ay_tiltLP,anglez_filtered[-1]]
 
         # commandtime = time.time()
         # tcomm = commandtime - timetime
         # print tcomm
       #print "not frozen"
       if tnow-lastsendtime>arduino_delay:     ### also happens super fast
-        print 'sent'
-        #print "sent: "+format(command[0],'0.2f')+","+format(command[1],'0.2f')+","+format(command[2],'0.2f')+","+format(command[3],'0.4f')+","+format(command[4],'0.4f')+","+format(command[5],'0.4f')
+        #print 'sent'
+        print "sent: "+format(command[0],'0.2f')+","+format(command[1],'0.2f')+","+format(command[2],'0.2f')+","+format(command[3],'0.4f')+","+format(command[4],'0.4f')+","+format(command[5],'0.4f')
         lastsendtime = tnow
         ser.write('!')
         for ind in range(0,len(command)-1):
@@ -226,11 +247,14 @@ def getdata():    ### 1000 Hz (not including plot time)
 
   # create a figure for us to see our data on
   ion()
-  fig,ax = subplots(1,1)
-  ax.hold(True)
+  fig,ax = subplots(3,1)
+  ax[0].hold(True)
+  ax[1].hold(True)
+  ax[2].hold(True)
   fig.canvas.draw()
-  plt1 = ax.plot(0,0,'r')[0]
-  plt2 = ax.plot(0,0,'k')[0]
+  plt1 = ax[0].plot(0,0,'r')[0]
+  plt2 = ax[1].plot(0,0,'k')[0]
+  plt3 = ax[2].plot(0,0,'b')[0]
   buffsize = 500  #might want to change this
   t = []
   plotXvals = []
@@ -270,7 +294,7 @@ def getdata():    ### 1000 Hz (not including plot time)
       anglezraw = float(message_split[5])
       ax_raw=append(ax_raw,axraw) 
       ay_raw=append(ay_raw,ayraw) 
-      az_raw=append(ax_raw,azraw) 
+      az_raw=append(az_raw,azraw) 
       anglex_raw=append(anglex_raw,anglexraw)  
       angley_raw=append(angley_raw,angleyraw)  
       anglez_raw=append(anglez_raw,anglezraw) 
@@ -296,7 +320,7 @@ def getdata():    ### 1000 Hz (not including plot time)
         t.append(time.time()-starttime)
         plotXvals.append(axraw)
         plotYvals.append(ayraw)
-        # plotZvals.append(azraw)
+        plotZvals.append(azraw)
       else: 
         t = t[1:]
         t.append(time.time())
@@ -304,19 +328,23 @@ def getdata():    ### 1000 Hz (not including plot time)
         plotXvals.append(axraw)
         plotYvals = plotYvals[1:]
         plotYvals.append(ayraw)
-        # plotZvals = plotZvals[1:]
-        # plotZvals.append(azraw)
+        plotZvals = plotZvals[1:]
+        plotZvals.append(azraw)
 
       if (time.time()-plotoldtime>plot_delay and len(t)>=buffsize):#if enough time has passed
         #set the old time
         plotoldtime = time.time()
         #set our X limits of the plot to only look at the last 5 seconds of data
-        ax.set_xlim(t[-1]-5,t[-1])
-        ax.set_ylim(-1.3,1.3)
+        ax[0].set_xlim(t[-1]-5,t[-1])
+        ax[0].set_ylim(-1.3,1.3)
+        ax[1].set_xlim(t[-1]-5,t[-1])
+        ax[1].set_ylim(-1.3,1.3)
+        ax[2].set_xlim(t[-1]-5,t[-1])
+        ax[2].set_ylim(-1.3,1.3)
         #this sets the line plt1 data to be our updated t and r vectors.
         plt1.set_data(t,plotXvals)
         plt2.set_data(t,plotYvals)
-        # plt3.set_data(t,plotZvals)
+        plt3.set_data(t,plotZvals)
         #the draw command is last, and tells matplotlib to update the figure!!
         fig.canvas.draw()
         pause(.0001)#must have a small pause here or nothing will work. Pause is a matplotlib.pyplot function.
