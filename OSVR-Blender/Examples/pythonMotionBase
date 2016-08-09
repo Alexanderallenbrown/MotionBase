@@ -1,0 +1,48 @@
+import bge
+import osvr.ClientKit
+import socket
+import sys, select
+import time
+from math import *
+from numpy import *
+
+cont = bge.logic.getCurrentController()
+own = cont.owner
+print("print")
+running = True
+velx=0
+velxOld=0
+vely=0
+velyOld=0
+velz=0
+velzOld=0
+
+host = 'localhost'
+port = 8000#some value
+ 
+send_address = (host, port) # Set the address to send to
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)    # Create Datagram Socket (UDP)
+s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # Make Socket Reusable
+s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1) # Allow incoming broadcasts
+s.setblocking(False) # Set socket to non-blocking mode
+#s.bind(('', port)) #Accept Connections on port
+
+starttime = time.time()#in seconds... big number
+
+def motion_base():
+    from bge import logic
+    global velx, velxOld, vely, velyOld, velz, velzOld
+    velocity = own.getLinearVelocity(1)
+    velx = velocity[0]
+    accelx = velx-velxOld * logic.getAverageFrameRate()
+    vely = velocity[1]
+    accely = vely-velyOld * logic.getAverageFrameRate()
+    velz = velocity[2]
+    accelz = velz-velzOld * logic.getAverageFrameRate()
+    #send accelx
+    velxOld = velx
+    velyOld = vely
+    velzOld = velz
+    print ("sending: "+str(accelx)+","+str(accely)+","+str(accelz))
+    #s.sendto(str(off)+","+str(on)+","+str(off)+","+str(off)+","+str(off)+","+str(off), send_address)#send the data
+    #time.sleep(0.001)#wait for .1 seconds
