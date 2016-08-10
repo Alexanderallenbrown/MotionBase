@@ -58,7 +58,7 @@ def motion_base():
     velyOld = vely
     velzOld = velz
 
-    print ("Acceleration: "+str(format(accelx,'0.4f'))+","+str(format(accely,'0.4f'))+","+str(format(accelz,'0.4f'))+ "\t" + "Angular Velocity: "+str(format(rotVelx,'0.4f'))+","+str(format(rotVely,'0.4f'))+","+str(format(rotVelz,'0.4f')))
+    #print ("Acceleration: "+str(format(accelx,'0.4f'))+","+str(format(accely,'0.4f'))+","+str(format(accelz,'0.4f'))+ "\t" + "Angular Velocity: "+str(format(rotVelx,'0.4f'))+","+str(format(rotVely,'0.4f'))+","+str(format(rotVelz,'0.4f')))
 
     sendString = (str(format(accelx,'0.4f'))+","+str(format(accely,'0.4f'))+","+str(format(accelz,'0.4f'))+","+str(format(rotVelx,'0.4f'))+","+str(format(rotVely,'0.4f'))+","+str(format(rotVelz,'0.4f')))
     sentBytes = bytearray(sendString,'utf-8')

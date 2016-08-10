@@ -1,13 +1,15 @@
 import sys
 sys.path.append("/usr/local/lib/python3.4/dist-packages/")
+sys.path.append("/usr/lib/python3/dist-packages/")
 #sys.path.append("/usr/local/lib/python3.4/dist-packages/numpy-1.12.0.dev0+4c415d2-py3.4-linux-x86_64.egg/")
 #import numpy
-from numpy import array,dot 
-from matplotlib.pyplot import *
+from numpy import *#array,dot,cos,sin,sqrt,tan
+
+#from matplotlib.pyplot import *
 
 class DugoffBicycleModel:
 
-    def __init__(self,a = 0.8,b = 1.0,m = 1000.0,I=4000.0,U=20.0,Cf=100000.0,Cr=100000.0,mu=1.0,dT=0.01,tiretype='dugoff',drive='rear',bias=0.5,autopilot_gain = 1):
+    def __init__(self,a = 0.8,b = 1.0,m = 1000.0,I=4000.0,U=20.0,Cf=100000.0,Cr=100000.0,mu=1.0,dT=0.01,tiretype='dugoff',drive='rear',bias=0.2,autopilot_gain = 1):
         """ 
         DugoffBicycleModel(a = 1.2,b = 1.0,m = 1000.0,I=2000.0,U=20.0,Cf=-100000.0,Cr=-100000.0,mu=1.0,dT=0.01,tiretype='dugoff',coords='local'))
         This is a bicycle model. It can use a dugoff tire model or a linear tire model.
@@ -39,10 +41,13 @@ class DugoffBicycleModel:
         self.autopilot_gain=autopilot_gain
         self.steer_limit = 0.25 #radioans
         self.cruise_gain = 5
+        #calculate vertical tire forces TODO roll model? Longitudinal Weight Transfer?
+        self.Fzf = self.m*self.b/(self.a+self.b)*9.81
+        self.Fzr = self.m*self.a/(self.a+self.b)*9.81
 
 
         #engine stuff TODO:
-        self.power  = 100000 #~100 HP  (100 KW) engine, constant power all the time. For now.
+        self.power  = 20000 #~100 HP  (100 KW) engine, constant power all the time. For now.
 
         #aero stuff: taken from a Nissan Leaf drag area 7.8 ft^2 0.725 m^2, Cd 0.32
         self.CdA = .32
@@ -67,37 +72,43 @@ class DugoffBicycleModel:
     def state_eq(self,x,t,Fxf,Fxr,delta):
         """ state_eq(self,x,t,Fx,delta):
             returns state derivatives for odeint"""
-        #calculate vertical tire forces TODO roll model? Longitudinal Weight Transfer?
-        Fzf = self.m*self.b/(self.a+self.b)*9.81
-        Fzr = self.m*self.a/(self.a+self.b)*9.81
 
-        if abs(Fxf/Fzf)>self.mu: #make sure we can't apply any more brakes than makes sense.
-            Fxf = Fzf*self.mu
-        if abs(Fxr/Fzr)>self.mu: #make sure we can't apply any more brakes than makes sense.
-            Fxr = Fzr*self.mu
+        if abs(Fxf/self.Fzf)>self.mu: #make sure we can't apply any more brakes than makes sense.
+            Fxf = self.Fzf*self.mu*sign(Fxf)
+        if abs(Fxr/self.Fzr)>self.mu: #make sure we can't apply any more brakes than makes sense.
+            Fxr = self.Fzr*self.mu*sign(Fxr)
         #calculate slip angles
-        if x[3]>0:
+        if abs(x[3])>0:
             self.alpha_f = 1/x[3]*(x[1]+self.a*x[5])-delta
             self.alpha_r = 1/x[3]*(x[1]-self.b*x[5]) 
             #print self.alpha_f,self.alpha_r
-        else:
-            self.alpha_f=0
-            self.alpha_r=0
+        else:#if the car is only spinning, but not driving forward, then alpha is nonsense
+            self.alpha_f = 0
+            self.alpha_r = 0
+
         #calculate tire forces
         if self.tiretype=='dugoff':
-            self.Fyf = self.dugoffFy(self.alpha_f,Fzf,self.mu,Fxf,self.Caf)
-            self.Fyr = self.dugoffFy(self.alpha_r,Fzr,self.mu,Fxr,self.Car)
+            #if the car is moving, use a real tire model
+            if self.x[3]>0:
+                self.Fyf = self.dugoffFy(self.alpha_f,self.Fzf,self.mu,Fxf,self.Caf)
+                self.Fyr = self.dugoffFy(self.alpha_r,self.Fzr,self.mu,Fxr,self.Car)
+            else:
+                #the car isn't really moving, so use static friction
+                self.Fyf = -self.Fzf*self.mu*sign(self.x[1]+self.a*self.x[5])
+                self.Fyr = -self.Fzr*self.mu*sign(self.x[1]-self.b*self.x[5])
         else:
             if self.x[3]>0:
                 self.Fyf = -self.alpha_f*self.Caf
                 self.Fyr = -self.alpha_r*self.Car
             else:
-                self.Fyf = 0
-                self.Fyr =0
+                #the car isn't really moving, so use static friction
+                self.Fyf = -self.Fzf*self.mu*sign(self.x[1]+self.a*self.x[5])
+                self.Fyr = -self.Fzr*self.mu*sign(self.x[1]-self.b*self.x[5])
+
         Ydot = x[1]*cos(x[4])+x[3]*sin(x[4]) #north velocity NOT local!
         vdot = -x[3]*x[5] + 1/self.m*(self.Fyf+self.Fyr) #derivative of local lateral velocity
         Xdot = x[3]*cos(x[4])-x[1]*sin(x[4]) #East velocity NOT local!
-        Udot = x[5]*x[1]+(Fxf+Fxr)/self.m# -self.CdA*x[3]**2 #this is the derivative of local forward speed
+        Udot = x[5]*x[1]+(Fxf+Fxr)/self.m #-self.CdA*x[3]**2 #this is the derivative of local forward speed
         Psidot = x[5]
         rdot = (self.a*self.Fyf-self.b*self.Fyr)/self.I #cosines in there? Small angle? Sounds/Looks OK...
         #print array([[Ydot],[vdot],[Xdot],[Udot],[Psidot],[rdot]])
@@ -105,13 +116,15 @@ class DugoffBicycleModel:
 
     def calc_inputs(self,brake,gas,steer):
         #first calculate engine power accepting an input from 0 to 1
-        #print gas
+        print (gas)
+        gas = -gas
         if gas<0:
             gas = 0
+        print (gas)
         if abs(gas)>1:
             gas = 1
 
-        if self.x[3]>0:
+        if self.U>0:
             Engine_Force = gas * self.power/self.x[3]
             if Engine_Force>self.mu*self.m*9.81:
                 Engine_Force = self.mu*self.m*9.81
@@ -123,22 +136,34 @@ class DugoffBicycleModel:
 
 
         #now calculate the brake forces accepting an input from 0 to 1
-        total_brake_force = -brake * self.mu*(self.m*9.81) #max brakes out. TODO model brake fade and speed dependence
+        total_brake_force = brake * self.mu*(self.m*9.81) #max brakes out. TODO model brake fade and speed dependence
         front_brake_force = total_brake_force*(1-self.bias)#so the brake bias of 1 means all rear brakes
         rear_brake_force = total_brake_force*self.bias
-        if self.drive=='rear':
-            Fxf = front_brake_force
-            Fxr = rear_brake_force +Engine_Force
-        elif self.drive=='all':
-            Fxf = front_brake_force+Engine_Force/2
-            Fxr = rear_brake_force+Engine_Force/2
+        if self.U>0:
+            if self.drive=='rear':
+                Fxf = -front_brake_force
+                Fxr = -rear_brake_force +Engine_Force
+            elif self.drive=='all':
+                Fxf = -front_brake_force+Engine_Force/2
+                Fxr = -rear_brake_force+Engine_Force/2
+            else:
+                Fxf = -front_brake_force+Engine_Force
+                Fxr = -rear_brake_force
         else:
-            Fxf = front_brake_force+Engine_Force
-            Fxr = rear_brake_force
+            if self.drive=='rear':
+                Fxf = -front_brake_force*sign(self.x[3])
+                Fxr = -rear_brake_force*sign(self.x[3]) +Engine_Force
+            elif self.drive=='all':
+                Fxf = -front_brake_force*sign(self.x[3])+Engine_Force/2
+                Fxr = -rear_brake_force*sign(self.x[3])+Engine_Force/2
+            else:
+                Fxf = -front_brake_force*sign(self.x[3])+Engine_Force
+                Fxr = -rear_brake_force*sign(self.x[3])
+        
         return Fxf,Fxr,steer
 
     def cruise(self,setspeed):
-        gas = self.cruise_gain*(setspeed-self.x[3])#Just p-control for the moment TODO
+        gas = self.cruise_gain*(setspeed-self.U)#Just p-control for the moment TODO
         
         if gas<0:
             gas = 0
@@ -170,7 +195,9 @@ class DugoffBicycleModel:
         #this should have taken casre of all contingencies and got us the correct inputs for the car.
         xdot = self.state_eq(self.x,0,Fxf,Fxr,steer)
         self.x = self.x+self.dT*xdot #this should update the states
-        
+        self.U = self.x[3]
+        print("actual inputs passed:     "+str(Fxf)+","+str(Fxr)+","+str(steer))
+        print("car thinks forward speed is: "+str(self.U))
         return self.x,xdot
 
 

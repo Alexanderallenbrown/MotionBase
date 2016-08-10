@@ -1,5 +1,5 @@
 from numpy import *
-from matplotlib.pyplot import *
+#from matplotlib.pyplot import *
 
 # A Dugoff Tire model implementation in python/numpy
 #Alexander Brown, Ph.D.

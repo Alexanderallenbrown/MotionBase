@@ -1,16 +1,22 @@
 #import time
 from DugoffBicycleModel import DugoffBicycleModel
-from bge import logic,constrains
+import bge
+#from bge import logic,constraints
+
+global gas, brake, steer, car
 
 def setup():
-    car = DugoffBicycleModel()
+    global car
+    car = DugoffBicycleModel(U=0)
+    controller = bge.logic.getCurrentController()
     cube = controller.owner
     cube.worldPosition = [car.x[2],car.x[0],0]
     cube.worldOrientation = [0,0,car.x[4]]
 
-def gas():
+def gascalc():
     reversePower = 2000.0
     gasPower = 8000.0
+    controller = bge.logic.getCurrentController()
     joy = controller.sensors["joygas"]
     val = joy.axisValues[2]
     if val<-130:
@@ -24,13 +30,14 @@ def gas():
         power2 = val2/32768.0*reversePower
     else:
         power2 = 0   
-    gas = power-power2
-    return gas                
+    gasnum = power-power2
+    return gasnum                
 
-def brake(): 
+def brakecalc(): 
     # set braking amount
-    brakeAmount = 1000.0      # front and back brakes
-    ebrakeAmount = 10000.0    # back brakes only  
+    brakeAmount = 10.0      # front and back brakes
+    ebrakeAmount = 10.0    # back brakes only
+    controller = bge.logic.getCurrentController()  
     joy = controller.sensors["joybrake"]
     val = joy.axisValues[3]
     val = -val + 32768
@@ -42,26 +49,27 @@ def brake():
         front_Brake = 0
         back_Brake = 0
         brakes = False
-    #print("brakes: " + str(front_Brake) + "," + str(back_Brake) + "," + str(brakes))
-    vehicleID.applyBraking( front_Brake, 0)
-    vehicleID.applyBraking( front_Brake, 1)
-    vehicleID.applyBraking( back_Brake, 2)
-    vehicleID.applyBraking( back_Brake, 3)
+    return front_Brake
 
-    return brakes
-
-def steer():
+def steercalc():
+    controller = bge.logic.getCurrentController()
     joy = controller.sensors["joysticksteer"]
-    turn = -joy.axisValues[0]*30.0/26000*3.14/180.0 
+    turn = -joy.axisValues[0]*10.0/26000*3.14/180.0 
     return turn
 
 def main():
-    gas = gas()
-    brake = brake()
-    steer = steer()
-    car.dt = logic.getAverageFrameRate()
-    car.dt = 1/car.dt
-    car.euler_update(brake,gas,steer,'off',0,'off','off',0)
+    global gas, brake, steer, car
+
+    gas = gascalc()
+    brake = brakecalc()
+    steer = steercalc()
+    print("Gas,Brake,Steer: " + str(gas) + "," + str(brake) + "," + str(steer))
+    frmrt = bge.logic.getAverageFrameRate()
+    car.dT = 1/frmrt
+    #print(car.dT)
+    car.x, xdot = car.euler_update(brake,gas,steer,'off',0,'off','off',0)
+    print(car.x)
+    controller = bge.logic.getCurrentController()
     cube = controller.owner
     cube.worldPosition = [car.x[2],car.x[0],0]
     cube.worldOrientation = [0,0,car.x[4]]
